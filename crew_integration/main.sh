@@ -81,6 +81,9 @@ case ${1} in
   -t)  
        exec ruby ${SENDER} 'terminal'
        ;;
+  -i)
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/installer.html"
+       ;;
   *)
        echo -e "${BLUE}${help}${RESET}"
        ;;
