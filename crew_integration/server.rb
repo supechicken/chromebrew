@@ -16,6 +16,5 @@ EM.run {
                  system ARGV[0].dup
              end
          }
-         ws.onclose { puts "close?" }    
 end
          }
