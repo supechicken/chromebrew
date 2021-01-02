@@ -1,6 +1,6 @@
 require 'em-websocket'
 require 'fileutils'
-PWA_PREFIX = '/usr/local/lib'
+PWA_PREFIX = '/usr/local/lib/pwa'
 CROSH_PREFIX = '/usr/share/crosh'
 
 EM.run {
