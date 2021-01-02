@@ -29,13 +29,9 @@ case ${1} in
   -n)
        mkdir -p ${app_path}
        cp ${PWA_PREFIX}/tools/* ${app_path}
-       manifest=${app_path}/manifest.json
        installer=${app_path}/installer.html
        starter=${app_path}/starter.html
        js=${app_path}/starter.js
-       
-       sed -i "s/linuxapp/${2^}/g" ${manifest}
-       sed -i "s/unixapp/${2}/g" ${manifest} 
        
        sed -i "s/app/${2^}/g" ${installer}
        
