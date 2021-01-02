@@ -12,7 +12,7 @@ EM.run {
              case message
              when 'terminal'
                  FileUtils.mkdir_p PWA_PREFIX
-                 system "sudo mount -io bind #{PWA_PREFIX}/tools/50-crosh.sh #{CROSH_PREFIX}/dev.d/50-crosh.sh"
+                 system "sudo mount -io bind #{PWA_PREFIX}/50-crosh.sh #{CROSH_PREFIX}/dev.d/50-crosh.sh"
                  ws.send 'Ready'
              else
                  system ARGV[0].dup
