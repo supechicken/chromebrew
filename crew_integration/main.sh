@@ -24,9 +24,11 @@ help='
 if [[ $extension_id = '' ]]; then echo -e "${BLUE}$(crew postinstall crew_integration)${RESET}" && exit 1; fi
 case ${1} in
   -s)
+       pkill ruby
        ruby ${SERVER}
        ;;
   -n)
+       pkill ruby
        mkdir -p ${app_path}
        cp ${PWA_PREFIX}/tools/* ${app_path}
        installer=${app_path}/installer.html
@@ -72,12 +74,15 @@ case ${1} in
        echo -e "${BLUE}${help}${RESET}"
        ;;
   -u)  
+       pkill ruby
        exec ruby ${SENDER} "$2"
        ;;
   -t)  
+       pkill ruby
        exec ruby ${SENDER} 'terminal'
        ;;
   -i)
+       pkill ruby
        exec ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/installer.html"
        ;;
   *)
