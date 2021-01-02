@@ -68,7 +68,7 @@ case ${1} in
        echo -e "${GREEN}Shortcut for ${2^} deployed!${RESET}"
        pkill ruby
        ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/${2}/installer.html"
-       exec ruby ${SERVER} 2> /dev/null &
+       exec ruby ${SERVER} &
        ;;
   -h)
        echo -e "${BLUE}${help}${RESET}"
