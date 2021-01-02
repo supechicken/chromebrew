@@ -5,9 +5,7 @@ CROSH_PREFIX = '/usr/share/crosh'
 
 EM.run {
      EM::WebSocket.run(:host => "0.0.0.0", :port => 25500) do |ws|
-         ws.onopen { |handshake|
-             system ''
-         }
+         ws.onopen { |handshake| }
          ws.onmessage { |message|
              case message
              when 'terminal'
