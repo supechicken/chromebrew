@@ -1,0 +1,16 @@
+{
+  "name": "Terminal",
+  "short_name": "Terminal",
+  "start_url": "/apps/hterm/starter.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "description": "Terminal for Chrome OS.",
+  "icons": [
+    {
+    "src": "terminal.png",
+    "sizes": "1024x1024",
+    "type": "image/png"
+    }
+  ]
+}
