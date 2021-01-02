@@ -1,3 +1,10 @@
+var ws = new WebSocket("ws://localhost:25500","protocol");
+chrome.runtime.onInstalled.addListener(function(i){
+  ws.onopen = function(e) { 
+    console.log("Connected!");
+    ws.send(chrome.runtime.id);
+  };
+});
 setInterval(function main() {
 var TERM = "chrome-untrusted://crosh";
 var ws = new WebSocket("ws://localhost:25500","protocol");
