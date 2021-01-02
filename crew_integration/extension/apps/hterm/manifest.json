@@ -9,7 +9,7 @@
   "icons": [
     {
     "src": "terminal.png",
-    "sizes": "256x256",
+    "sizes": "1024x1024",
     "type": "image/png"
     }
   ]
