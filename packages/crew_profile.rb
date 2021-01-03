@@ -3,10 +3,10 @@ require 'package'
 class Crew_profile < Package
   description 'A profile for Chromebrew, to be used instead of ~/.*rc'
   homepage 'https://github.com/skycocker/chromebrew'
-  version "1"
+  version "2"
   compatibility 'all'
   source_url 'file:///dev/null'
-  source_sha256 '27b201cec82d903a1856972e6d7ff1ac58a67c761d729ecd7fd14f24fa9d9901'
+  source_sha256 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
   depends_on "xdg_base"
 
