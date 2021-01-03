@@ -80,7 +80,7 @@ case ${1} in
        ;;
   -i)
        pkill ruby
-       exec ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/installer.html"
+       exec ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/main.html"
        ;;
   *)
        echo -e "${BLUE}${help}${RESET}"
