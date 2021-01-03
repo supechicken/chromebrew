@@ -25,7 +25,7 @@ if [[ $extension_id = '' ]]; then echo -e "${BLUE}$(crew postinstall crew_integr
 case ${1} in
   -s)
        pkill ruby
-       ruby ${SERVER}
+       exec ruby ${SERVER} &
        ;;
   -n)
        pkill ruby
@@ -72,15 +72,18 @@ case ${1} in
        ;;
   -u)  
        pkill ruby
-       exec ruby ${SENDER} "$2"
+       ruby ${SENDER} "$2"
+       exec ruby ${SERVER} &
        ;;
   -t)  
        pkill ruby
-       exec ruby ${SENDER} 'terminal'
+       ruby ${SENDER} 'terminal'
+       exec ruby ${SERVER} &
        ;;
   -i)
        pkill ruby
-       exec ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/main.html"
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/main.html"
+       exec ruby ${SERVER} &
        ;;
   *)
        echo -e "${BLUE}${help}${RESET}"
