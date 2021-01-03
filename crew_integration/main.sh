@@ -31,13 +31,10 @@ case ${1} in
        pkill ruby
        mkdir -p ${app_path}
        cp ${PWA_PREFIX}/tools/* ${app_path}
-       installer=${app_path}/installer.html
-       starter=${app_path}/starter.html
+       html=${app_path}/main.html
        js=${app_path}/starter.js
        
-       sed -i "s/app/${2^}/g" ${installer}
-       
-       sed -i "s/app/${2}/g" ${starter}
+       sed -i "s/app/${2^}/g" ${html}
        
        sed -i "s/app/${2}/g" ${js}
        #######################################
@@ -67,7 +64,7 @@ case ${1} in
        convert ${app_path}/icon.png -resize 1024x1024 ${app_path}/icon.png
        echo -e "${GREEN}Shortcut for ${2^} deployed!${RESET}"
        pkill ruby
-       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/${2}/installer.html"
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/${2}/main.html"
        exec ruby ${SERVER} &
        ;;
   -h)
