@@ -12,7 +12,7 @@ class Crew_integration < Package
   case ARGV[0]
   when 'reinstall', 'install'
      FileUtils.rm_rf "#{CREW_PREFIX}/lib/pwa/"
-     FileUtils.rm_rf "#{Dir.home}/MyFiles/.extension"
+     FileUtils.rm_rf "#{HOME}/MyFiles/.extension"
   end
     
   case ARGV[0]
@@ -34,8 +34,8 @@ class Crew_integration < Package
       system "install -Dm755 x-www-browser.sh #{CREW_DEST_PREFIX}/bin/x-www-browser"
       FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/lib/pwa/"
       FileUtils.ln_s "#{CREW_PREFIX}/bin/crew_integration", "#{CREW_DEST_PREFIX}/bin/pwashortcut"
-      FileUtils.mkdir_p "#{Dir.home}/MyFiles/.extension/"
-      FileUtils.mv Dir.glob('extension/*'), "#{Dir.home}/MyFiles/.extension/"
+      FileUtils.mkdir_p "#{CREW_DEST_HOME}/MyFiles/.extension/"
+      FileUtils.mv Dir.glob('extension/*'), "#{CREW_DEST_HOME}/MyFiles/.extension/"
       FileUtils.mv Dir.glob('*'), "#{CREW_DEST_PREFIX}/lib/pwa/"
       FileUtils.ln_s "#{CREW_PREFIX}/lib/pwa/send.rb", "#{CREW_DEST_PREFIX}/lib/pwa/sender.rb"
     end 
@@ -72,6 +72,6 @@ class Crew_integration < Package
   end
   def self.remove
       FileUtils.rm_rf "#{CREW_LIB_PREFIX}/pwa/"
-      FileUtils.rm_rf "#{Dir.home}/.extension/"
+      FileUtils.rm_rf "#{HOME}/.extension/"
   end
 end
