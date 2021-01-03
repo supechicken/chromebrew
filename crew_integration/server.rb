@@ -13,7 +13,7 @@ EM.run {
                  system "sudo mount -io bind #{PWA_PREFIX}/50-crosh.sh #{CROSH_PREFIX}/dev.d/50-crosh.sh"
                  ws.send 'Ready'
              else
-                 system ARGV[0].dup
+                 system message
              end
          }
 end
