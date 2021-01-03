@@ -25,7 +25,7 @@ if [[ $extension_id = '' ]]; then echo -e "${BLUE}$(crew postinstall crew_integr
 case ${1} in
   -s)
        pkill ruby
-       exec ruby ${SERVER} &
+       exec ruby ${SERVER}
        ;;
   -n)
        pkill ruby
