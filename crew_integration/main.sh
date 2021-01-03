@@ -25,7 +25,7 @@ if [[ $extension_id = '' ]]; then echo -e "${BLUE}$(crew postinstall crew_integr
 case ${1} in
   -s)
        pkill ruby
-       screen -d -m ruby ${SERVER}
+       exec ruby ${SERVER}
        ;;
   -n)
        pkill ruby
@@ -65,7 +65,7 @@ case ${1} in
        echo -e "${GREEN}Shortcut for ${2^} deployed!${RESET}"
        pkill ruby
        ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/${2}/main.html"
-       screen -d -m ruby ${SERVER}
+       exec ruby ${SERVER} &
        ;;
   -h)
        echo -e "${BLUE}${help}${RESET}"
@@ -73,17 +73,17 @@ case ${1} in
   -u)  
        pkill ruby
        ruby ${SENDER} "$2"
-       screen -d -m ruby ${SERVER}
+       exec ruby ${SERVER} &
        ;;
   -t)  
        pkill ruby
        ruby ${SENDER} 'terminal'
-       screen -d -m ruby ${SERVER}
+       exec ruby ${SERVER} &
        ;;
   -i)
        pkill ruby
        ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/main.html"
-       screen -d -m ruby ${SERVER}
+       exec ruby ${SERVER} &
        ;;
   *)
        echo -e "${BLUE}${help}${RESET}"
