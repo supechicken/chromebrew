@@ -10,7 +10,7 @@ EXTENSION_PREFIX=~/MyFiles/.extension
 PWA_PREFIX=${CREW_LIB_PREFIX}/pwa
 SERVER=${PWA_PREFIX}/server.rb
 SENDER=${PWA_PREFIX}/send.rb
-appicon_path=${EXTENSION_PREFIX}/icon/
+appicon_path=${EXTENSION_PREFIX}/icon
 extension_id=id_id
 help='
   -s                  Start shortcut server
@@ -31,9 +31,9 @@ case ${1} in
        #######################################
        # icon
        appname=${2}
-       if [ -f $PWA_PREFIX/icons/$appname.* ]; then
+       if [ -f $PWA_PREFIX/icon/$appname.* ]; then
          echo -e "${GREEN}Found an icon for ${appname^}, using it.${RESET}"
-         cp ${PWA_PREFIX}/icons/${appname}.png $appicon_path/${2}.png
+         cp ${PWA_PREFIX}/icon/${appname}.png $appicon_path/${2}.png
        else
          icon () { ls -1 $CREW_PREFIX/share/pixmaps/ | grep $appname; }
          if [[ $(icon) != '' ]]; then
@@ -49,7 +49,7 @@ case ${1} in
            fi
          else
            echo -e "${YELLOW}${2^} does not provide any icon :/ Using default Chromebrew icon.${RESET}"
-           cp ${PWA_PREFIX}/icons/brew.png ${appicon_path}/${2}.png
+           cp ${PWA_PREFIX}/icon/brew.png ${appicon_path}/${2}.png
          fi
        fi
        convert ${appicon_path}/${2}.png -resize 1024x1024 ${appicon_path}/${2}.png
