@@ -19,7 +19,6 @@ help='
   -u (URL)            Open URL
   -t                  Open Chrome terminal
 '
-if [[ $extension_id = '' ]]; then echo -e "${BLUE}$(crew postinstall crew_integration)${RESET}" && exit 1; fi
 case ${1} in
   -s)
        pkill ruby
@@ -29,12 +28,6 @@ case ${1} in
        pkill ruby
        mkdir -p ${app_path}
        cp ${PWA_PREFIX}/tools/* ${app_path}
-       html=${app_path}/main.html
-       js=${app_path}/starter.js
-       
-       sed -i "s/app/${2^}/g" ${html}
-       
-       sed -i "s/app/${2}/g" ${js}
        #######################################
        # icon
        appname=${2}
