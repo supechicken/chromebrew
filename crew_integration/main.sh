@@ -10,7 +10,7 @@ EXTENSION_PREFIX=~/MyFiles/.extension
 PWA_PREFIX=${CREW_LIB_PREFIX}/pwa
 SERVER=${PWA_PREFIX}/server.rb
 SENDER=${PWA_PREFIX}/send.rb
-app_path=${EXTENSION_PREFIX}/apps/${2}
+appicon_path=${EXTENSION_PREFIX}/icon/
 extension_id=id_id
 help='
   -s                  Start shortcut server
@@ -26,21 +26,21 @@ case ${1} in
        ;;
   -n)
        pkill ruby
-       mkdir -p ${app_path}
-       cp ${PWA_PREFIX}/tools/* ${app_path}
+       mkdir -p ${appicon_path}
+       cp ${PWA_PREFIX}/icon/* ${icon_path}
        #######################################
        # icon
        appname=${2}
        if [ -f $PWA_PREFIX/icons/$appname.* ]; then
          echo -e "${GREEN}Found an icon for ${appname^}, using it.${RESET}"
-         cp ${PWA_PREFIX}/icons/${appname}.png $app_path/icon.png
+         cp ${PWA_PREFIX}/icons/${appname}.png $appicon_path/${2}.png
        else
          icon () { ls -1 $CREW_PREFIX/share/pixmaps/ | grep $appname; }
          if [[ $(icon) != '' ]]; then
            num=$(icon | wc -l)
            if [[ $num = 1 ]]; then
              echo -e "${GREEN}Found an preinstalled icon for ${appname^}, using it.${RESET}"
-             convert ${CREW_PREFIX}/share/pixmaps/$(icon) ${app_path}/icon.png
+             convert ${CREW_PREFIX}/share/pixmaps/$(icon) ${appicon_path}/${2}.png
            else
              echo -e "${BLUE}${num} icons were found for ${appname^}, here is the path of them${RESET}"
              icon
@@ -49,13 +49,13 @@ case ${1} in
            fi
          else
            echo -e "${YELLOW}${2^} does not provide any icon :/ Using default Chromebrew icon.${RESET}"
-           cp ${PWA_PREFIX}/icons/brew.png ${app_path}/icon.png
+           cp ${PWA_PREFIX}/icons/brew.png ${appicon_path}/${2}.png
          fi
        fi
-       convert ${app_path}/icon.png -resize 1024x1024 ${app_path}/icon.png
+       convert ${appicon_path}/${2}.png -resize 1024x1024 ${appicon_path}/${2}.png
        echo -e "${GREEN}Shortcut for ${2^} deployed!${RESET}"
        pkill ruby
-       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/${2}/main.html"
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/main.html?cmd=${2}"
        exec ruby ${SERVER} &
        ;;
   -h)
@@ -73,7 +73,7 @@ case ${1} in
        ;;
   -i)
        pkill ruby
-       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/apps/hterm/main.html"
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/main.html?cmd=terminal"
        exec ruby ${SERVER} &
        ;;
   *)
