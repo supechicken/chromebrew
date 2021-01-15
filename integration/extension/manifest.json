@@ -4,7 +4,7 @@
   "version": "3.0",
   "description": "Improves integration with Chrome OS shell.",
   "author": "supechicken666",
-  "icons": { "228": "icon/brew228.png" },
+  "icons": { "546": "icon/brew546.png" },
   "browser_action": {
     "default_icon": {
       "28": "icon/brew28.png"
