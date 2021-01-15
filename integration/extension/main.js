@@ -6,9 +6,13 @@ window.onload(function() {
     command(cmd)
 });
 function command(cmd) {
-    var ws = new WebSocket('ws://localhost:25500','protocol');
-    ws.onopen = function() {
-        ws.send(cmd);
+    if (cmd = 'terminal') {
+        chrome.windows.open('/html/crosh.html');
         self.close()
+    } else {
+        var ws = new WebSocket('ws://localhost:25500','protocol');
+        ws.onopen = function() {
+            ws.send(cmd);
+            self.close()
     }
 }
