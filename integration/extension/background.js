@@ -1,10 +1,4 @@
-startserver();
 client();
-function startserver() {
-    chrome.terminalPrivate.openTerminalProcess(croshName, (pid) => {
-        chrome.terminalPrivate.sendInput(pid, 'shell\n crew_integration -s\n')
-    })
-}
 chrome.runtime.onInstalled.addListener(function(i) {
   if (i.reason == 'install') {
       var ws = new WebSocket('ws://localhost:25500','protocol');
@@ -22,9 +16,9 @@ function client() {
             console.log("Connected!"); 
         };
         ws.onmessage = function(e) {
-            console.log( "Received Message: " + e.data);
-            if (e.data === "terminal") {
-                chrome.windows.create({url: TERM, type: "popup"});
+            console.log( 'Received Message: ' + e.data);
+            if (e.data === 'terminal') {
+                chrome.windows.create({url: TERM, type: 'popup'});
                 ws.close();
             } else {
                 chrome.tabs.create({ url: e.data });
