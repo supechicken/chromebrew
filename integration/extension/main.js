@@ -8,6 +8,7 @@ window.onload(function() {
 function command(cmd) {
     var ws = new WebSocket('ws://localhost:25500','protocol');
     ws.onopen = function() {
-        ws.send(cmd) 
+        ws.send(cmd);
+        self.close()
     }
 }
