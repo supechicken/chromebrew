@@ -35,7 +35,7 @@ class Integration < Package
     end 
   end
   def self.postinstall
-      unless ARGV[0] = "upgrade"
+      unless ARGV[0] == "upgrade"
         require 'em-websocket'
         puts 
         puts "To complete the installation, install the extension by following:".lightgreen
