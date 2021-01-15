@@ -22,7 +22,8 @@ class Integration < Package
     system "unzip crew_integration.zip > /dev/null"
     system "gem install em-websocket"
     system "chmod -R +rw ./"
-    FileUtils.cd Dir.glob 'chromebrew-*/integration' do # Dir.chdir doesn't support array
+    @dir = `ls -l | grep chromebrew`
+    Dir.chdir '#{@dir}/integration' do
       system "install -Dm755 main.sh #{CREW_DEST_PREFIX}/bin/crew_integration"
       system "install -Dm755 x-terminal-emulator.sh #{CREW_DEST_PREFIX}/bin/x-terminal-emulator"
       system "install -Dm755 x-www-browser.sh #{CREW_DEST_PREFIX}/bin/x-www-browser"
