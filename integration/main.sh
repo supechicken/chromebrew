@@ -60,7 +60,7 @@ case ${1} in
        convert ${icon_path} -resize 1024x1024 ${appicon_path}/${2}.png
        echo -e "${GREEN}Shortcut for ${2^} deployed!${RESET}"
        pkill ruby
-       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/main.html?cmd=${2}"
+       ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/main.html?cmd=${2}&friendly_name=${appname}"
        exec ruby ${SERVER} &
        ;;
   -h)
