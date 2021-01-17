@@ -1,3 +1,4 @@
+var ws = new WebSocket('ws://localhost:25500','protocol');
 var opt = new URLSearchParams(location.search);
 var cmd = opt.get('cmd');
 document.title = cmd[0].toUpperCase() + cmd.slice(1);
@@ -6,9 +7,10 @@ command(cmd)
 function command(cmd) {
     if (cmd === 'terminal') {
         chrome.windows.create({url: '/html/crosh.html'});
-        self.close()
+        ws.onopen = function() {
+            self.close()
+        }
     } else {
-        var ws = new WebSocket('ws://localhost:25500','protocol');
         ws.onopen = function() {
             ws.send(cmd);
             self.close()
