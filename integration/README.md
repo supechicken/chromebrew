@@ -29,3 +29,6 @@ crew_integration <option>
   -u (URL)            Open URL
   -t                  Open Chrome terminal
 ```
+## Screenshots
+### Launcher
+<p align="center"><img src="/integration/launcher.png" alt="Launcher Screenshot" /></p>
