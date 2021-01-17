@@ -79,6 +79,7 @@ case ${1} in
   -i)
        pkill ruby
        ruby ${PWA_PREFIX}/sender.rb "chrome-extension://${extension_id}/main.html?cmd=terminal&friendly_name=Terminal"
+       sleep 5
        exec ruby ${SERVER} &
        ;;
   *)
