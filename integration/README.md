@@ -1,7 +1,7 @@
 # Chromebrew Integration
 ## Supported Systems
 - All architecture supported by Chromebrew
-- Chrome/Chromium OS based system (CloudReady) with 84+ version
+- Chrome/Chromium OS based system (CloudReady) with 56+ version
 - Stable channel (recommend)
 ## Features
 - Add X/Wayland applications shortcut to Chrome/Chromium OS launcher though PWA
