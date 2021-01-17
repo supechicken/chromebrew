@@ -31,4 +31,4 @@ crew_integration <option>
 ```
 ## Screenshots
 ### Launcher
-<p align="center"><img src="/integration/launcher.png" alt="Launcher Screenshot" /></p>
+<p align="center"><img src="/integration/screenshots/launcher.png" alt="Launcher Screenshot" /></p>
