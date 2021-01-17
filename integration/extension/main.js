@@ -14,5 +14,6 @@ function command(cmd) {
         ws.onopen = function() {
             ws.send(cmd);
             self.close()
+        }
     }
 }
