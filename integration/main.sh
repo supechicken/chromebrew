@@ -33,7 +33,7 @@ case ${1} in
        if [[ ${desktop_file} != '' ]]; then
          appname=$(grep 'Name=' ${desktop_file} | cut -d'=' -f2 | sed -n '1p' )
        else
-         appname=${2}
+         appname=${2^}
        fi
        if [ -f "${appicon_path}/${appname}.png" ]; then
          echo -e "${GREEN}Found an icon for ${appname^}, using it.${RESET}"
