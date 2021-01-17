@@ -7,8 +7,8 @@ document.querySelector("link[rel~='icon']").href = `/icon/${cmd}.png`;
 command(cmd)
 function command(cmd) {
     if (cmd === 'terminal') {
-        chrome.windows.create({url: '/html/crosh.html'});
         ws.onopen = function() {
+            chrome.windows.create({url: '/html/crosh.html'});
             self.close()
         }
     } else {
