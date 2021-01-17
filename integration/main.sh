@@ -28,7 +28,12 @@ case ${1} in
        pkill ruby
        #######################################
        # icon
-       appname=${2}
+       desktop_file=$( find ${CREW_PREFIX} -name ${2}.desktop | sed -n '1p' )
+       if [[ desktop_file != '' ]]; then
+         appname=$(grep Name= ${desktop_file} | cut -d'=' -f2)
+       else
+         appname=${2}
+       fi
        if [ -f ${appicon_path}/${appname}.png ]; then
          echo -e "${GREEN}Found an icon for ${appname^}, using it.${RESET}"
        else
