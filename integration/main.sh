@@ -29,7 +29,7 @@ case ${1} in
        #######################################
        # icon
        desktop_file=$( find ${CREW_PREFIX} -name ${2}.desktop | sed -n '1p' )
-       if [[ desktop_file != '' ]]; then
+       if [[ ${desktop_file} != '' ]]; then
          appname=$(grep Name= ${desktop_file} | cut -d'=' -f2)
        else
          appname=${2}
