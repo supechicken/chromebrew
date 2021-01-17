@@ -28,9 +28,9 @@ case ${1} in
        pkill ruby
        #######################################
        # icon
-       desktop_file=$( find ${CREW_PREFIX} -name ${2}.desktop | sed -e '1p' )
+       desktop_file=$( find ${CREW_PREFIX} -name ${2}.desktop | sed -n '1p' )
        if [[ ${desktop_file} != '' ]]; then
-         appname=$(grep Name= ${desktop_file} | cut -d'=' -f2)
+         appname=$(grep 'Name=' ${desktop_file} | cut -d'=' -f2 | sed -n '1p' )
        else
          appname=${2}
        fi
