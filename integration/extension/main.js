@@ -5,7 +5,7 @@ document.querySelector("link[rel~='icon']").href = `/icon/${cmd}.png`;
 command(cmd)
 
 function command(cmd) {
-    if (cmd = 'terminal') {
+    if (cmd === 'terminal') {
         chrome.windows.open('/html/crosh.html');
         self.close()
     } else {
