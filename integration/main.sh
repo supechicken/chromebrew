@@ -28,16 +28,17 @@ case ${1} in
        pkill ruby
        #######################################
        # icon
+       cmd=${2}
        desktop_file=$( find ${CREW_PREFIX} -name ${2}.desktop | sed -n '1p' )
        if [[ ${desktop_file} != '' ]]; then
          appname=$(grep 'Name=' ${desktop_file} | cut -d'=' -f2 | sed -n '1p' )
        else
          appname=${2}
        fi
-       if [ -f ${appicon_path}/${appname}.png ]; then
+       if [ -f "${appicon_path}/${appname}.png" ]; then
          echo -e "${GREEN}Found an icon for ${appname^}, using it.${RESET}"
        else
-         icon () { ls -1 $CREW_PREFIX/share/pixmaps/ | grep $appname; }
+         icon () { ls -1 ${CREW_PREFIX}/share/pixmaps/ | grep ${cmd}; }
          if [[ $(icon) != '' ]]; then
            num=$(icon | wc -l)
            if [[ $num = 1 ]]; then
