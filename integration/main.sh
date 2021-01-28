@@ -43,11 +43,11 @@ case ${1} in
            NUM=$(icon | wc -l)
            if [[ $NUM = 1 ]]; then
              echo -e "${GREEN}Found an preinstalled icon for ${APPNAME}, using it.${RESET}"
-             convert ${CREW_PREFIX}/share/pixmaps/$(icon) ${APPICON_PATH}/${CMD}.png
+             ICON_PATH=${CREW_PREFIX}/share/pixmaps/$(icon)
            else
              echo -e "${BLUE}${NUM} icons were found for ${APPNAME}, here is the path of them${RESET}"
              icon
-             read -r -p "Which icon do you want to use (Enter the path): " icon_path
+             read -r -p "Which icon do you want to use (Enter the path): " ICON_PATH
              echo -e "${RESET}"
            fi
          else
@@ -56,7 +56,7 @@ case ${1} in
          fi
        fi
        if [[ ${ICON_PATH} = '' ]]; then
-           icon_path="${APPICON_PATH}/${CMD}.png"
+           ICON_PATH="${APPICON_PATH}/${CMD}.png"
        fi
        convert ${ICON_PATH} -resize 1024x1024 ${APPICON_PATH}/${CMD}.png
        echo -e "${GREEN}Shortcut for ${APPNAME} deployed!${RESET}"
