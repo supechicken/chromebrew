@@ -1,5 +1,6 @@
 require 'io/console'
 require 'digest/sha2'
+require 'uri'
 require_relative 'const'
 require_relative 'color'
 require_relative 'progress_bar'
@@ -18,54 +19,74 @@ rescue RuntimeError => e
   end
 end
 
-require 'uri'
-
-def downloader(url, sha256sum, filename = File.basename(url), verbose = false)
+def downloader(url, sha256sum, filename = File.basename(url), verbose = false, git: nil, save_to_cache_dir: false, **args)
   # downloader: wrapper for all Chromebrew downloaders (`net/http`,`curl`...)
-  # Usage: downloader <url>, <sha256sum>, <filename::optional>, <verbose::optional>
+  # Usage: downloader <url>, <sha256sum>, <filename::optional>, <verbose::optional>, <options>
   #
   #           <url>: URL that points to the target file
   #     <sha256sum>: SHA256 checksum, verify downloaded file with given checksum
   #      <filename>: (Optional) Output path/filename
   #       <verbose>: (Optional) Verbose output
   #
+  # Options:
+  #                 [git]: (Optional) Specify if #{url} is a git url, determine automatically by default
+  #   [save_to_cache_dir]: (Optional) Copy downloaded file/repository to CREW_CACHE_DIR
+  #              [**args]: (Optional) Arguments that will be passed to the actual downloader
+  #
   uri = URI(url)
 
-  if CREW_USE_CURL || !ENV['CREW_DOWNLOADER'].to_s.empty?
-    # force using external downloader if either CREW_USE_CURL or ENV['CREW_DOWNLOADER'] is set
-    external_downloader(uri, filename, verbose)
+  # determine if #{uri} is a git url
+  git ||= uri.scheme.eql?('git') or File.extname(uri.path).eql?('.git')
+
+  if git
+    git_downloader(uri, filename, verbose, **args)
   else
-    case uri.scheme
-    when 'http', 'https'
-      # use net/http if the url protocol is http(s)://
-      http_downloader(uri, filename, verbose)
-    when 'file'
-      # use FileUtils to copy if it is a local file (the url protocol is file://)
-      if File.exist?(uri.path)
-        return FileUtils.cp(uri.path, filename)
-      else
-        abort "#{uri.path}: File not found :/".lightred
-      end
+    if CREW_USE_CURL or !ENV['CREW_DOWNLOADER'].to_s.empty?
+      # force using external downloader if either CREW_USE_CURL or ENV['CREW_DOWNLOADER'] is set
+      external_downloader(uri, filename, verbose, **args)
     else
-      # use external downloader (curl by default) if the url protocol is not http(s):// or file://
-      external_downloader(uri, filename, verbose)
+      case uri.scheme
+      when 'http', 'https'
+        # use net/http if the url protocol is http(s)://
+        http_downloader(uri, filename, verbose, **args)
+      when 'file'
+        # use FileUtils to copy if it is a local file (the url protocol is file://)
+        if File.exist?(uri.path)
+          FileUtils.cp(uri.path, filename)
+        else
+          abort "#{uri.path}: File not found :/".lightred
+        end
+      else
+        # use external downloader (curl by default) if the url protocol is not http(s):// or file://
+        external_downloader(uri, filename, verbose, **args)
+      end
+    end
+
+    # verify with given checksum
+    calc_sha256sum = Digest::SHA256.hexdigest(File.read(filename))
+
+    unless sha256sum.casecmp?('SKIP') || (calc_sha256sum == sha256sum)
+      FileUtils.rm_f filename
+
+      warn 'Checksum mismatch :/ Try again?'.lightred, <<~EOT
+        #{''}
+                              Filename: #{filename.lightblue}
+            Expected checksum (SHA256): #{sha256sum.green}
+          Calculated checksum (SHA256): #{calc_sha256sum.red}
+      EOT
+
+      exit 2
     end
   end
 
-  # verify with given checksum
-  calc_sha256sum = Digest::SHA256.hexdigest(File.read(filename))
-
-  unless sha256sum =~ (/^SKIP$/i) || (calc_sha256sum == sha256sum)
-    FileUtils.rm_f filename
-
-    warn 'Checksum mismatch :/ Try again?'.lightred, <<~EOT
-      #{''}
-                            Filename: #{filename.lightblue}
-          Expected checksum (SHA256): #{sha256sum.green}
-        Calculated checksum (SHA256): #{calc_sha256sum.red}
-    EOT
-
-    exit 2
+  if save_to_cache_dir
+    if git
+      repo_name = File.basename(filename, '.git')
+      system 'tar', '-c', '--zstd', '.', '-f', File.join(CREW_CACHE_DIR, "#{repo_name}.tar.zst"), chdir: repo_name, exception: true
+    else
+      FileUtils.cp filename, File.join(CREW_CACHE_DIR, filename)
+    end
+    warn 'Archive copied to cache'.green if verbose
   end
 end
 
@@ -75,9 +96,9 @@ def http_downloader(uri, filename = File.basename(url), verbose = false)
   # open http connection
   Net::HTTP.start(uri.host, uri.port, {
     max_retries: CREW_DOWNLOADER_RETRY,
-      use_ssl: uri.scheme.eql?('https'),
-      ca_file: SSL_CERT_FILE,
-      ca_path: SSL_CERT_DIR
+        use_ssl: uri.scheme.eql?('https'),
+        ca_file: SSL_CERT_FILE,
+        ca_path: SSL_CERT_DIR
   }) do |http|
     http.request(Net::HTTP::Get.new(uri)) do |response|
       case
@@ -135,6 +156,28 @@ def http_downloader(uri, filename = File.basename(url), verbose = false)
         progress_bar_thread.join
       end
     end
+  end
+end
+
+def git_downloader(uri, destdir, verbose = false, branch: nil, hashtag: nil, latest_commit_only: true, clone_submodules: true, fetch_all_tags: false)
+  git_config_args = {
+    'advice.detachedHead': false,
+    'init.defaultBranch': 'master'
+  }.map {|opt, val| [ '-c', "#{opt}=#{val}" ] } .flatten
+
+  # wrapper function for git command
+  git_cmd = lambda do |*args|
+    system 'git', *git_config_args, *args, exception: true
+  end
+
+  Dir.chdir(destdir) do
+    git_cmd.call 'init'
+    git_cmd.call *%w[remote add origin], uri.to_s
+    git_cmd.call *%W[fetch #{'--depth=1' if latest_commit_only} origin], (hashtag || branch)
+    git_cmd.call *%w[checkout FETCH_HEAD]
+
+    git_cmd.call *%w[submodule update --init --recursive] if clone_submodules
+    git_cmd.call *%w[fetch --tags] if fetch_all_tags
   end
 end
 

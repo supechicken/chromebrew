@@ -549,7 +549,7 @@ def update
   abort "'crew update' is used to update crew itself. Use 'crew upgrade <package1> [<package2> ...]' to update specific packages.".orange if @pkgName
   # update package lists
   Dir.chdir CREW_LIB_PATH do
-    if CREW_TESTING == '1'
+    if CREW_TESTING
       puts 'Updating crew from testing repository...'
       system "git remote add testing #{CREW_TESTING_REPO} 2>/dev/null || \
         git remote set-url testing #{CREW_TESTING_REPO}"
@@ -654,24 +654,81 @@ end
 
 def download
   url = @pkg.get_url(@device[:architecture])
-  source = @pkg.is_source?(@device[:architecture])
+  is_source = @pkg.is_source?(@device[:architecture])
+  is_git = !!(@pkg.git_hashtag || @pkg.git_branch)
 
-  uri = URI.parse url
   filename = File.basename(uri.path)
   sha256sum = @pkg.get_sha256(@device[:architecture])
-  @extract_dir = @pkg.get_extract_dir
+  extract_dir = @pkg.get_extract_dir
 
-  if !url
-    abort "No precompiled binary or source is available for #{@device[:architecture]}.".lightred
-  elsif !source
-    puts 'Precompiled binary available, downloading...'
-  elsif @pkg.build_from_source
-    puts 'Downloading source...'
-  elsif uri =~ /^SKIP$/i
+  abort "No precompiled binary or source is available for #{@device[:architecture]}.".lightred unless url
+
+  if url.casecmp?('SKIP')
     puts 'Skipping source download...'
-  else
-    puts 'No precompiled binary available for your platform, downloading source...'
+    return
   end
+
+  if is_source
+    if @pkg.build_from_source
+      puts 'Downloading source...'
+    else
+      puts 'No precompiled binary available for your platform, downloading source...'
+    end
+  else
+    puts 'Precompiled binary available, downloading...'
+  end
+
+  if git
+    repo_name = File.basename(filename, '.git')
+    cache_tarball = File.join(CREW_CACHE_ENABLED, "#{repo_name}.tar.zst")
+
+    if CREW_CACHE_ENABLED and File.exist?(cache_tarball)
+      puts 'Archive found in cache'.lightgreen
+      FileUtils.cp cache_tarball, "./#{repo_name}.tar.zst"
+      puts 'Archive copied from cache'.lightgreen
+    else
+      puts 'Downloading source from a git repository. This may take a while...'.lightgreen
+      downloader url, nil, repo_name, @opt_verbose,
+                 **{
+                       save_to_cache_dir: CREW_CACHE_ENABLED,
+                                  branch: @pkg.git_branch,
+                                 hashtag: @pkg.git_hashtag,
+                      latest_commit_only: !@pkg.git_clone_deep?,
+                        clone_submodules: !@pkg.no_git_submodules?,
+                          fetch_all_tags: @pkg.git_fetchtags?
+                   }
+      puts "Source downloaded.".lightgreen
+  else
+    cache_filename = File.join(CREW_CACHE_ENABLED, filename)
+
+    if CREW_CACHE_ENABLED and File.exist?(cache_filename)
+      puts 'Archive found in cache'.lightgreen
+      FileUtils.cp cache_tarball, "./#{repo_name}.tar.zst"
+      puts 'Archive copied from cache'.lightgreen
+    else
+      downloader url, sha256sum, filename, @opt_verbose, save_to_cache_dir: CREW_CACHE_ENABLED
+      puts "Archive downloaded.".lightgreen
+    end
+
+    case File.basename(filename)
+    when /\.zip$/i, /\.(tar(\.(gz|bz2|xz|lzma|lz|zst))?|tgz|tbz|tpxz|txz)$/i, /\.deb$/i, /\.AppImage$/i
+      unpack(filename)
+    else
+      FileUtils.mkdir_p extract_dir
+      FileUtils.cp filename, extract_dir
+    end
+  end
+
+
+
+
+
+
+
+
+
+
+
 
   @git = uri.scheme =~ /git/ ? true : false
 
@@ -1752,7 +1809,7 @@ def install_command(args)
     @pkgName = name
     search @pkgName
     print_current_package true
-    @pkg.build_from_source = true if @opt_src || @opt_recursive || (CREW_BUILD_FROM_SOURCE == '1')
+    @pkg.build_from_source = true if @opt_src || @opt_recursive || CREW_BUILD_FROM_SOURCE
     resolve_dependencies_and_install
   end
 end
@@ -1786,7 +1843,7 @@ def reinstall_command(args)
     @pkgName = name
     search @pkgName
     print_current_package
-    @pkg.build_from_source = true if @opt_src || @opt_recursive || (CREW_BUILD_FROM_SOURCE == '1')
+    @pkg.build_from_source = true if @opt_src || @opt_recursive || CREW_BUILD_FROM_SOURCE
     next unless @pkgName
 
     @pkg.in_upgrade = true
@@ -1849,7 +1906,7 @@ def upgrade_command(args)
     @pkgName = name
     search @pkgName
     print_current_package
-    @pkg.build_from_source = true if @opt_src || (CREW_BUILD_FROM_SOURCE == '1')
+    @pkg.build_from_source = true if @opt_src || CREW_BUILD_FROM_SOURCE
     upgrade
   end.empty? and begin
     upgrade
