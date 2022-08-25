@@ -14,7 +14,7 @@ jobs:
         ruby-version: 'ruby-head'
 
     - name: Check `source_url` for all architectures
-      run: ruby url_validity_check.rb check_source_url
+      run: ruby .github/workflows/url_validity_check.rb check_source_url
 
   binary_url:
     runs-on: ubuntu-latest
@@ -25,4 +25,4 @@ jobs:
         ruby-version: 'ruby-head'
 
     - name: Check `binary_url` for all architectures
-      run: ruby url_validity_check.rb check_binary_url
+      run: ruby .github/workflows/url_validity_check.rb check_binary_url
