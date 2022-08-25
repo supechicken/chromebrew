@@ -1,9 +1,9 @@
 require 'digest/sha2'
 require 'uri'
 
-$LOAD_PATH << File.expand_path('./lib')
-require_relative 'lib/color'
-require_relative 'lib/package'
+$LOAD_PATH << File.expand_path('../../lib')
+require_relative '../../lib/color'
+require_relative '../../lib/package'
 
 CHANGED_FILES = `git diff --name-only #{ENV['DEFAULT_BRANCH']}...HEAD`.chomp.lines
 
