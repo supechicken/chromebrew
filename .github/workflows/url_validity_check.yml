@@ -1,0 +1,30 @@
+name: URL validity checker
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  source_url:
+    name: `source_url` validity check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 'ruby-head'
+
+    - name: Check `source_url` for all architectures
+      runs: ruby url_validity_check.rb check_source_url
+
+  binary_url:
+    name: `binary_url` validity check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 'ruby-head'
+
+    - name: Check `binary_url` for all architectures
+      runs: ruby url_validity_check.rb check_binary_url
