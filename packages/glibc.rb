@@ -20,7 +20,7 @@ class Glibc < Package
   # from the one ChromeOS ships with.
   # @libc_version = '2.33'
   if @libc_version == '2.23'.freeze
-    version '2.23-3'
+    version '2.23-4'
     source_url 'https://ftpmirror.gnu.org/glibc/glibc-2.23.tar.xz'
     source_sha256 '94efeb00e4603c8546209cefb3e1a50a5315c86fa9b078b6fad758e187ce13e9'
 
@@ -31,7 +31,7 @@ class Glibc < Package
       i686: '3ee19cbb907eb219a2c1b02df6de1ca13b09b0d375101657d54a2485aacdc445'
     })
   elsif @libc_version == '2.27'
-    version '2.27'
+    version '2.27-1'
     source_url 'https://ftpmirror.gnu.org/glibc/glibc-2.27.tar.xz'
     source_sha256 '5172de54318ec0b7f2735e5a91d908afe1c9ca291fec16b5374d9faadfc1fc72'
 
@@ -46,7 +46,7 @@ class Glibc < Package
        x86_64: '5fe94642dbbf900d22b715021c73ac1a601b81517f0da1e7413f0af8fbea7997'
     })
   elsif @libc_version == '2.32'.freeze # All architectures with updates past M92.
-    version '2.32-2'
+    version '2.32-3'
     source_url 'https://ftpmirror.gnu.org/glibc/glibc-2.32.tar.xz'
     source_sha256 '1627ea54f5a1a8467032563393e0901077626dc66f37f10ee6363bb722222836'
 
@@ -61,7 +61,7 @@ class Glibc < Package
        x86_64: '3e3eaa6551492ef0f1bc28600102503b721b19d0ee7396c4301771df402ea355'
     })
   elsif @libc_version.to_f >= 2.33 # All architectures with updates past M97.
-    version '2.33'
+    version '2.33-1'
     source_url 'https://ftpmirror.gnu.org/glibc/glibc-2.33.tar.xz'
     source_sha256 '2e2556000e105dbd57f0b6b2a32ff2cf173bde4f0d85dffccfd8b7e51a0677ff'
 
@@ -598,10 +598,20 @@ class Glibc < Package
       puts "System glibc version is #{LIBC_VERSION}.".lightblue
       puts 'Creating symlinks to system glibc version to prevent breakage.'.lightblue
       @libraries.each do |lib|
-        Dir.glob("/#{ARCH_LIB}/#{lib}*").each do |f|
+        # Reject entries which aren't libraries ending in .so, and which aren't files.
+        Dir["/#{ARCH_LIB}/#{lib}.so*"].reject { |f| File.directory?(f) }.each do |f|
           if `file #{f} | grep "shared object"`
             g = File.basename(f)
             FileUtils.ln_sf f.to_s, g.to_s
+          end
+        end
+        # Reject entries which aren't libraries ending in .so, and which aren't files.
+        # Reject text files such as libc.so because they points to files like
+        # libc_nonshared.a, which are not provided by ChromeOS
+        Dir["/usr/#{ARCH_LIB}/#{lib}.so*"].reject { |f| File.directory?(f) }.each do |f|
+          if `file #{f} | grep "shared object"`
+            g = File.basename(f)
+            FileUtils.ln_sf f.to_s, g.to_s unless `file #{g} | grep "ASCII text"`
           end
         end
       end
@@ -624,20 +634,20 @@ class Glibc < Package
       # This is the array of locales to save:
       @locales = %w[C cs_CZ de_DE en es_MX fa_IR fr_FR it_IT ja_JP ru_RU tr_TR zh]
       @localedirs = %W[#{CREW_PREFIX}/share/locale #{CREW_PREFIX}/share/i18n/locales]
-      @filelist = File.readlines("#{CREW_META_PATH}#{to_s.downcase}.filelist")
+      @filelist = File.readlines("#{CREW_META_PATH}/glibc.filelist")
       @localedirs.each do |localedir|
         Dir.chdir localedir do
-          Dir.glob('*').each do |f|
+          Dir['*'].each do |f|
             next if @locales.any? { |s| File.basename(f).include?(s) }
 
             FileUtils.rm_f f
             @fpath = "#{localedir}/#{f}"
-            @filelist.reject! { |e| e =~ /#{@fpath}/ }
+            @filelist.reject! { |e| e.include?(@fpath) }
           end
         end
       end
-      puts "Updating #{to_s.downcase} package filelist...".lightblue
-      File.open("#{CREW_META_PATH}#{to_s.downcase}.filelist", 'w+') do |f|
+      puts 'Updating glibc package filelist...'.lightblue
+      File.open("#{CREW_META_PATH}/glibc.filelist", 'w+') do |f|
         f.puts(@filelist)
       end
     end
