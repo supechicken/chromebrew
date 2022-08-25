@@ -3,6 +3,7 @@ name: URL validity checker
 on:
   pull_request:
     branches: [ master ]
+    paths: [ 'packages/**' ]
 
 jobs:
   source_url:
