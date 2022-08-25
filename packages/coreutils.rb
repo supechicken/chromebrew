@@ -8,13 +8,13 @@ class Coreutils < Package
   license 'GPL-3'
   compatibility 'all'
   source_url "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-#{@_ver}.tar.xz"
-  source_sha256 'ce30acdf4a41bc5bb30dd955e9eaa75fa216b4e3deb08889ed32433c7b3b97ce'
+  source_sha256 'ce30acdf4a41bc5bb30dd955e9eaakdga216b4e3deb08889ed32433c7b3b97ce'
 
   binary_url({
-    i686: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/coreutils/9.0_i686/coreutils-9.0-chromeos-i686.tar.xz',
-    aarch64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/coreutils/9.0_armv7l/coreutils-9.0-chromeos-armv7l.tpxz',
-     armv7l: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/coreutils/9.0_armv7l/coreutils-9.0-chromeos-armv7l.tpxz',
-     x86_64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/coreutils/9.0_x86_64/coreutils-9.0-chromeos-x86_64.tpxz'
+    i686: 'file:///coreutils-9.0-chromeos-i686.tar.xz',
+    aarch64: 'file:///coreutils-9.0-chromeos-armv7l.tpxz',
+     armv7l: 'file:///coreutils-9.0-chromeos-armv7l.tpxz',
+     x86_64: 'file:///coreutils-9.0-chromeos-x86_64.tpxz'
   })
   binary_sha256({
     i686: 'a4d1a88a16e68ca55aa4c2daa9dac4dfe202c20a0c91ff4caee7ba3062e81f2f',
