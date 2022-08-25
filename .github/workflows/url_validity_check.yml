@@ -6,7 +6,6 @@ on:
 
 jobs:
   source_url:
-    name: `source_url` validity check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -18,7 +17,6 @@ jobs:
       run: ruby url_validity_check.rb check_source_url
 
   binary_url:
-    name: `binary_url` validity check
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
