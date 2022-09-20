@@ -3,9 +3,10 @@ require 'package'
 class Dropbox < Package
   description 'Dropbox simplifies the way you create, share and collaborate.  Bring your photos, docs, and videos anywhere and keep your files safe.'
   homepage 'https://www.dropbox.com/'
-  version '48.4.58'
+  version '48.4.58-1'
   license 'Dropbox-TOS'
   compatibility 'i686,x86_64'
+
   case ARCH
   when 'i686'
     source_url 'https://clientupdates.dropboxstatic.com/dbx-releng/client/dropbox-lnx.x86-48.4.58.tar.gz'
@@ -24,30 +25,30 @@ class Dropbox < Package
     x86_64: 'c2c699372e4646ce5ed542fa189c08dc44dea1ae312f7401f1f385279e1b2ded'
   })
 
-  depends_on 'python2' unless File.exist? "#{CREW_PREFIX}/bin/python"
+  no_compile_needed
+
+  depends_on 'python3'
   depends_on 'libxslt'
 
   def self.build
-    system 'curl -#LO https://linux.dropbox.com/packages/dropbox.py'
-    system "sed -i 's,~/.dropbox-dist,#{CREW_LIB_PREFIX}/dropbox,g' dropbox.py"
-    system "echo '#!/bin/bash' > dropboxd"
-    system "echo 'PWD=$(pwd)' >> dropboxd"
-    system "echo 'cd #{CREW_LIB_PREFIX}/dropbox' >> dropboxd"
-    system "echo './dropboxd' >> dropboxd"
-    system "echo 'cd $PWD' >> dropboxd"
-    system 'chmod +x dropboxd'
-    system "echo '#!/bin/bash' > dropbox"
-    system "echo 'python #{CREW_PREFIX}/bin/dropbox.py \"$@\"' >> dropbox"
-    system 'chmod +x dropbox'
+    downloader 'https://linux.dropbox.com/packages/dropbox.py', 'SKIP'
+    system 'sed', '-i', "s,~/.dropbox-dist,#{CREW_LIB_PREFIX}/dropbox,g", 'dropbox.py'
+
+    @dropboxd_wrapper = <<~EOF
+      #!/bin/bash -e
+
+      cd #{CREW_LIB_PREFIX}/dropbox
+      exec ./dropboxd "${@}"
+    EOF
   end
 
   def self.install
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "mkdir -p #{CREW_DEST_LIB_PREFIX}/dropbox"
-    system "cp -r .dropbox-dist/* #{CREW_DEST_LIB_PREFIX}/dropbox"
-    system "cp dropbox.py #{CREW_DEST_PREFIX}/bin"
-    system "cp dropboxd #{CREW_DEST_PREFIX}/bin"
-    system "cp dropbox #{CREW_DEST_PREFIX}/bin"
+    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/bin"
+
+    File.write "#{CREW_DEST_PREFIX}/bin/dropboxd", @dropboxd_wrapper, perm: 0o755
+
+    FileUtils.mv '.dropbox-dist', "#{CREW_DEST_LIB_PREFIX}/dropbox"
+    FileUtils.install 'dropbox.py', "#{CREW_DEST_PREFIX}/bin/dropbox", mode: 0o755
   end
 
   def self.postinstall

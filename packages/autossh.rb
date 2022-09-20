@@ -25,19 +25,19 @@ class Autossh < Package
   depends_on 'openssh'
   
   def self.build
-    system "./configure #{CREW_OPTIONS} \
-            --with-ssh=$(which ssh)"
+    system "./configure #{CREW_OPTIONS} --with-ssh=$(command -v ssh)"
     system 'make'
   end
   
   def self.install
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "mkdir -p #{CREW_DEST_PREFIX}/share/doc/autossh"
-    system "mkdir -p #{CREW_DEST_PREFIX}/share/examples/autossh"
-    system "mkdir -p #{CREW_DEST_PREFIX}/man/man1"
-    system "cp autossh #{CREW_DEST_PREFIX}/bin"
-    system "cp CHANGES README #{CREW_DEST_PREFIX}/share/doc/autossh"
-    system "cp autossh.host rscreen #{CREW_DEST_PREFIX}/share/examples/autossh"
-    system "cp autossh.1 #{CREW_DEST_PREFIX}/man/man1"
+    FileUtils.mkdir_p %W[#{CREW_DEST_PREFIX}/bin
+      #{CREW_DEST_PREFIX}/share/doc/autossh
+      #{CREW_DEST_PREFIX}/share/examples/autossh
+      #{CREW_DEST_MAN_PREFIX}/man1
+    ]
+
+    FileUtils.install 'autossh', "#{CREW_DEST_PREFIX}/bin", mode: 0o755
+    FileUtils.install %w[CHANGES README autossh.host rscreen], "#{CREW_DEST_PREFIX}/share/doc/autossh", mode: 0o644
+    FileUtils.install 'autossh.1', "#{CREW_DEST_MAN_PREFIX}/man1"
   end
 end

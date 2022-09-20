@@ -22,24 +22,25 @@ class Antiword < Package
      x86_64: '5486ee47684aaf249f0f75f9c903aa8c79b41466ae94aa0dbbd660090af438d0'
   })
 
+  def self.patch
+    system "find . -type f -exec sed -i 's,/usr/share,#{CREW_PREFIX}/share,g' {} \\;"
+  end
+
   def self.build
-    system "sed -i 's,GLOBAL_RESOURCES_DIR = /usr/share/antiword,GLOBAL_RESOURCES_DIR = #{CREW_PREFIX}/share/antiword,' Makefile.Linux"
-    system "sed -i 's,/share/,/,g' antiword.h"
-    system "sed -i 's,/usr/antiword,#{CREW_PREFIX}/share/antiword,g' antiword.h"
-    system "sed -i 's,/usr/share/antiword,#{CREW_PREFIX}/share/antiword,' Docs/antiword.1"
     system 'make'
   end
 
   def self.install
-    system "mkdir -p /home/#{USER}/user/.antiword"
-    system "mkdir -p #{CREW_DEST_DIR}/home/#{USER}/user/.antiword"
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "mkdir -p #{CREW_DEST_PREFIX}/man/man1"
-    system "mkdir -p #{CREW_DEST_PREFIX}/share/antiword"
-    system "cp antiword #{CREW_DEST_PREFIX}/bin"
-    system "cp Docs/antiword.1 #{CREW_DEST_PREFIX}/man/man1"
-    system "cp Resources/* #{CREW_DEST_PREFIX}/share/antiword"
-    system "cp Resources/UTF-8.txt /home/#{USER}/user/.antiword"
-    system "cp Resources/UTF-8.txt #{CREW_DEST_DIR}/home/#{USER}/user/.antiword"
+    FileUtils.mkdir_p %W[
+      #{CREW_DEST_HOME}/.antiword
+      #{CREW_DEST_PREFIX}/bin
+      #{CREW_DEST_MAN_PREFIX}/man1
+    ]
+
+    FileUtils.install 'antiword', "#{CREW_DEST_PREFIX}/bin", mode: 0o755
+    FileUtils.install 'Docs/antiword.1', "#{CREW_DEST_MAN_PREFIX}/man1", mode: 0o644
+
+    FileUtils.mv 'Resources/', "#{CREW_DEST_PREFIX}/share/antiword"
+    FileUtils.install 'Resources/UTF-8.txt', "#{CREW_DEST_HOME}/.antiword", mode: 0o644
   end
 end

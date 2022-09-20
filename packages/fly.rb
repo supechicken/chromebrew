@@ -29,7 +29,7 @@ class Fly < Package
   end
 
   def self.install
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "cp fly #{CREW_DEST_PREFIX}/bin"
+    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/bin"
+    FileUtils.install 'fly', "#{CREW_DEST_PREFIX}/bin", mode: 0o755
   end
 end

@@ -3,11 +3,13 @@ require 'package'
 class Binclock < Package
   description 'Ncurses clock, with time displayed in colourful binary'
   homepage 'https://github.com/JohnAnthony/Binary-Clock'
-  version '3883e8'
+  @_commit = '3883e8876576a45162b9a128d8317b20f98c5140'
+  version @_commit[0, 7]
   license 'GPL-2'
   compatibility 'all'
-  source_url 'https://github.com/JohnAnthony/Binary-Clock/archive/3883e8876576a45162b9a128d8317b20f98c5140.tar.gz'
-  source_sha256 'e8caa26437301c70bf9840901db9e46d32b99c0ec8b442562f96390e28f35408'
+
+  source_url 'https://github.com/JohnAnthony/Binary-Clock.git'
+  git_hashtag @_commit
 
   binary_url({
     aarch64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/binclock/3883e8_armv7l/binclock-3883e8-chromeos-armv7l.tar.xz',
@@ -32,9 +34,8 @@ class Binclock < Package
   end
 
   def self.install
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "mkdir -p #{CREW_DEST_PREFIX}/share/man/man1"
-    system "cp binclock #{CREW_DEST_PREFIX}/bin"
-    system "cp binclock.1 #{CREW_DEST_PREFIX}/share/man/man1"
+    FileUtils.mkdir_p %W[#{CREW_DEST_PREFIX}/bin #{CREW_DEST_MAN_PREFIX}/man1]
+    FileUtils.install 'binclock', "#{CREW_DEST_PREFIX}/bin", mode: 0o755
+    FileUtils.install 'binclock.1', "#{CREW_DEST_MAN_PREFIX}/man1"
   end
 end

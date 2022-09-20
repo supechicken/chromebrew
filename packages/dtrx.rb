@@ -2,39 +2,28 @@ require 'package'
 
 class Dtrx < Package
   description "An intelligent archive extraction tool for UNIX-like systems standing for 'Do The Right Extraction.'"
-  homepage 'https://brettcsmith.org/2007/dtrx/' # 404 Not Found
-  version '7.1'
-  license '' # Can't find license for project
+  homepage 'https://github.com/dtrx-py/dtrx'
+  version '8.4.0'
+  license 'GPL-3'
   compatibility 'all'
-  source_url 'https://brettcsmith.org/2007/dtrx/dtrx-7.1.tar.gz' # 404 Not Found
-  source_sha256 '1c9afe48e9d9d4a1caa4c9b0c50593c6fe427942716ce717d81bae7f8425ce97'
+  source_url 'https://github.com/dtrx-py/dtrx/releases/download/8.4.0/dtrx-8.4.0.tar.gz'
+  source_sha256 'e96b87194481a54807763b33fc764d4de5fe0e4df6ee51147f72c0ccb3bed6fa'
 
-  binary_url({
-    aarch64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/dtrx/7.1_armv7l/dtrx-7.1-chromeos-armv7l.tar.xz',
-     armv7l: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/dtrx/7.1_armv7l/dtrx-7.1-chromeos-armv7l.tar.xz',
-       i686: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/dtrx/7.1_i686/dtrx-7.1-chromeos-i686.tar.xz',
-     x86_64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/dtrx/7.1_x86_64/dtrx-7.1-chromeos-x86_64.tar.xz'
-  })
-  binary_sha256({
-    aarch64: 'a607b05853dfa122ebdb852f28ac59b6142c99f7ee156a631b75bc5d82f797fa',
-     armv7l: 'a607b05853dfa122ebdb852f28ac59b6142c99f7ee156a631b75bc5d82f797fa',
-       i686: 'cdd735f6be940b2535b89226bfdeba5b65e92cbdfe0a828bceb7fc5787d872d7',
-     x86_64: '4817af93d2c30c4ced5c8fb5a4e0ebc7ebb51fb6fbfb2300380b27221b6b5c49'
-  })
+  no_compile_needed
 
   depends_on 'binutils'
   depends_on 'bz2'
   depends_on 'cabextract'
   depends_on 'cpio'
   depends_on 'lha'
-  depends_on 'python2'
+  depends_on 'python3'
   depends_on 'unrar'
   depends_on 'unshield'
   depends_on 'unzip'
 
   def self.install
-    system "python setup.py install --prefix=#{CREW_PREFIX}"
-    system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-    system "cp #{CREW_PREFIX}/bin/dtrx #{CREW_DEST_PREFIX}/bin"
+    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/bin"
+    system "python3 setup.py install #{PY_SETUP_INSTALL_OPTIONS}"
+    FileUtils.install "#{CREW_PREFIX}/bin/dtrx", "#{CREW_DEST_PREFIX}/bin", mode: 0o755
   end
 end

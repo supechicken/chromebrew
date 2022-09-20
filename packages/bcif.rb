@@ -25,15 +25,11 @@ class Bcif < Package
   depends_on 'unzip'
 
   def self.build
-    FileUtils.cd('Cpp') do
-      system 'bash make.sh'
-    end
+    system 'bash', 'make.sh', chdir: 'Cpp'
   end
 
   def self.install
-    FileUtils.cd('Cpp') do
-      system "mkdir -p #{CREW_DEST_PREFIX}/bin"
-      system "cp bcif #{CREW_DEST_PREFIX}/bin"
-    end
+    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/bin"
+    FileUtils.install 'Cpp/bcif', "#{CREW_DEST_PREFIX}/bin", mode: 0o755
   end
 end
