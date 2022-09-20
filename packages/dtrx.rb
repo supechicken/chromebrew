@@ -6,8 +6,8 @@ class Dtrx < Package
   version '8.4.0'
   license 'GPL-3'
   compatibility 'all'
-  source_url 'https://github.com/dtrx-py/dtrx/releases/download/8.4.0/dtrx-8.4.0.tar.gz'
-  source_sha256 'e96b87194481a54807763b33fc764d4de5fe0e4df6ee51147f72c0ccb3bed6fa'
+  source_url 'https://github.com/dtrx-py/dtrx.git'
+  git_hashtag version
 
   no_compile_needed
 
