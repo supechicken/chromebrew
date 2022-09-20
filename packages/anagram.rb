@@ -13,7 +13,7 @@ class Anagram < Package
     system "./configure #{CREW_OPTIONS}"
     system 'make'
 
-    File.write 'anagram-wrapper', <<~EOF
+    @_anagram_wrapper = <<~EOF
       #!/bin/bash -e
 
       exec #{CREW_PREFIX}/share/anagram/bin/anagram \
@@ -31,7 +31,8 @@ class Anagram < Package
 
     system "gzip -c -9 anagram.1 > #{CREW_DEST_MAN_PREFIX}/man1/anagram.1.gz"
 
-    FileUtils.install 'anagram-wrapper', "#{CREW_DEST_PREFIX}/bin/anagram", mode: 0o755
+    File.write "#{CREW_DEST_PREFIX}/bin/anagram", @_anagram_wrapper, perm: 0o755
+
     FileUtils.install 'anagram', "#{CREW_DEST_PREFIX}/share/anagram/bin", mode: 0o755
     FileUtils.install 'crossword.txt', "#{CREW_DEST_PREFIX}/share/anagram", mode: 0o644
     FileUtils.install 'wordlist.bin', "#{CREW_DEST_PREFIX}/share/anagram", mode: 0o644
