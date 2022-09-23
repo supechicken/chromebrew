@@ -17,6 +17,12 @@ CREW_BUILD: "#{CREW_TGT}"
 CREW_LINKER       : "#{ENV.fetch('CREW_LINKER', 'mold')}"
 CREW_LINKER_FLAGS : "#{ENV.fetch('CREW_LINKER_FLAGS', nil)}"
 
+CREW_CORE_FLAGS           : "-O2 -pipe -ffat-lto-objects -fPIC -fuse-ld=#{CREW_LINKER} #{CREW_LINKER_FLAGS}"
+CREW_COMMON_FLAGS         : "#{CREW_CORE_FLAGS} -flto"
+CREW_COMMON_FNO_LTO_FLAGS : "#{CREW_CORE_FLAGS} -fno-lto"
+CREW_LDFLAGS              : "-flto #{CREW_LINKER_FLAGS}"
+CREW_FNO_LTO_LDFLAGS      : -fno-lto
+
 CREW_ENV_OPTIONS: |-
   #{
     CREW_ENV_OPTIONS_HASH = if CREW_DISABLE_ENV_OPTIONS
@@ -55,12 +61,6 @@ CREW_ENV_FNO_LTO_OPTIONS: |-
 
 # Use ninja or samurai
 CREW_NINJA                : "#{ENV.fetch('CREW_NINJA', 'samu')}"
-
-CREW_CORE_FLAGS           : "-O2 -pipe -ffat-lto-objects -fPIC -fuse-ld=#{CREW_LINKER} #{CREW_LINKER_FLAGS}"
-CREW_COMMON_FLAGS         : "#{CREW_CORE_FLAGS} -flto"
-CREW_COMMON_FNO_LTO_FLAGS : "#{CREW_CORE_FLAGS} -fno-lto"
-CREW_LDFLAGS              : "-flto #{CREW_LINKER_FLAGS}"
-CREW_FNO_LTO_LDFLAGS      : -fno-lto
 
 CREW_OPTIONS: >-
   --prefix=#{CREW_PREFIX}
