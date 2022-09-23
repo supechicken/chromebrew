@@ -4,7 +4,7 @@ require 'yaml'
 require_relative 'color'
 
 # import config file (in #{CREW_PREFIX}/etc/crew/config.json)
-config_path = File.expand_path(__dir__, '../../../etc/crew/config.json')
+config_path = File.expand_path('../../../etc/crew/config.json', __dir__)
 
 if File.exist?(config_path)
   JSON.load_file(config_path).each_pair do |name, value|
@@ -21,7 +21,7 @@ end
 require_relative 'runtime_const'
 
 # import build constants (in etc/build_const.yaml)
-YAML.load_file(File.expand_path(__dir__, '../etc/build_const.yaml')).each_pair do |name, value|
+YAML.load_file(File.expand_path('../etc/build_const.yaml', __dir__)).each_pair do |name, value|
   value = eval(value.inspect.sub('\#{', '#{')) # resolve variables in string
   Object.const_get(name, value)
 end
