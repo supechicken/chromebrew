@@ -1,6 +1,7 @@
 # const.rb: Load constants from different files
 require 'json'
 require 'yaml'
+require 'fileutils'
 require_relative 'color'
 
 # import config file (in #{CREW_PREFIX}/etc/crew/config.json)
