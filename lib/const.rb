@@ -23,5 +23,5 @@ require_relative 'runtime_const'
 # import build constants (in etc/build_const.yaml)
 YAML.load_file(File.expand_path('../etc/build_const.yaml', __dir__)).each_pair do |name, value|
   value = eval(value.inspect.gsub('\#{', '#{').gsub('\n', "\n")) # resolve variables in string
-  Object.const_get(name, value)
+  Object.const_set(name, value)
 end
