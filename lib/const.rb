@@ -9,7 +9,7 @@ config_file = File.expand_path('../../../etc/crew/config.json', __dir__)
 unless File.exist?(config_file)
   # generate a new one if not exist
   warn 'Configuration file does not exist! A new one will be generated.'.yellow
-  system File.join(__dir__, '../bin/crew_generate_config')
+  system 'ruby', File.expand_path('../tools/generate_config.rb', __dir__)
 end
 
 JSON.load_file(config_file).each_pair do |name, value|
