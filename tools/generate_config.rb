@@ -75,10 +75,10 @@ end.map do |crew_const|
 end.to_h
 
 # write to config
-config_path = File.join(CREW_CONFIG_PATH, 'config.json')
+config_file = File.join(CREW_CONFIG_PATH, 'config.json')
 json = JSON.pretty_generate(config)
 
 FileUtils.mkdir_p CREW_CONFIG_PATH
-File.write(config_path, json)
+File.write(config_file, json)
 
-puts "Configuration file saved in #{config_path}."
+puts "Configuration file saved in #{config_file}."
