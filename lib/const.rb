@@ -13,7 +13,7 @@ unless File.exist?(config_file)
 end
 
 JSON.load_file(config_file).each_pair do |name, value|
-  value = eval(value.inspect.sub('\#{', '#{')) # resolve variables in string
+  value = eval(value.inspect.gsub('\#{', '#{').gsub('\n', "\n")) # resolve variables in string
   Object.const_set(name, value)
 end
 
@@ -22,6 +22,6 @@ require_relative 'runtime_const'
 
 # import build constants (in etc/build_const.yaml)
 YAML.load_file(File.expand_path('../etc/build_const.yaml', __dir__)).each_pair do |name, value|
-  value = eval(value.inspect.sub('\#{', '#{')) # resolve variables in string
+  value = eval(value.inspect.gsub('\#{', '#{').gsub('\n', "\n")) # resolve variables in string
   Object.const_get(name, value)
 end
