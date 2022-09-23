@@ -1,4 +1,4 @@
-# build_const.yml: Defines constants used in building packages from source
+# build_const.yaml: Defines constants used in building packages from source
 
 CREW_CORE_FLAGS           : "-O2 -pipe -ffat-lto-objects -fPIC -fuse-ld=#{CREW_LINKER} #{CREW_LINKER_FLAGS}"
 CREW_COMMON_FLAGS         : "#{CREW_CORE_FLAGS} -flto"
