@@ -292,6 +292,9 @@ git sparse-checkout set packages lib bin crew tools
 git reset --hard origin/"${BRANCH}"
 echo -e "${RESET}"
 
+echo_info "Generating crew configuration file...\n"
+ruby ${CREW_LIB_PATH}/tools/generate_config.rb --prefix="${CREW_PREFIX}" --home="${HOME}" --arch="${ARCH}"
+
 echo_info "Updating crew package information...\n"
 # Without setting LD_LIBRARY_PATH, the mandb postinstall fails
 # from not being able to find the gdbm library.
