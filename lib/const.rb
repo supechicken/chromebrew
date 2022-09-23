@@ -1,7 +1,6 @@
 # const.rb: Load constants from different files
 require 'json'
 require 'yaml'
-require 'fileutils'
 require_relative 'color'
 
 # import config file (in #{CREW_PREFIX}/etc/crew/config.json)
@@ -10,7 +9,7 @@ config_file = File.expand_path('../../../etc/crew/config.json', __dir__)
 unless File.exist?(config_file)
   # generate a new one if not exist
   warn 'Configuration file does not exist! A new one will be generated.'.yellow
-  system 'ruby', File.expand_path('../tools/generate_config.rb', __dir__)
+  system 'ruby', File.expand_path('../tools/generate_config.rb', __dir__), exception: true
 end
 
 JSON.load_file(config_file).each_pair do |name, value|

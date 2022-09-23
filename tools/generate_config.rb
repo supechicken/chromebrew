@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # crew_generate_config.rb: Generate configuration file for Chromebrew
+require 'fileutils'
 require 'json'
 require 'optparse'
 
