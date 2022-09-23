@@ -51,7 +51,7 @@ CREW_ENV_FNO_LTO_OPTIONS: |-
                                         'CXXFLAGS' => CREW_COMMON_FNO_LTO_FLAGS,
                                         'FCFLAGS'  => CREW_COMMON_FNO_LTO_FLAGS,
                                         'FFLAGS'   => CREW_COMMON_FNO_LTO_FLAGS,
-                                        'LDFLAGS'  => CREW_FNO_LTO_LDFLAGS"
+                                        'LDFLAGS'  => CREW_FNO_LTO_LDFLAGS
                                       }
                                     end
 
