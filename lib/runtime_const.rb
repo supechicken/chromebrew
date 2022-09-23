@@ -81,48 +81,6 @@ SSL_CERT_DIR = if ENV['SSL_CERT_DIR'].to_s.empty? || !Dir.exist?(ENV.fetch('SSL_
                  ENV.fetch('SSL_CERT_DIR', nil)
                end
 
-case ARCH
-when 'aarch64', 'armv7l'
-  CREW_TGT = 'armv7l-cros-linux-gnueabihf'
-  CREW_BUILD = 'armv7l-cros-linux-gnueabihf'
-when 'i686'
-  CREW_TGT = 'i686-cros-linux-gnu'
-  CREW_BUILD = 'i686-cros-linux-gnu'
-when 'x86_64'
-  CREW_TGT = 'x86_64-cros-linux-gnu'
-  CREW_BUILD = 'x86_64-cros-linux-gnu'
-end
-
-CREW_LINKER = ENV.fetch('CREW_LINKER', 'mold')
-CREW_LINKER_FLAGS = ENV.fetch('CREW_LINKER_FLAGS', nil)
-
-CREW_ENV_OPTIONS_HASH = if CREW_DISABLE_ENV_OPTIONS
-                          { 'CREW_DISABLE_ENV_OPTIONS' => '1' }
-                        else
-                          {
-                            'CFLAGS'   => CREW_COMMON_FLAGS,
-                            'CXXFLAGS' => CREW_COMMON_FLAGS,
-                            'FCFLAGS'  => CREW_COMMON_FLAGS,
-                            'FFLAGS'   => CREW_COMMON_FLAGS,
-                            'LDFLAGS'  => CREW_LDFLAGS
-                          }
-                        end
-# parse from hash to shell readable string
-CREW_ENV_OPTIONS = CREW_ENV_OPTIONS_HASH.map { |k, v| "#{k}=\"#{v}\"" }.join(' ')
-
-CREW_ENV_FNO_LTO_OPTIONS_HASH = {
-  'CFLAGS'   => CREW_COMMON_FNO_LTO_FLAGS,
-  'CXXFLAGS' => CREW_COMMON_FNO_LTO_FLAGS,
-  'FCFLAGS'  => CREW_COMMON_FNO_LTO_FLAGS,
-  'FFLAGS'   => CREW_COMMON_FNO_LTO_FLAGS,
-  'LDFLAGS'  => CREW_FNO_LTO_LDFLAGS
-}
-# parse from hash to shell readable string
-CREW_ENV_FNO_LTO_OPTIONS = CREW_ENV_FNO_LTO_OPTIONS_HASH.map { |k, v| "#{k}=\"#{v}\"" }.join(' ')
-
-# Use ninja or samurai
-CREW_NINJA = ENV.fetch('CREW_NINJA', 'samu')
-
 CREW_ESSENTIAL_FILES = (
                          `LD_TRACE_LOADED_OBJECTS=1 #{CREW_PREFIX}/bin/ruby`.scan(/\t([^ ]+)/).flatten +
                          `LD_TRACE_LOADED_OBJECTS=1 #{CREW_PREFIX}/bin/rsync`.scan(/\t([^ ]+)/).flatten +
