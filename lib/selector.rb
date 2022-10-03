@@ -36,7 +36,10 @@ class Selector
   private def start_reading
     # start_reading(): read from terminal in separate thread
     @io_read = Thread.new do
-      $stdin.gets('') # discard any input in the input buffer
+      # discard any input in the input buffer
+      $stdin.read_nonblock(1024)
+    rescue IO::WaitReadable
+    ensure
       Thread.current[:input] = $stdin.getc
     end
   end
