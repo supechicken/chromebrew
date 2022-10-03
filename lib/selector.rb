@@ -67,13 +67,13 @@ class Selector
     end
 
     case
-    when Integer(@io_read&[:input], exception: false)&.between?(1, @options.size)
-      # when input is valid (is an integer and in range)
-      choice = @io_read[:input].to_i
-    when @io_read&[:input].to_s.chomp.empty?
+    when @io_read[:input].to_s.chomp.empty?
       # empty input or timeout
       warn "Selected \"#{@options[0][:value]}\" by default.".yellow
       choice = 1
+    when Integer(@io_read[:input], exception: false)&.between?(1, @options.size)
+      # when input is valid (is an integer and in range)
+      choice = @io_read[:input].to_i
     else
       # invalid input
       warn <<~EOT.yellow
