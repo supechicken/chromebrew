@@ -67,7 +67,7 @@ class Selector
     end
 
     case
-    when @io_read.nil? or @io_read[:input]&.chomp.empty?
+    when @io_read.nil?, @io_read[:input]&.chomp.empty?
       # empty input or timeout
       warn "Selected \"#{@options[0][:value]}\" by default.".yellow
       choice = 1
