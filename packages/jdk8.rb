@@ -77,7 +77,6 @@ class Jdk8 < Package
   end
 
   def self.postinstall
-    jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{jdk_arch}.tar.gz"][0]
     FileUtils.rm_f @jdk_bin if @jdk_bin
   end
 end
