@@ -25,11 +25,12 @@ class Selector
         # print current countdown
         $stderr.print "\r#{@prompt[:countdown] % time_remaining}"
 
-        if (time_remaining -= 1) == 0
+        if time_remaining == 0
           warn "Time expired.\n".yellow
           break when_timeout.call
         else
           sleep 1
+          time_remaining -= 1
         end
       end
     end
