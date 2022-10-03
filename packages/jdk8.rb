@@ -7,7 +7,16 @@ class Jdk8 < Package
   license 'Oracle-BCLA-JavaSE'
   compatibility 'all'
 
-  @jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{jdk_arch}.tar.gz"][0]
+  @jdk_arch = case ARCH
+             when 'aarch64', 'armv7l'
+               'arm32-vfp-hflt'
+             when 'i686'
+               'i586'
+             when 'x86_64'
+               'x64'
+             end
+
+  @jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{@jdk_arch}.tar.gz"][0]
 
   if @jdk_bin
     source_url 'file://' + @jdk_bin
@@ -35,15 +44,6 @@ class Jdk8 < Package
         return false
       end
     end
-
-    jdk_arch = case ARCH
-               when 'aarch64', 'armv7l'
-                 'arm32-vfp-hflt'
-               when 'i686'
-                 'i586'
-               when 'x86_64'
-                 'x64'
-               end
 
     unless @jdk_bin
       abort <<~EOT.orange
