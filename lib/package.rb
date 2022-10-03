@@ -1,5 +1,6 @@
 require 'English'
 require_relative 'package_helpers'
+require_relative 'selector'
 
 class Package
   property :description, :homepage, :version, :license, :compatibility,
