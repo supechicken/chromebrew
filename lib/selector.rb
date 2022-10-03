@@ -22,12 +22,13 @@ class Selector
       time_remaining = @timeout
 
       while time_remaining.positive? do
+        # print current countdown
+        $stderr.print "\r#{@prompt[:countdown] % time_remaining}"
+
         if (time_remaining -= 1) == 0
-          $stderr.print "\nTime expired.\n\n".yellow
+          warn "Time expired.\n".yellow
           break when_timeout.call
         else
-          # print current countdown
-          $stderr.print "\r#{@prompt[:countdown] % time_remaining}"
           sleep 1
         end
       end
@@ -67,7 +68,7 @@ class Selector
     end
 
     case
-    when @io_read.nil?, @io_read[:input]&.chomp&.empty?
+    when @io_read.nil?, @io_read[:input].to_s.chomp.empty?
       # empty input or timeout
       warn "Selected \"#{@options[0][:value]}\" by default.".yellow
       choice = 1
