@@ -26,7 +26,7 @@ class Selector
         sleep 1
 
         if remaining_time == 0
-          warn "Time expired.\n".yellow
+          warn "\nTime expired.\n".yellow
           when_timeout.call
         end
       end
