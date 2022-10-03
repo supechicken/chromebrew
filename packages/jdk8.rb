@@ -7,6 +7,16 @@ class Jdk8 < Package
   license 'Oracle-BCLA-JavaSE'
   compatibility 'all'
 
+  @jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{jdk_arch}.tar.gz"][0]
+
+  if @jdk_bin
+    source_url 'file://' + @jdk_bin
+  else
+    source_url 'SKIP'
+  end
+
+  source_sha256 'SKIP'
+
   no_compile_needed
   no_patchelf
 
@@ -35,9 +45,7 @@ class Jdk8 < Package
                  'x64'
                end
 
-    jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{jdk_arch}.tar.gz"][0]
-
-    unless jdk_bin
+    unless @jdk_bin
       abort <<~EOT.orange
 
         Oracle now requires an account to download the JDK.
@@ -49,9 +57,6 @@ class Jdk8 < Package
 
       EOT
     end
-
-    source_url 'file://' + jdk_bin
-    source_sha256 'SKIP'
   end
 
   def self.install
@@ -73,6 +78,6 @@ class Jdk8 < Package
 
   def self.postinstall
     jdk_bin = Dir["#{HOME}/Downloads/jdk-8u*-linux-#{jdk_arch}.tar.gz"][0]
-    FileUtils.rm_f jdk_bin if jdk_bin
+    FileUtils.rm_f @jdk_bin if @jdk_bin
   end
 end
