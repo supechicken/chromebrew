@@ -19,18 +19,15 @@ class Selector
   private def fire_timer (&when_timeout)
     # fire_timer(): start a timer in separate thread
     @countdown = Thread.new do
-      time_remaining = @timeout
-
-      while time_remaining.positive? do
+      @timeout.downto(0).each do |remaining_time|
         # print current countdown
-        $stderr.print "\r#{@prompt[:countdown] % time_remaining}"
+        $stderr.print "\r#{@prompt[:countdown] % remaining_time}"
 
-        if time_remaining == 0
+        sleep 1
+
+        if remaining_time == 0
           warn "Time expired.\n".yellow
           break when_timeout.call
-        else
-          sleep 1
-          time_remaining -= 1
         end
       end
     end
