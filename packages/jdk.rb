@@ -31,10 +31,10 @@ class Jdk < Package
       end.to_h
 
       options = [
-        { name: 'jdk8' , description: "Oracle JDK 8"  },
-        { name: 'jdk11', description: "Oracle JDK 11" }, 
-        { name: 'jdk17', description: "Oracle JDK 17" },
-        { name: 'jdk18', description: "Oracle JDK 18" }
+        { value: 'jdk8' , description: "Oracle JDK 8"  },
+        { value: 'jdk11', description: "Oracle JDK 11" }, 
+        { value: 'jdk17', description: "Oracle JDK 17" },
+        { value: 'jdk18', description: "Oracle JDK 18" }
       ]
 
       depends_on Selector.new(options).show_prompt
