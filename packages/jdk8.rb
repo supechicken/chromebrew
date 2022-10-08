@@ -2,7 +2,7 @@ require 'package'
 
 class Jdk8 < Package
   description 'The JDK is a development environment for building applications, applets, and components using the Java programming language.'
-  homepage 'https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html'
+  homepage 'https://www.oracle.com/java/technologies/javase/jdk8-archive-downloads.html'
   version '8u333+'
   license 'Oracle-BCLA-JavaSE'
   compatibility 'all'
@@ -51,7 +51,7 @@ class Jdk8 < Package
         Oracle now requires an account to download the JDK.
 
         You must login at https://login.oracle.com/mysso/signon.jsp and then visit:
-        https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+        https://www.oracle.com/java/technologies/javase/jdk8-archive-downloads.html
 
         Download the JDK for your architecture to #{HOME}/Downloads to continue.
 

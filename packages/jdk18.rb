@@ -2,12 +2,12 @@ require 'package'
 
 class Jdk18 < Package
   description 'The JDK is a development environment for building applications, applets, and components using the Java programming language.'
-  homepage 'https://www.oracle.com/java/technologies/javase/javase-jdk11-downloads.html'
+  homepage 'https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html'
   version '18.x'
   license 'Oracle-BCLA-JavaSE'
   compatibility 'x86_64'
 
-  @jdk_bin = Dir["#{HOME}/Downloads/jdk-11.*-linux-x64.tar.gz"][0]
+  @jdk_bin = Dir["#{HOME}/Downloads/jdk-18.*_linux-x64.tar.gz"][0]
 
   if @jdk_bin
     source_url 'file://' + @jdk_bin
@@ -42,7 +42,7 @@ class Jdk18 < Package
         Oracle now requires an account to download the JDK.
 
         You must login at https://login.oracle.com/mysso/signon.jsp and then visit:
-        https://www.oracle.com/java/technologies/downloads/#java18
+        https://www.oracle.com/java/technologies/javase/jdk18-archive-downloads.html
 
         Download the JDK for your architecture to #{HOME}/Downloads to continue.
 
