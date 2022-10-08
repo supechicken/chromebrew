@@ -42,7 +42,7 @@ class Jdk17 < Package
         Oracle now requires an account to download the JDK.
 
         You must login at https://login.oracle.com/mysso/signon.jsp and then visit:
-        https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+        https://www.oracle.com/java/technologies/downloads/#java17
 
         Download the JDK for your architecture to #{HOME}/Downloads to continue.
 
