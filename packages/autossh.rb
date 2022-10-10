@@ -23,12 +23,12 @@ class Autossh < Package
   })
 
   depends_on 'openssh'
-  
+
   def self.build
     system "./configure #{CREW_OPTIONS} --with-ssh=$(command -v ssh)"
     system 'make'
   end
-  
+
   def self.install
     FileUtils.mkdir_p %W[#{CREW_DEST_PREFIX}/bin
       #{CREW_DEST_PREFIX}/share/doc/autossh
