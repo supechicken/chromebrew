@@ -18,8 +18,8 @@ class Crouton_xiwi < Package
 
   def self.build
     Dir.chdir('src') do
-      system 'cc', '-lX11', '-lXfixes', '-lXdamage', '-lXext', '-lXtst', 'fbserver.c', '-o', 'xiwi_fbserver'
-      system 'cc', 'findnacld.c', 'xiwi_findnacld'
+      system 'cc', '-I', '.', '-lX11', '-lXfixes', '-lXdamage', '-lXext', '-lXtst', 'fbserver.c', '-o', 'xiwi_fbserver'
+      system 'cc', '-I', '.', 'findnacld.c', '-o', 'xiwi_findnacld'
     end
   end
 
@@ -27,8 +27,8 @@ class Crouton_xiwi < Package
     FileUtils.mkdir_p File.join(CREW_DEST_PREFIX, 'bin')
 
     Dir.chdir('src') do
-      FileUtils.install 'xiwi_fbserver', File.join(CREW_DEST_PREFIX, 'bin'), mode: 0o755
-      FileUtils.install 'xiwi_findnacld', File.join(CREW_DEST_PREFIX, 'bin'), mode: 0o755
+      FileUtils.install 'xiwi_fbserver', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
+      FileUtils.install 'xiwi_findnacld', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
     end
   end
 end
