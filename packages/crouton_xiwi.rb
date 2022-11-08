@@ -24,11 +24,13 @@ class Crouton_xiwi < Package
   end
 
   def self.install
-    FileUtils.mkdir_p File.join(CREW_DEST_PREFIX, 'bin')
+    FileUtils.mkdir_p [ File.join(CREW_DEST_PREFIX, 'bin'), File.join(CREW_DEST_PREFIX, 'etc') ]
 
-    Dir.chdir('src') do
-      FileUtils.install 'xiwi_fbserver', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
-      FileUtils.install 'xiwi_findnacld', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
-    end
+    FileUtils.install 'src/xiwi_fbserver', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
+    FileUtils.install 'src/xiwi_findnacld', File.join(CREW_DEST_PREFIX, 'bin/'), mode: 0o755
+    FileUtils.install 'chroot-bin/croutonfindnacl', File.join(CREW_DEST_PREFIX, 'bin/xiwi_findnacl'), mode: 0o755
+    FileUtils.install 'chroot-etc/xorg-dummy.conf', File.join(CREW_DEST_PREFIX, 'etc/'), mode: 0o755
+
+    Dir.chdir('')
   end
 end
