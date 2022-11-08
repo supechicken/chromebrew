@@ -17,6 +17,6 @@ class Xorg_dummy_driver < Package
   end
 
   def self.install
-    system 'make', "DESTDIR=#{DESTDIR}", 'install'
+    system 'make', "DESTDIR=#{CREW_DEST_DIR}", 'install'
   end
 end
