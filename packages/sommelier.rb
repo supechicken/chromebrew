@@ -7,7 +7,7 @@ class Sommelier < Package
   license 'BSD-Google'
   compatibility 'aarch64,armv7l,x86_64'
   source_url 'https://github.com/supechicken/crew-package-sommelier.git'
-  git_branch @_ver
+  git_branch version
 
   depends_on 'libdrm'
   depends_on 'libevdev'
