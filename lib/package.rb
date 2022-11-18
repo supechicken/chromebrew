@@ -1,4 +1,5 @@
 require 'English'
+require_relative 'backtick'
 require_relative 'const'
 require_relative 'color'
 require_relative 'package_helpers'
