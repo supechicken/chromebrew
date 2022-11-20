@@ -107,9 +107,7 @@ class Mesa < Package
     FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
 
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
-  end
 
-  def self.postinstall
     # The following are hacks to keep sommelier from complaining.
     Dir.chdir("#{CREW_LIB_PREFIX}/dri") do
       FileUtils.ln_sf '.', 'tls' unless File.exist?('tls')
