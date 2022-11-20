@@ -1,6 +1,6 @@
 require 'package'
 
-class Mesa < Package
+class Mesa_amber < Package
   description 'Open-source implementation of the OpenGL specification'
   homepage 'https://www.mesa3d.org'
   # We use mesa amber (derived from the 21.3 series) for older kernels
