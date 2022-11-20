@@ -263,6 +263,10 @@ class Mesa_amber < Package
   end
 
   def self.install
+    # copy supported pci list to filesystem for sommelier use
+    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
+    FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
+
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
 
     # refer to https://gitweb.gentoo.org/repo/gentoo.git/tree/media-libs/mesa-amber/mesa-amber-21.3.9.ebuild
