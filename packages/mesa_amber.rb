@@ -274,7 +274,6 @@ class Mesa_amber < Package
           system <<~BUILD
             meson setup #{CREW_MESON_OPTIONS} \
               -Db_asneeded=false \
-              -Dosmesa=#{osmesa} \
               -Damber=true \
               builddir
           BUILD
