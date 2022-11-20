@@ -219,7 +219,7 @@ class Mesa_amber < Package
         -Dglx=dri \
         -Dllvm=enabled \
         -Dshared-glapi=enabled \
-        -Dvulkan-drivers=intel,intel_hasvk \
+        -Dvulkan-drivers=intel \
         -Ddri-drivers=i965 \
         builddir
     BUILD
