@@ -3,17 +3,14 @@ require 'package'
 class Mesa_amber < Package
   description 'Open-source implementation of the OpenGL specification'
   homepage 'https://www.mesa3d.org'
-  # We use mesa amber (derived from the 21.3 series) for older kernels
-  # and current mesa versions for newer kernels.
-
-    # Built off of the mesa amber branch
-    git_hashtag 'acfef002a081f36e6eebc6e8ab908a36ab18f68c'
-    @_ver = git_hashtag[0, 7]
-    version "amber-#{@_ver}"
-
+  @_commit = 'acfef002a081f36e6eebc6e8ab908a36ab18f68c'
+  @_ver = "21.3.9-#{git_hashtag[0, 7]}"
+  version @_ver
   license 'MIT'
   compatibility 'all'
+
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
+  git_hashtag @_commit
 
   depends_on 'elfutils' # R
   depends_on 'eudev' # R
@@ -51,96 +48,53 @@ class Mesa_amber < Package
   depends_on 'zlibpkg' # R
   depends_on 'zstd' # R
 
+  def self.patch
+    puts 'Downloading patches...'.yellow
+    system 'curl', '-LZO', 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff'
 
-    def self.patch
-        # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
-        @freedrenopatch = <<~FREEDRENOPATCHEOF
-                  --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
-                  +++ b/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 19:52:53.115410668 +0000
-                  @@ -44,6 +44,15 @@
-                   #include "adreno_pm4.xml.h"
-                   #include "disasm.h"
-          #{'         '}
-                  +#include <unistd.h>
-                  +#include <sys/syscall.h>
-                  +
-                  +#ifndef SYS_gettid
-                  +#error "SYS_gettid unavailable on this system"
-                  +#endif
-                  +
-                  +#define gettid() ((pid_t)syscall(SYS_gettid))
-                  +
-                   #ifdef __cplusplus
-                   extern "C" {
-                   #endif
-        FREEDRENOPATCHEOF
-        File.write('freedreno.patch', @freedrenopatch)
-        system 'patch -Np1 -i freedreno.patch'
-        # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505
-        @tegrapatch = <<~TEGRAPATCHEOF
-                  diff --git a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-                  index 48d81f197db..f9b7bd57b27 100644
-                  --- a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-                  +++ b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-                  @@ -255,6 +255,10 @@ nvc0_validate_fb(struct nvc0_context *nvc0)
-          #{'         '}
-                            nvc0_resource_fence(res, NOUVEAU_BO_WR);
-          #{'         '}
-                  +         // hack to make opengl at least halfway working on a tegra k1
-                  +         // see: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505#note_627006
-                  +         fb->zsbuf=NULL;
-                  +
-                            assert(!fb->zsbuf);
-                         }
-        TEGRAPATCHEOF
-        File.write('tegra.patch', @tegrapatch)
-        system 'patch -Np1 -i tegra.patch'
+    # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
+    File.write 'freedreno.patch', <<~FREEDRENOPATCHEOF
+      --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
+      +++ b/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 19:52:53.115410668 +0000
+      @@ -44,6 +44,15 @@
+       #include "adreno_pm4.xml.h"
+       #include "disasm.h"
 
-      system 'curl', '-LZO', "https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff"
+      +#include <unistd.h>
+      +#include <sys/syscall.h>
+      +
+      +#ifndef SYS_gettid
+      +#error "SYS_gettid unavailable on this system"
+      +#endif
+      +
+      +#define gettid() ((pid_t)syscall(SYS_gettid))
+      +
+       #ifdef __cplusplus
+       extern "C" {
+       #endif
+    FREEDRENOPATCHEOF
 
+    # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505
+    File.write 'tegra.patch', <<~TEGRAPATCHEOF
+      diff --git a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
+      index 48d81f197db..f9b7bd57b27 100644
+      --- a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
+      +++ b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
+      @@ -255,6 +255,10 @@ nvc0_validate_fb(struct nvc0_context *nvc0)
 
+                nvc0_resource_fence(res, NOUVEAU_BO_WR);
 
+      +         // hack to make opengl at least halfway working on a tegra k1
+      +         // see: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505#note_627006
+      +         fb->zsbuf=NULL;
+      +
+                assert(!fb->zsbuf);
+              }
+    TEGRAPATCHEOF
 
-      # llvm 13/14 patch  See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5455
-      # & https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.patch
-      #downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.diff',
-      #           '76d2dd16532336837bccd4885c40efed0ab5f1de8e8fa114a7835dc269f221ac'
-      system 'patch -Np1 -i 13273.diff'
-      # mesa: Implement ANGLE_sync_control_rate (used by Chrome browser)
-      #downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15381.diff',
-      #           '1391e189f5ad40a711a6f72a7d59aef1b943ec9dc408852f5f562699bf50ba6c'
-      system 'patch -Np1 -i 15381.diff'
-      # llvm 15 patch
-      #puts 'patch 1'
-      #downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15091.diff',
-      #           'c53387c9fce1f34b6d7c0272ebef148dda59dea35fd83df2f3f4a0033732ebbd'
-      system 'patch -Np1 -i 15091.diff'
-      # another llvm 15 patch
-      #downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/15232.diff',
-      #           'c66b6b03a59ad43a89bc7ab4e04f8c311631d27c3ea6769217c09beef707d6c3'
-      system 'patch -Np1 -i 15232.diff'
-      # another llvm 15 patch
-      #puts 'patch 3'
-      #downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16129.diff',
-      #           '88e5d7f6b4e6dd4ac7220cf194aab6e86d748a8cb99a86515eb4c6bdf9b20959'
-      system 'patch -Np1 -i 16129.diff'
-        # another llvm 15 patch
-      #  puts 'patch 4'
-        # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff',
-        #            '56725f4238d8bb60d813db1724e37bf149345ff456c0c2792f0982d237c18cf1'
-        #system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff'
-        puts 'installing patch 4'
-        system 'patch -Np1 -F 10  -i 16289.diff'
-        # another llvm 15 patch
-        puts 'patch 5'
-        # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff',
-        #            'b769f0eb2db0b71723f8ad6f20c03a166a54eab74bfd292cf5b9c8ea86d2c73b'
-        #system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff'
-        system 'patch -Np1 -i 17514.diff'
-        puts 'downloader done'
-        # another llvm 15 patch
-        # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
-        @mesa_patch = <<~'PATCH_EOF'
+    # another llvm 15 patch
+    # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
+    File.write '17518.patch', <<~'PATCH_EOF'
         diff -Npaur a/lp_bld_arit.c b/lp_bld_arit.c
         --- a/src/gallium/auxiliary/gallivm/lp_bld_arit.c
         +++ b/src/gallium/auxiliary/gallivm/lp_bld_arit.c
@@ -268,27 +222,57 @@ class Mesa_amber < Package
             /*
              * We don't use RCPPS because:
 
-        PATCH_EOF
-        File.write('mesa.patch', @mesa_patch)
-        system 'patch -p1 -i mesa.patch'
-    end
+    PATCH_EOF
+
+    system 'patch', '-Np1', '-i', 'freedreno.patch'
+    system 'patch', '-Np1', '-i', 'tegra.patch'
+
+    # llvm 13/14 patch  See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5455
+    # & https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.patch
+    system 'patch', '-Np1', '-i', '13273.diff'
+    # mesa: Implement ANGLE_sync_control_rate (used by Chrome browser)
+    system 'patch', '-Np1', '-i', '15381.diff'
+    # llvm 15 patch
+    system 'patch', '-Np1', '-i', '15091.diff'
+    system 'patch', '-Np1', '-i', '15232.diff'
+    system 'patch', '-Np1', '-i', '16129.diff'
+    system 'patch', '-Np1', '-F', '10', '-i', '16289.diff'
+    system 'patch', '-Np1', '-i', '17514.diff'
+    system 'patch', '-Np1', '-i', '17158.patch'
+  end
 
     def self.build
+      system <<~BUILD
+        meson setup #{CREW_MESON_OPTIONS} \
+          -Db_asneeded=false \
+          -Damber=true \
+          -Ddri3=enabled \
+          -Degl=enabled \
+          -Dgbm=enabled \
+          -Dgles2=enabled \
+          -Dglvnd=true \
+          -Dglx=dri \
+          -Dshared-glapi=enabled \
+          -Ddri-drivers=i965 \
+          -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
+          builddir
+      BUILD
 
-          # amber mesa
-          system <<~BUILD
-            meson setup #{CREW_MESON_OPTIONS} \
-              -Db_asneeded=false \
-              -Ddri-drivers=i965 \
-              -Damber=true \
-              builddir
-          BUILD
-
-          system 'meson configure builddir'
-          system 'mold -run samu -C builddir'
+      system 'meson configure builddir'
+      system 'mold -run samu -C builddir'
   end
 
   def self.install
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
+
+    # refer to https://gitweb.gentoo.org/repo/gentoo.git/tree/media-libs/mesa-amber/mesa-amber-21.3.9.ebuild
+    puts 'Removing files provided by mainline mesa...'.yellow
+
+    FileUtils.rm_rf Dir[
+      "#{CREW_DEST_LIB_PREFIX}/libgbm.so*",
+      "#{CREW_DEST_LIB_PREFIX}/libglapi.so*",
+      "#{CREW_DEST_PREFIX}/include/",
+      "#{CREW_DEST_PREFIX}/share/drirc.d/00-mesa-defaults.conf"
+    ]
   end
 end
