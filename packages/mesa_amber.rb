@@ -238,7 +238,7 @@ class Mesa_amber < Package
     system 'patch', '-Np1', '-i', '16129.diff'
     system 'patch', '-Np1', '-F', '10', '-i', '16289.diff'
     system 'patch', '-Np1', '-i', '17514.diff'
-    system 'patch', '-Np1', '-i', '17158.patch'
+    system 'patch', '-Np1', '-i', '17518.patch'
   end
 
     def self.build
