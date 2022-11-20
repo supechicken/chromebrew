@@ -73,6 +73,7 @@ class Mesa < Package
   end
 
     def self.patch
+      Dir.chdir('amber') do
         # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
         @freedrenopatch = <<~FREEDRENOPATCHEOF
                   --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
@@ -139,23 +140,23 @@ class Mesa < Package
       downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16129.diff',
                  '88e5d7f6b4e6dd4ac7220cf194aab6e86d748a8cb99a86515eb4c6bdf9b20959'
       system 'patch -Np1 -i 16129.diff'
-      # another llvm 15 patch
-      puts 'patch 4'
-      # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff',
-      #            '56725f4238d8bb60d813db1724e37bf149345ff456c0c2792f0982d237c18cf1'
-      system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff'
-      puts 'installing patch 4'
-      system 'patch -Np1 -F 10  -i 16289.diff'
-      # another llvm 15 patch
-      puts 'patch 5'
-      # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff',
-      #            'b769f0eb2db0b71723f8ad6f20c03a166a54eab74bfd292cf5b9c8ea86d2c73b'
-      system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff'
-      system 'patch -Np1 -i 17514.diff'
-      puts 'downloader done'
-      # another llvm 15 patch
-      # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
-      @mesa_patch = <<~'PATCH_EOF'
+        # another llvm 15 patch
+        puts 'patch 4'
+        # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff',
+        #            '56725f4238d8bb60d813db1724e37bf149345ff456c0c2792f0982d237c18cf1'
+        system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/16289.diff'
+        puts 'installing patch 4'
+        system 'patch -Np1 -F 10  -i 16289.diff'
+        # another llvm 15 patch
+        puts 'patch 5'
+        # downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff',
+        #            'b769f0eb2db0b71723f8ad6f20c03a166a54eab74bfd292cf5b9c8ea86d2c73b'
+        system 'curl -OLf https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17514.diff'
+        system 'patch -Np1 -i 17514.diff'
+        puts 'downloader done'
+        # another llvm 15 patch
+        # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
+        @mesa_patch = <<~'PATCH_EOF'
         diff -Npaur a/lp_bld_arit.c b/lp_bld_arit.c
         --- a/src/gallium/auxiliary/gallivm/lp_bld_arit.c
         +++ b/src/gallium/auxiliary/gallivm/lp_bld_arit.c
@@ -283,9 +284,10 @@ class Mesa < Package
             /*
              * We don't use RCPPS because:
 
-      PATCH_EOF
-      File.write('mesa.patch', @mesa_patch)
-      system 'patch -p1 -i mesa.patch'
+        PATCH_EOF
+        File.write('mesa.patch', @mesa_patch)
+        system 'patch -p1 -i mesa.patch'
+      end
     end
 
     def self.build
