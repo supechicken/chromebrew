@@ -4,7 +4,7 @@ class Mesa_amber < Package
   description 'Open-source implementation of the OpenGL specification'
   homepage 'https://www.mesa3d.org'
   @_commit = 'acfef002a081f36e6eebc6e8ab908a36ab18f68c'
-  @_ver = "21.3.9-#{git_hashtag[0, 7]}"
+  @_ver = "21.3.9-#{@_commit[0, 7]}"
   version @_ver
   license 'MIT'
   compatibility 'all'
