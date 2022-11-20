@@ -124,6 +124,8 @@ class Mesa < Package
         FileUtils.ln_sf '../../libgbm.so', 'i915_gbm.so'
         # For AMD GPUs
         FileUtils.ln_sf '../../libgbm.so', 'amdgpu_gbm.so'
+        # For QEMU virgl
+        FileUtils.ln_sf '../../libgbm.so', 'virtio_gpu_gbm.so'
       end
     when 'armv7l', 'aarch64'
       Dir.chdir("#{CREW_LIB_PREFIX}/gbm/tls") do
