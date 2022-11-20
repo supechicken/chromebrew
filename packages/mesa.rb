@@ -11,6 +11,14 @@ class Mesa < Package
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
   git_hashtag "mesa-#{@_ver}"
 
+  binary_url({
+    x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
+  })
+
+  binary_sha256({
+    x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
+  })
+
   depends_on 'elfutils' # R
   depends_on 'eudev' # R
   depends_on 'expat' # R

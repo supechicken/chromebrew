@@ -12,6 +12,14 @@ class Mesa_amber < Package
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
   git_hashtag @_commit
 
+  binary_url({
+    x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa_amber-21.3.9-acfef00-chromeos-x86_64.tar.zst'
+  })
+
+  binary_sha256({
+    x86_64: 'a1735aa37c1f96d6285f99ff5367c97d467ebf230dc3a18cda220e7bdd509e0d'
+  })
+
   depends_on 'elfutils' # R
   depends_on 'eudev' # R
   depends_on 'expat' # R
