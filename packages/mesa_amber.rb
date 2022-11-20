@@ -7,17 +7,17 @@ class Mesa_amber < Package
   @_ver = "21.3.9-#{@_commit[0, 7]}"
   version @_ver
   license 'MIT'
-  compatibility 'all'
+  compatibility 'x86_64'
 
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
   git_hashtag @_commit
 
   binary_url({
-    x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa_amber-21.3.9-acfef00-chromeos-x86_64.tar.zst'
+    #x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa_amber-21.3.9-acfef00-chromeos-x86_64.tar.zst'
   })
 
   binary_sha256({
-    x86_64: 'a1735aa37c1f96d6285f99ff5367c97d467ebf230dc3a18cda220e7bdd509e0d'
+    #x86_64: 'a1735aa37c1f96d6285f99ff5367c97d467ebf230dc3a18cda220e7bdd509e0d'
   })
 
   depends_on 'elfutils' # R
@@ -59,46 +59,6 @@ class Mesa_amber < Package
   def self.patch
     puts 'Downloading patches...'.yellow
     system 'curl', '-LZO', 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff'
-
-    # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
-    File.write 'freedreno.patch', <<~FREEDRENOPATCHEOF
-      --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
-      +++ b/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 19:52:53.115410668 +0000
-      @@ -44,6 +44,15 @@
-       #include "adreno_pm4.xml.h"
-       #include "disasm.h"
-
-      +#include <unistd.h>
-      +#include <sys/syscall.h>
-      +
-      +#ifndef SYS_gettid
-      +#error "SYS_gettid unavailable on this system"
-      +#endif
-      +
-      +#define gettid() ((pid_t)syscall(SYS_gettid))
-      +
-       #ifdef __cplusplus
-       extern "C" {
-       #endif
-    FREEDRENOPATCHEOF
-
-    # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505
-    File.write 'tegra.patch', <<~TEGRAPATCHEOF
-      diff --git a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-      index 48d81f197db..f9b7bd57b27 100644
-      --- a/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-      +++ b/src/gallium/drivers/nouveau/nvc0/nvc0_state_validate.c
-      @@ -255,6 +255,10 @@ nvc0_validate_fb(struct nvc0_context *nvc0)
-
-                nvc0_resource_fence(res, NOUVEAU_BO_WR);
-
-      +         // hack to make opengl at least halfway working on a tegra k1
-      +         // see: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3505#note_627006
-      +         fb->zsbuf=NULL;
-      +
-                assert(!fb->zsbuf);
-              }
-    TEGRAPATCHEOF
 
     # another llvm 15 patch
     # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
@@ -232,9 +192,6 @@ class Mesa_amber < Package
 
     PATCH_EOF
 
-    system 'patch', '-Np1', '-i', 'freedreno.patch'
-    system 'patch', '-Np1', '-i', 'tegra.patch'
-
     # llvm 13/14 patch  See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5455
     # & https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.patch
     system 'patch', '-Np1', '-i', '13273.diff'
@@ -260,7 +217,9 @@ class Mesa_amber < Package
         -Dgles2=enabled \
         -Dglvnd=true \
         -Dglx=dri \
+        -Dllvm=enabled \
         -Dshared-glapi=enabled \
+        -Dvulkan-drivers=intel,intel_hasvk \
         -Ddri-drivers=i965 \
         builddir
     BUILD
@@ -272,19 +231,21 @@ class Mesa_amber < Package
   def self.install
     # copy supported pci list to filesystem for sommelier use
     FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
-    FileUtils.cp 'include/pci_ids/i965_pci_ids.h', "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
+    FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
 
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
+  end
 
-    # refer to https://gitweb.gentoo.org/repo/gentoo.git/tree/media-libs/mesa-amber/mesa-amber-21.3.9.ebuild
-    puts 'Removing files provided by mainline mesa...'.yellow
+  def self.postinstall
+    # The following are hacks to keep sommelier from complaining.
+    Dir.chdir("#{CREW_LIB_PREFIX}/dri") do
+      FileUtils.ln_sf '.', 'tls' unless File.exist?('tls')
+    end
 
-    FileUtils.rm_rf Dir[
-      "#{CREW_DEST_LIB_PREFIX}/libgbm.so*",
-      "#{CREW_DEST_LIB_PREFIX}/libglapi.so*",
-      "#{CREW_DEST_PREFIX}/include/",
-      "#{CREW_DEST_LIB_PREFIX}/pkgconfig/",
-      "#{CREW_DEST_PREFIX}/share/drirc.d/00-mesa-defaults.conf"
-    ]
+    FileUtils.mkdir_p "#{CREW_LIB_PREFIX}/gbm/tls"
+    Dir.chdir("#{CREW_LIB_PREFIX}/gbm/tls") do
+      # For Intel GPUs
+      FileUtils.ln_sf '../../libgbm.so', 'i915_gbm.so'
+    end
   end
 end

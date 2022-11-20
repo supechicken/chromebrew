@@ -3,21 +3,33 @@ require 'package'
 class Mesa < Package
   description 'Open-source implementation of the OpenGL specification'
   homepage 'https://www.mesa3d.org'
-  @_ver = '22.3.0-rc3'
-  version @_ver
   license 'MIT'
-  compatibility 'all'
+  compatibility 'aarch64,armv7l,x86_64'
 
-  source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
-  git_hashtag "mesa-#{@_ver}"
+  # We use mesa amber (derived from the 21.3 series) for intel hardware with older kernels
+  # and current mesa versions for newer kernels.
+  if CREW_IS_INTEL && ( Gem::Version.new(CREW_KERNEL_VERSION) < Gem::Version.new('4.16') )
+    amber_pkg = Package.load_package( File.join(CREW_PACKAGES_PATH, 'mesa_amber.rb') )
 
-  binary_url({
-    x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
-  })
+    version amber_pkg.version
+    compatibility amber_pkg.compatibility
+    is_fake
 
-  binary_sha256({
-    x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
-  })
+    depends_on 'mesa_amber'
+  else
+    @_ver = '22.3.0-rc3'
+    version @_ver
+    source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
+    git_hashtag "mesa-#{@_ver}"
+
+    binary_url({
+      x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
+    })
+
+    binary_sha256({
+      x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
+    })
+  end
 
   depends_on 'elfutils' # R
   depends_on 'eudev' # R
@@ -55,21 +67,12 @@ class Mesa < Package
   depends_on 'zlibpkg' # R
   depends_on 'zstd' # R
 
-  # We use mesa amber (derived from the 21.3 series) for intel hardware with older kernels
-  # and current mesa versions for newer kernels.
-  if CREW_IS_INTEL && ( Gem::Version.new(CREW_KERNEL_VERSION) < Gem::Version.new('4.16') )
-    depends_on 'mesa_amber'
-  end
-
   def self.build
     vulkan_drivers = %w[swrast virtio-experimental]
     galliumdrivers = %w[swrast virgl]
     osmesa = true
 
     case ARCH
-    when 'i686'
-      vulkan_drivers += %w[intel intel_hasvk]
-      osmesa = false
     when 'aarch64', 'armv7l'
       vulkan_drivers += %w[broadcom freedreno imagination-experimental panfrost]
       galliumdrivers += %w[freedreno nouveau tegra panfrost lima v3d vc4]
@@ -104,28 +107,28 @@ class Mesa < Package
     FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
 
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
+  end
 
-=begin
+  def self.postinstall
     # The following are hacks to keep sommelier from complaining.
-    Dir.chdir("#{CREW_DEST_LIB_PREFIX}/dri") do
-      FileUtils.ln_s '.', 'tls' unless File.exist?('tls')
+    Dir.chdir("#{CREW_LIB_PREFIX}/dri") do
+      FileUtils.ln_sf '.', 'tls' unless File.exist?('tls')
     end
 
-    FileUtils.mkdir_p "#{CREW_DEST_LIB_PREFIX}/gbm/tls"
+    FileUtils.mkdir_p "#{CREW_LIB_PREFIX}/gbm/tls"
 
     case ARCH
     when 'x86_64', 'i686'
-      Dir.chdir("#{CREW_DEST_LIB_PREFIX}/gbm/tls") do
+      Dir.chdir("#{CREW_LIB_PREFIX}/gbm/tls") do
         # For Intel GPUs
-        FileUtils.ln_s '../../libgbm.so', 'i915_gbm.so'
+        FileUtils.ln_sf '../../libgbm.so', 'i915_gbm.so'
         # For AMD GPUs
-        FileUtils.ln_s '../../libgbm.so', 'amdgpu_gbm.so'
+        FileUtils.ln_sf '../../libgbm.so', 'amdgpu_gbm.so'
       end
     when 'armv7l', 'aarch64'
-      Dir.chdir("#{CREW_DEST_LIB_PREFIX}/gbm/tls") do
-        FileUtils.ln_s '../../libgbm.so', 'pvr_gbm.so'
+      Dir.chdir("#{CREW_LIB_PREFIX}/gbm/tls") do
+        FileUtils.ln_sf '../../libgbm.so', 'pvr_gbm.so'
       end
     end
-=end
   end
 end
