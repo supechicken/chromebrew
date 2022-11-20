@@ -18,16 +18,16 @@ class Mesa < Package
     depends_on 'mesa_amber'
   else
     @_ver = '22.3.0-rc3'
-    version @_ver
+    version "#{@_ver}-1"
     source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
     git_hashtag "mesa-#{@_ver}"
 
     binary_url({
-      x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
+      #x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
     })
 
     binary_sha256({
-      x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
+      #x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
     })
   end
 
@@ -69,7 +69,7 @@ class Mesa < Package
 
   def self.build
     vulkan_drivers = %w[swrast virtio-experimental]
-    galliumdrivers = %w[swrast virgl]
+    galliumdrivers = %w[swrast zink virgl]
     osmesa = true
 
     case ARCH

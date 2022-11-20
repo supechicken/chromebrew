@@ -5,7 +5,7 @@ class Mesa_amber < Package
   homepage 'https://www.mesa3d.org'
   @_commit = 'acfef002a081f36e6eebc6e8ab908a36ab18f68c'
   @_ver = "21.3.9-#{@_commit[0, 7]}"
-  version @_ver
+  version "#{@_ver}-1"
   license 'MIT'
   compatibility 'x86_64'
 
@@ -63,132 +63,132 @@ class Mesa_amber < Package
     # another llvm 15 patch
     # Refreshed patch from https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/17518.diff
     File.write '17518.patch', <<~'PATCH_EOF'
-        diff -Npaur a/lp_bld_arit.c b/lp_bld_arit.c
-        --- a/src/gallium/auxiliary/gallivm/lp_bld_arit.c
-        +++ b/src/gallium/auxiliary/gallivm/lp_bld_arit.c
-        @@ -391,16 +391,10 @@ lp_build_comp(struct lp_build_context *b
-                  return LLVMBuildNot(builder, a, "");
-            }
+      diff -Npaur a/lp_bld_arit.c b/lp_bld_arit.c
+      --- a/src/gallium/auxiliary/gallivm/lp_bld_arit.c
+      +++ b/src/gallium/auxiliary/gallivm/lp_bld_arit.c
+      @@ -391,16 +391,10 @@ lp_build_comp(struct lp_build_context *b
+                return LLVMBuildNot(builder, a, "");
+          }
 
-        -   if(LLVMIsConstant(a))
-        -      if (type.floating)
-        -          return LLVMConstFSub(bld->one, a);
-        -      else
-        -          return LLVMConstSub(bld->one, a);
-        +   if (type.floating)
-        +      return LLVMBuildFSub(builder, bld->one, a, "");
-            else
-        -      if (type.floating)
-        -         return LLVMBuildFSub(builder, bld->one, a, "");
-        -      else
-        -         return LLVMBuildSub(builder, bld->one, a, "");
-        +      return LLVMBuildSub(builder, bld->one, a, "");
-         }
+      -   if(LLVMIsConstant(a))
+      -      if (type.floating)
+      -          return LLVMConstFSub(bld->one, a);
+      -      else
+      -          return LLVMConstSub(bld->one, a);
+      +   if (type.floating)
+      +      return LLVMBuildFSub(builder, bld->one, a, "");
+          else
+      -      if (type.floating)
+      -         return LLVMBuildFSub(builder, bld->one, a, "");
+      -      else
+      -         return LLVMBuildSub(builder, bld->one, a, "");
+      +      return LLVMBuildSub(builder, bld->one, a, "");
+       }
 
 
-        @@ -479,16 +473,10 @@ lp_build_add(struct lp_build_context *bl
-               }
-            }
+      @@ -479,16 +473,10 @@ lp_build_add(struct lp_build_context *bl
+             }
+          }
 
-        -   if(LLVMIsConstant(a) && LLVMIsConstant(b))
-        -      if (type.floating)
-        -         res = LLVMConstFAdd(a, b);
-        -      else
-        -         res = LLVMConstAdd(a, b);
-        +   if (type.floating)
-        +      res = LLVMBuildFAdd(builder, a, b, "");
-            else
-        -      if (type.floating)
-        -         res = LLVMBuildFAdd(builder, a, b, "");
-        -      else
-        -         res = LLVMBuildAdd(builder, a, b, "");
-        +      res = LLVMBuildAdd(builder, a, b, "");
+      -   if(LLVMIsConstant(a) && LLVMIsConstant(b))
+      -      if (type.floating)
+      -         res = LLVMConstFAdd(a, b);
+      -      else
+      -         res = LLVMConstAdd(a, b);
+      +   if (type.floating)
+      +      res = LLVMBuildFAdd(builder, a, b, "");
+          else
+      -      if (type.floating)
+      -         res = LLVMBuildFAdd(builder, a, b, "");
+      -      else
+      -         res = LLVMBuildAdd(builder, a, b, "");
+      +      res = LLVMBuildAdd(builder, a, b, "");
 
-            /* clamp to ceiling of 1.0 */
-            if(bld->type.norm && (bld->type.floating || bld->type.fixed))
-        @@ -815,16 +803,10 @@ lp_build_sub(struct lp_build_context *bl
-               }
-            }
+          /* clamp to ceiling of 1.0 */
+          if(bld->type.norm && (bld->type.floating || bld->type.fixed))
+      @@ -815,16 +803,10 @@ lp_build_sub(struct lp_build_context *bl
+             }
+          }
 
-        -   if(LLVMIsConstant(a) && LLVMIsConstant(b))
-        -      if (type.floating)
-        -         res = LLVMConstFSub(a, b);
-        -      else
-        -         res = LLVMConstSub(a, b);
-        +   if (type.floating)
-        +      res = LLVMBuildFSub(builder, a, b, "");
-            else
-        -      if (type.floating)
-        -         res = LLVMBuildFSub(builder, a, b, "");
-        -      else
-        -         res = LLVMBuildSub(builder, a, b, "");
-        +      res = LLVMBuildSub(builder, a, b, "");
+      -   if(LLVMIsConstant(a) && LLVMIsConstant(b))
+      -      if (type.floating)
+      -         res = LLVMConstFSub(a, b);
+      -      else
+      -         res = LLVMConstSub(a, b);
+      +   if (type.floating)
+      +      res = LLVMBuildFSub(builder, a, b, "");
+          else
+      -      if (type.floating)
+      -         res = LLVMBuildFSub(builder, a, b, "");
+      -      else
+      -         res = LLVMBuildSub(builder, a, b, "");
+      +      res = LLVMBuildSub(builder, a, b, "");
 
-            if(bld->type.norm && (bld->type.floating || bld->type.fixed))
-               res = lp_build_max_simple(bld, res, bld->zero, GALLIVM_NAN_RETURN_OTHER_SECOND_NONNAN);
-        @@ -980,29 +962,15 @@ lp_build_mul(struct lp_build_context *bl
-            else
-               shift = NULL;
+          if(bld->type.norm && (bld->type.floating || bld->type.fixed))
+             res = lp_build_max_simple(bld, res, bld->zero, GALLIVM_NAN_RETURN_OTHER_SECOND_NONNAN);
+      @@ -980,29 +962,15 @@ lp_build_mul(struct lp_build_context *bl
+          else
+             shift = NULL;
 
-        -   if(LLVMIsConstant(a) && LLVMIsConstant(b)) {
-        -      if (type.floating)
-        -         res = LLVMConstFMul(a, b);
-        -      else
-        -         res = LLVMConstMul(a, b);
-        -      if(shift) {
-        -         if(type.sign)
-        -            res = LLVMConstAShr(res, shift);
-        -         else
-        -            res = LLVMConstLShr(res, shift);
-        -      }
-        -   }
-        -   else {
-        -      if (type.floating)
-        -         res = LLVMBuildFMul(builder, a, b, "");
-        +   if (type.floating)
-        +       res = LLVMBuildFMul(builder, a, b, "");
-        +    else
-        +       res = LLVMBuildMul(builder, a, b, "");
-        +    if (shift) {
-        +       if (type.sign)
-        +          res = LLVMBuildAShr(builder, res, shift, "");
-               else
-        -         res = LLVMBuildMul(builder, a, b, "");
-        -      if(shift) {
-        -         if(type.sign)
-        -            res = LLVMBuildAShr(builder, res, shift, "");
-        -         else
-        -            res = LLVMBuildLShr(builder, res, shift, "");
-        -      }
-        +          res = LLVMBuildLShr(builder, res, shift, "");
-            }
+      -   if(LLVMIsConstant(a) && LLVMIsConstant(b)) {
+      -      if (type.floating)
+      -         res = LLVMConstFMul(a, b);
+      -      else
+      -         res = LLVMConstMul(a, b);
+      -      if(shift) {
+      -         if(type.sign)
+      -            res = LLVMConstAShr(res, shift);
+      -         else
+      -            res = LLVMConstLShr(res, shift);
+      -      }
+      -   }
+      -   else {
+      -      if (type.floating)
+      -         res = LLVMBuildFMul(builder, a, b, "");
+      +   if (type.floating)
+      +       res = LLVMBuildFMul(builder, a, b, "");
+      +    else
+      +       res = LLVMBuildMul(builder, a, b, "");
+      +    if (shift) {
+      +       if (type.sign)
+      +          res = LLVMBuildAShr(builder, res, shift, "");
+             else
+      -         res = LLVMBuildMul(builder, a, b, "");
+      -      if(shift) {
+      -         if(type.sign)
+      -            res = LLVMBuildAShr(builder, res, shift, "");
+      -         else
+      -            res = LLVMBuildLShr(builder, res, shift, "");
+      -      }
+      +          res = LLVMBuildLShr(builder, res, shift, "");
+          }
 
-            return res;
-        @@ -1288,15 +1256,6 @@ lp_build_div(struct lp_build_context *bl
-            if(a == bld->undef || b == bld->undef)
-               return bld->undef;
+          return res;
+      @@ -1288,15 +1256,6 @@ lp_build_div(struct lp_build_context *bl
+          if(a == bld->undef || b == bld->undef)
+             return bld->undef;
 
-        -   if(LLVMIsConstant(a) && LLVMIsConstant(b)) {
-        -      if (type.floating)
-        -         return LLVMConstFDiv(a, b);
-        -      else if (type.sign)
-        -         return LLVMConstSDiv(a, b);
-        -      else
-        -         return LLVMConstUDiv(a, b);
-        -   }
-        -
-            /* fast rcp is disabled (just uses div), so makes no sense to try that */
-            if(FALSE &&
-               ((util_get_cpu_caps()->has_sse && type.width == 32 && type.length == 4) ||
-        @@ -2643,7 +2602,7 @@ lp_build_rcp(struct lp_build_context *bl
-            assert(type.floating);
+      -   if(LLVMIsConstant(a) && LLVMIsConstant(b)) {
+      -      if (type.floating)
+      -         return LLVMConstFDiv(a, b);
+      -      else if (type.sign)
+      -         return LLVMConstSDiv(a, b);
+      -      else
+      -         return LLVMConstUDiv(a, b);
+      -   }
+      -
+          /* fast rcp is disabled (just uses div), so makes no sense to try that */
+          if(FALSE &&
+             ((util_get_cpu_caps()->has_sse && type.width == 32 && type.length == 4) ||
+      @@ -2643,7 +2602,7 @@ lp_build_rcp(struct lp_build_context *bl
+          assert(type.floating);
 
-            if(LLVMIsConstant(a))
-        -      return LLVMConstFDiv(bld->one, a);
-        +      return LLVMBuildFDiv(builder, bld->one, a, "");
+          if(LLVMIsConstant(a))
+      -      return LLVMConstFDiv(bld->one, a);
+      +      return LLVMBuildFDiv(builder, bld->one, a, "");
 
-            /*
-             * We don't use RCPPS because:
+          /*
+           * We don't use RCPPS because:
 
     PATCH_EOF
 
