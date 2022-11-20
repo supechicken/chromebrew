@@ -274,6 +274,8 @@ class Mesa_amber < Package
           system <<~BUILD
             meson setup #{CREW_MESON_OPTIONS} \
               -Db_asneeded=false \
+              -Ddri_drivers=i965 \
+              -Dosmesa=true \
               -Damber=true \
               builddir
           BUILD
