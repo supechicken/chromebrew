@@ -5,16 +5,12 @@ class Mesa < Package
   homepage 'https://www.mesa3d.org'
   # We use mesa amber (derived from the 21.3 series) for older kernels
   # and current mesa versions for newer kernels.
-  if CREW_KERNEL_VERSION.to_f < 5.10
+
     # Built off of the mesa amber branch
     git_hashtag 'acfef002a081f36e6eebc6e8ab908a36ab18f68c'
     @_ver = git_hashtag[0, 7]
     version "amber-#{@_ver}"
-  else
-    @_ver = '22.3.0-rc3'
-    version @_ver
-    git_hashtag "mesa-#{@_ver}"
-  end
+
   license 'MIT'
   compatibility 'all'
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
@@ -55,25 +51,8 @@ class Mesa < Package
   depends_on 'zlibpkg' # R
   depends_on 'zstd' # R
 
-  if build_from_source
-    # clone amber branch
-    if %w[i686 x86_64].include?(ARCH)
-      FileUtils.mkdir('amber')
-
-      Dir.chdir('amber') do
-        #system 'git', 'clone', source_url, '-b', 'amber', '--single-branch', '--depth=1', 'amber'
-        system 'git init'
-        system 'git config advice.detachedHead false'
-        system 'git config init.defaultBranch master'
-        system "git remote add origin #{source_url}"
-        system "git fetch --depth 1 origin acfef002a081f36e6eebc6e8ab908a36ab18f68c"
-        system 'git checkout FETCH_HEAD'
-      end
-    end
-  end
 
     def self.patch
-      Dir.chdir('amber') do
         # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
         @freedrenopatch = <<~FREEDRENOPATCHEOF
                   --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
@@ -287,30 +266,10 @@ class Mesa < Package
         PATCH_EOF
         File.write('mesa.patch', @mesa_patch)
         system 'patch -p1 -i mesa.patch'
-      end
     end
 
     def self.build
-      vulkan_drivers = %w[swrast virtio-experimental]
-      galliumdrivers = %w[swrast virgl]
-      lto = CREW_MESON_OPTIONS
-      osmesa = true
 
-      case ARCH
-      when 'i686'
-        vulkan_drivers += %w[intel intel_hasvk]
-        lto = CREW_MESON_FNO_LTO_OPTIONS
-        osmesa = false
-      when 'aarch64', 'armv7l'
-        vulkan_drivers += %w[broadcom freedreno imagination-experimental panfrost]
-        galliumdrivers += %w[freedreno nouveau tegra panfrost lima v3d vc4]
-      when 'x86_64'
-        vulkan_drivers += %w[amd intel intel_hasvk]
-        galliumdrivers += %w[radeonsi iris crocus]
-      end
-
-      if %w[i686 x86_64].include?(ARCH)
-        Dir.chdir('amber') do
           # amber mesa
           system <<~BUILD
             meson setup #{lto} \
@@ -322,71 +281,9 @@ class Mesa < Package
 
           system 'meson configure builddir'
           system 'mold -run samu -C builddir'
-        end
-      end
-
-      unless ARCH == 'i686'
-        # mainline mesa
-        system <<~BUILD
-          meson setup #{CREW_MESON_OPTIONS} \
-            -Db_asneeded=false \
-            -Ddri3=enabled \
-            -Degl=enabled \
-            -Dgbm=enabled \
-            -Dgles2=enabled \
-            -Dglvnd=true \
-            -Dglx=dri \
-            -Dllvm=enabled \
-            -Dvulkan-drivers=#{vulkan_drivers} \
-            -Dgallium-drivers=#{galliumdrivers} \
-            -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
-            builddir
-        BUILD
-
-        system 'meson configure builddir'
-        system 'mold -run samu -C builddir'
-      end
   end
 
   def self.install
-    FileUtils.mkdir %w[amber_destdir mainline_destdir]
-
-    warn 'Installing amber mesa...'.yellow
-    system "DESTDIR=#{Dir.pwd}/amber_destdir samu -C builddir install"
-    warn 'Installing mainline mesa...'.yellow
-    system "DESTDIR=#{Dir.pwd}/mainline_destdir samu -C builddir install", chdir: 'amber'
-
-    # check for conflicts between amber mesa and mainline mesa in case if any
-    amber_filelist    = `cd amber_destdir; find .`.lines(chomp: true)
-    mainline_filelist = `cd mainline_destdir; find .`.lines(chomp: true)
-
-    conflicts = mainline_filelist.intersection(amber_filelist)
-
-    if conflicts.any?
-      p conflicts
-      abort 'Conflict found!'.lightred
-    end
-
-    system "rsync -ahHAXW --remove-source-files ./amber_destdir/ #{CREW_DEST_DIR}"
-    system "rsync -ahHAXW --remove-source-files ./mainline_destdir/ #{CREW_DEST_DIR}"
-
-    # The following are hacks to keep sommelier from complaining.
-    Dir.chdir("#{CREW_DEST_LIB_PREFIX}/dri") do
-      FileUtils.ln_s '.', 'tls' unless File.exist?('tls')
-    end
-    FileUtils.mkdir_p "#{CREW_DEST_LIB_PREFIX}/gbm/tls"
-    case ARCH
-    when 'x86_64', 'i686'
-      Dir.chdir("#{CREW_DEST_LIB_PREFIX}/gbm/tls") do
-        # For Intel GPUs
-        FileUtils.ln_s '../../libgbm.so', 'i915_gbm.so'
-        # For AMD GPUs
-        FileUtils.ln_s '../../libgbm.so', 'amdgpu_gbm.so'
-      end
-    when 'armv7l', 'aarch64'
-      Dir.chdir("#{CREW_DEST_LIB_PREFIX}/gbm/tls") do
-        FileUtils.ln_s '../../libgbm.so', 'pvr_gbm.so'
-      end
-    end
+    system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
   end
 end
