@@ -49,7 +49,7 @@ class Mesa < Package
 
   # We use mesa amber (derived from the 21.3 series) for intel hardware with older kernels
   # and current mesa versions for newer kernels.
-  if CREW_IS_INTEL && ( Gem::Version.new(CREW_KERNEL_VERSION) < Gem::Version.new(4.16) )
+  if CREW_IS_INTEL && ( Gem::Version.new(CREW_KERNEL_VERSION) < Gem::Version.new('4.16') )
     depends_on 'mesa_amber'
   end
 
