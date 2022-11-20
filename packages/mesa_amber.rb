@@ -241,30 +241,30 @@ class Mesa_amber < Package
     system 'patch', '-Np1', '-i', '17518.patch'
   end
 
-    def self.build
-      system <<~BUILD
-        mold -run meson setup #{CREW_MESON_OPTIONS} \
-          -Db_asneeded=false \
-          -Damber=true \
-          -Ddri3=enabled \
-          -Degl=enabled \
-          -Dgbm=enabled \
-          -Dgles2=enabled \
-          -Dglvnd=true \
-          -Dglx=dri \
-          -Dshared-glapi=enabled \
-          -Ddri-drivers=i965 \
-          builddir
-      BUILD
+  def self.build
+    system <<~BUILD
+      mold -run meson setup #{CREW_MESON_OPTIONS} \
+        -Db_asneeded=false \
+        -Damber=true \
+        -Ddri3=enabled \
+        -Degl=enabled \
+        -Dgbm=enabled \
+        -Dgles2=enabled \
+        -Dglvnd=true \
+        -Dglx=dri \
+        -Dshared-glapi=enabled \
+        -Ddri-drivers=i965 \
+        builddir
+    BUILD
 
-      system 'meson configure builddir'
-      system 'mold -run samu -C builddir'
+    system 'meson configure builddir'
+    system 'mold -run samu -C builddir'
   end
 
   def self.install
     # copy supported pci list to filesystem for sommelier use
     FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
-    FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
+    FileUtils.cp 'include/pci_ids/i965_pci_ids.h', "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
 
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
 
@@ -275,6 +275,7 @@ class Mesa_amber < Package
       "#{CREW_DEST_LIB_PREFIX}/libgbm.so*",
       "#{CREW_DEST_LIB_PREFIX}/libglapi.so*",
       "#{CREW_DEST_PREFIX}/include/",
+      "#{CREW_DEST_LIB_PREFIX}/pkgconfig/",
       "#{CREW_DEST_PREFIX}/share/drirc.d/00-mesa-defaults.conf"
     ]
   end
