@@ -71,7 +71,7 @@ class Mesa < Package
     end
 
     system <<~BUILD
-      meson setup #{CREW_MESON_OPTIONS} \
+      mold -run meson setup #{CREW_MESON_OPTIONS} \
         -Db_asneeded=false \
         -Ddri3=enabled \
         -Degl=enabled \

@@ -243,7 +243,7 @@ class Mesa_amber < Package
 
     def self.build
       system <<~BUILD
-        meson setup #{CREW_MESON_OPTIONS} \
+        mold -run meson setup #{CREW_MESON_OPTIONS} \
           -Db_asneeded=false \
           -Damber=true \
           -Ddri3=enabled \
