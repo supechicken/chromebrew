@@ -96,7 +96,7 @@ class Mesa_amber < Package
         File.write('tegra.patch', @tegrapatch)
         system 'patch -Np1 -i tegra.patch'
 
-      system 'curl', '-LO', "https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff"
+      system 'curl', '-LZO', "https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff"
 
 
 
@@ -280,7 +280,6 @@ class Mesa_amber < Package
             meson setup #{CREW_MESON_OPTIONS} \
               -Db_asneeded=false \
               -Ddri-drivers=i965 \
-              -Dosmesa=true \
               -Damber=true \
               builddir
           BUILD
