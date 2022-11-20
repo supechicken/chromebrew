@@ -272,7 +272,7 @@ class Mesa_amber < Package
 
           # amber mesa
           system <<~BUILD
-            meson setup #{lto} \
+            meson setup #{CREW_MESON_OPTIONS} \
               -Db_asneeded=false \
               -Dosmesa=#{osmesa} \
               -Damber=true \
