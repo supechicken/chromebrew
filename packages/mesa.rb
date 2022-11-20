@@ -19,32 +19,6 @@ class Mesa < Package
   compatibility 'all'
   source_url 'https://gitlab.freedesktop.org/mesa/mesa.git'
 
-  if CREW_KERNEL_VERSION.to_f < 5.10
-    binary_url({
-      aarch64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/amber-acfef00_armv7l/mesa-amber-acfef00-chromeos-armv7l.tar.zst',
-       armv7l: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/amber-acfef00_armv7l/mesa-amber-acfef00-chromeos-armv7l.tar.zst',
-         i686: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/amber-acfef00_i686/mesa-amber-acfef00-chromeos-i686.tar.zst',
-       x86_64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/amber-acfef00_x86_64/mesa-amber-acfef00-chromeos-x86_64.tar.zst'
-    })
-    binary_sha256({
-      aarch64: 'e9ef6ce22956bdae6f75a44e953cc189f08a3c7e7cf9235a24dbe77f94dc39dd',
-       armv7l: 'e9ef6ce22956bdae6f75a44e953cc189f08a3c7e7cf9235a24dbe77f94dc39dd',
-         i686: '596ce6a08d3b63ba990058acdf876e4b815882e3d0e0c61bfcd079fdfeb6fb9f',
-       x86_64: '9fe6dfd910312956da149dd5cd95f2fd58f7ca4bd8a4dbc646ec11ac3864a683'
-    })
-  else
-    binary_url({
-      aarch64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/22.3.0-rc3_armv7l/mesa-22.3.0-rc3-chromeos-armv7l.tar.zst',
-       armv7l: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/22.3.0-rc3_armv7l/mesa-22.3.0-rc3-chromeos-armv7l.tar.zst',
-       x86_64: 'https://gitlab.com/api/v4/projects/26210301/packages/generic/mesa/22.3.0-rc3_x86_64/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
-    })
-    binary_sha256({
-      aarch64: '2b509913bc66eb87b4794edb7739d3f57b00a0ea68b61f6d7e97ce8268c11465',
-       armv7l: '2b509913bc66eb87b4794edb7739d3f57b00a0ea68b61f6d7e97ce8268c11465',
-       x86_64: '02e83dff70b8b81f8c0d44659e6a63dfacb17faf4ebccde66c3c2bdaaff39473'
-    })
-  end
-
   depends_on 'elfutils' # R
   depends_on 'eudev' # R
   depends_on 'expat' # R
@@ -81,10 +55,24 @@ class Mesa < Package
   depends_on 'zlibpkg' # R
   depends_on 'zstd' # R
 
-  if CREW_KERNEL_VERSION.to_f < 5.10
+  def self.prebuilt
+    # clone amber branch
+    if %w[i686 x86_64].include?(ARCH)
+      FileUtils.mkdir('amber')
+
+      Dir.chdir('amber') do
+        #system 'git', 'clone', source_url, '-b', 'amber', '--single-branch', '--depth=1', 'amber'
+        system 'git init'
+        system 'git config advice.detachedHead false'
+        system 'git config init.defaultBranch master'
+        system "git remote add origin #{@pkg.source_url}"
+        system "git fetch --depth 1 origin acfef002a081f36e6eebc6e8ab908a36ab18f68c"
+        system 'git checkout FETCH_HEAD'
+      end
+    end
+  end
+
     def self.patch
-      case ARCH
-      when 'aarch64', 'armv7l'
         # See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5067
         @freedrenopatch = <<~FREEDRENOPATCHEOF
                   --- a/src/gallium/drivers/freedreno/freedreno_util.h   2021-08-05 14:40:22.000000000 +0000
@@ -127,7 +115,7 @@ class Mesa < Package
         TEGRAPATCHEOF
         File.write('tegra.patch', @tegrapatch)
         system 'patch -Np1 -i tegra.patch'
-      end
+
       # llvm 13/14 patch  See https://gitlab.freedesktop.org/mesa/mesa/-/issues/5455
       # & https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.patch
       downloader 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/13273.diff',
@@ -301,56 +289,85 @@ class Mesa < Package
     end
 
     def self.build
+      vulkan_drivers = %w[swrast virtio-experimental]
+      galliumdrivers = %w[swrast virgl]
+      lto = CREW_MESON_OPTIONS
+      osmesa = true
+
       case ARCH
       when 'i686'
-        @vk = 'intel,swrast'
-        @galliumdrivers = 'swrast,svga,virgl,zink'
-        @lto = CREW_MESON_FNO_LTO_OPTIONS
-        @osmesa = 'false'
+        vulkan_drivers += %w[intel intel_hasvk]
+        lto = CREW_MESON_FNO_LTO_OPTIONS
+        osmesa = false
       when 'aarch64', 'armv7l'
-        @vk = 'auto'
-        @galliumdrivers = 'auto'
-        @lto = CREW_MESON_OPTIONS
-        @osmesa = 'true'
+        vulkan_drivers += %w[broadcom freedreno imagination-experimental panfrost]
+        galliumdrivers += %w[freedreno nouveau tegra panfrost lima v3d vc4]
       when 'x86_64'
-        @vk = 'auto'
-        @galliumdrivers = 'r300,r600,radeonsi,nouveau,virgl,svga,swrast,iris,crocus'
-        @lto = CREW_MESON_OPTIONS
-        @osmesa = 'true'
+        vulkan_drivers += %w[amd intel intel_hasvk]
+        galliumdrivers += %w[radeonsi iris crocus]
       end
-      system "meson #{@lto} \
-      -Db_asneeded=false \
-      -Ddri-drivers=auto \
-      -Dvulkan-drivers=#{@vk} \
-      -Dgallium-drivers=#{@galliumdrivers} \
-      -Dosmesa=#{@osmesa} \
-      -Dglvnd=true \
-       builddir"
-      system 'meson configure builddir'
-      system 'mold -run samu -C builddir'
-    end
-  else
-    def self.build
-      system "meson #{CREW_MESON_OPTIONS} \
-      -Db_asneeded=false \
-      -Ddri3=enabled \
-      -Degl=enabled \
-      -Dgbm=enabled \
-      -Dgles1=disabled \
-      -Dgles2=enabled \
-      -Dglvnd=true \
-      -Dglx=dri \
-      -Dllvm=enabled \
-      -Dvulkan-drivers=auto \
-      -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
-       builddir"
-      system 'meson configure builddir'
-      system 'mold -run samu -C builddir'
-    end
+
+      if %w[i686 x86_64].include?(ARCH)
+        Dir.chdir('amber') do
+          # amber mesa
+          system <<~BUILD
+            meson setup #{lto} \
+              -Db_asneeded=false \
+              -Dosmesa=#{osmesa} \
+              -Damber=true \
+              builddir
+          BUILD
+
+          system 'meson configure builddir'
+          system 'mold -run samu -C builddir'
+        end
+      end
+
+      unless ARCH == 'i686'
+        # mainline mesa
+        system <<~BUILD
+          meson setup #{CREW_MESON_OPTIONS} \
+            -Db_asneeded=false \
+            -Ddri3=enabled \
+            -Degl=enabled \
+            -Dgbm=enabled \
+            -Dgles2=enabled \
+            -Dglvnd=true \
+            -Dglx=dri \
+            -Dllvm=enabled \
+            -Dvulkan-drivers=#{vulkan_drivers} \
+            -Dgallium-drivers=#{galliumdrivers} \
+            -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
+            builddir
+        BUILD
+
+        system 'meson configure builddir'
+        system 'mold -run samu -C builddir'
+      end
   end
 
   def self.install
-    system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
+    FileUtils.mkdir %w[amber_destdir mainline_destdir]
+
+    warn 'Installing amber mesa...'.yellow
+    system "DESTDIR=#{Dir.pwd}/amber_destdir samu -C builddir install"
+    warn 'Installing mainline mesa...'.yellow
+    system "DESTDIR=#{Dir.pwd}/mainline_destdir samu -C builddir install", chdir: 'amber'
+
+    # check for conflicts between amber mesa and mainline mesa in case if any
+    amber_filelist    = `cd amber_destdir; find .`.lines(chomp: true)
+    mainline_filelist = `cd mainline_destdir; find .`.lines(chomp: true)
+
+    conflicts = mainline_filelist.intersection(amber_filelist)
+
+    if conflicts.any?
+      p conflicts
+      abort 'Conflict found!'.lightred
+    end
+
+    system "rsync -ahHAXW --remove-source-files ./amber_destdir/ #{CREW_DEST_DIR}"
+    system "rsync -ahHAXW --remove-source-files ./mainline_destdir/ #{CREW_DEST_DIR}"
+
     # The following are hacks to keep sommelier from complaining.
     Dir.chdir("#{CREW_DEST_LIB_PREFIX}/dri") do
       FileUtils.ln_s '.', 'tls' unless File.exist?('tls')
