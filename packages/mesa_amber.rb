@@ -254,7 +254,6 @@ class Mesa_amber < Package
           -Dglx=dri \
           -Dshared-glapi=enabled \
           -Ddri-drivers=i965 \
-          -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
           builddir
       BUILD
 
