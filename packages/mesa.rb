@@ -80,8 +80,8 @@ class Mesa < Package
         -Dglvnd=true \
         -Dglx=dri \
         -Dllvm=enabled \
-        -Dvulkan-drivers=#{vulkan_drivers} \
-        -Dgallium-drivers=#{galliumdrivers} \
+        -Dvulkan-drivers=#{vulkan_drivers.join(',')} \
+        -Dgallium-drivers=#{galliumdrivers.join(',')} \
         -Dvideo-codecs='vc1dec,h264dec,h264enc,h265dec,h265enc' \
         builddir
     BUILD
