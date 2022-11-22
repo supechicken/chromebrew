@@ -23,11 +23,15 @@ class Mesa < Package
     git_hashtag "mesa-#{@_ver}"
 
     binary_url({
-      #x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221120/mesa-22.3.0-rc3-chromeos-x86_64.tar.zst'
+      aarch64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221122/mesa-22.3.0-rc3-1-chromeos-armv7l.tar.zst',
+      armv7l: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221122/mesa-22.3.0-rc3-1-chromeos-armv7l.tar.zst',
+      x86_64: 'https://github.com/supechicken/chromebrew/releases/download/mesa-build-20221122/mesa-22.3.0-rc3-1-chromeos-x86_64.tar.zst'
     })
 
     binary_sha256({
-      #x86_64: '035ee85fca0408f18166de0bfcf3a31825c2f1c2748745fcb8568f69d9035799'
+      aarch64: 'fe9b7cbbf1b22eed553e86b35d4c2cd8571124c5e60c989750c404061cf6c563',
+      armv7l: 'fe9b7cbbf1b22eed553e86b35d4c2cd8571124c5e60c989750c404061cf6c563',
+      x86_64: 'f5e8c98a4348f9914cde1bb30c8e2d3323ea0515bf9e2c9427051e523c727bab'
     })
   end
 
