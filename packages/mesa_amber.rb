@@ -229,21 +229,21 @@ class Mesa_amber < Package
   end
 
   def self.install
+    FileUtils.mkdir_p %W[#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/ #{CREW_DEST_LIB_PREFIX}/gbm/tls]
+
     # copy supported pci list to filesystem for sommelier use
-    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
     FileUtils.cp_r Dir['include/pci_ids/*_pci_ids.h'], "#{CREW_DEST_PREFIX}/etc/mesa_driver_supported_list/"
 
     system "DESTDIR=#{CREW_DEST_DIR} samu -C builddir install"
 
     # The following are hacks to keep sommelier from complaining.
-    Dir.chdir("#{CREW_LIB_PREFIX}/dri") do
-      FileUtils.ln_sf '.', 'tls' unless File.exist?('tls')
+    Dir.chdir("#{CREW_DEST_LIB_PREFIX}/dri") do
+      FileUtils.ln_s '.', 'tls' unless File.exist?('tls')
     end
 
-    FileUtils.mkdir_p "#{CREW_LIB_PREFIX}/gbm/tls"
-    Dir.chdir("#{CREW_LIB_PREFIX}/gbm/tls") do
+    Dir.chdir("#{CREW_DEST_LIB_PREFIX}/gbm/tls") do
       # For Intel GPUs
-      FileUtils.ln_sf '../../libgbm.so', 'i915_gbm.so'
+      FileUtils.ln_s '../../libgbm.so', 'i915_gbm.so'
     end
   end
 end
