@@ -56,6 +56,12 @@ class Mesa_amber < Package
   depends_on 'zlibpkg' # R
   depends_on 'zstd' # R
 
+  def self.preflight
+    if File.exist?("#{CREW_META_PATH}/mesa.filelist")
+      abort 'Please remove "mesa" before installing "mesa_amber".'.yellow
+    end
+  end
+
   def self.patch
     puts 'Downloading patches...'.yellow
     system 'curl', '-LZO', 'https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/{13273,15381,15091,15232,16129,16289,17514}.diff'
