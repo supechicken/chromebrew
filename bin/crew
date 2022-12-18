@@ -1030,51 +1030,46 @@ def prepare_package(destdir)
     @pkg.postbuild
 
     # create file list
-    system 'find . -type f > ../filelist'
-    system 'find . -type l >> ../filelist'
-    system 'cut -c2- ../filelist > filelist'
+    system "find . \\( -type f -o -type l \\) -printf '/%P\\n'", out: '../filelist'
 
     # check for FHS3 compliance
     puts 'Checking for FHS3 compliance...'
-    @_errors = 0
-    @fhs_compliant_prefix = %w[bin etc include lib libexec opt sbin share var]
-    @fhs_compliant_prefix.append(ARCH_LIB) if ARCH_LIB == 'lib64'
+    @_errors = false
+    @fhs_compliant_prefix = %W[bin etc include lib libexec opt sbin share var #{ARCH_LIB}]
+
     Dir.foreach(CREW_DEST_PREFIX) do |filename|
-      next if (filename == '.') || (filename == '..')
+      next if %w[. ..].include?(filename)
 
       unless @fhs_compliant_prefix.include?(filename)
         if CREW_FHS_NONCOMPLIANCE_ONLY_ADVISORY || @pkg.no_fhs?
-          puts "Warning: #{CREW_PREFIX}/#{filename} in #{@pkg.name} is not FHS3 compliant.".orange
+          warn "Warning: #{CREW_PREFIX}/#{filename} in #{@pkg.name} is not FHS3 compliant.".orange
         else
-          puts "Error: #{CREW_PREFIX}/#{filename} in #{@pkg.name} is not FHS3 compliant.".lightred
-          @_errors = 1
+          warn "Error: #{CREW_PREFIX}/#{filename} in #{@pkg.name} is not FHS3 compliant.".lightred
+          @_errors = true
         end
       end
     end
 
     # check for conflicts with other installed files
     puts 'Checking for conflicts with files from installed packages...'
-    conflicts = []
     conflictscmd = `grep --exclude #{CREW_META_PATH}#{@pkg.name}.filelist -Fxf filelist #{CREW_META_PATH}*.filelist`
-    conflicts << conflictscmd.gsub(/(\.filelist|#{CREW_META_PATH})/, '').split("\n")
-    conflicts.reject!(&:empty?)
+    conflicts    = conflictscmd.lines(chomp: true).map {|f| File.basename(f, '.filelist') }
+
     unless conflicts.empty?
       if CREW_CONFLICTS_ONLY_ADVISORY || @pkg.conflicts_ok?
-        puts 'Warning: There is a conflict with the same file in another package.'.orange
+        warn 'Warning: There is a conflict with the same file in another package.'.orange
       else
-        puts 'Error: There is a conflict with the same file in another package.'.lightred
-        @_errors = 1
+        warn 'Error: There is a conflict with the same file in another package.'.lightred
+        @_errors = true
       end
-      conflicts.each { |conflict| puts conflict }
+      warn conflicts
     end
 
     # abort if errors encountered
-    abort 'Exiting due to above errors.'.lightred if @_errors == 1
+    abort 'Exiting due to above errors.'.lightred if @_errors
 
     # create directory list
-    system 'find . -type d > ../dlist'
-    system 'cut -c2- ../dlist > dlistcut'
-    system 'tail -n +2 dlistcut > dlist'
+    system "find . -type d -printf '/%P\\n' | tail -n +2", out: '../dlist'
 
     # remove temporary files
     FileUtils.rm_rf ['dlistcut', '../dlist', '../filelist'], verbose: @fileutils_verbose
@@ -1172,16 +1167,15 @@ end
 def shrink_dir(dir)
   unless CREW_NOT_SHRINK_ARCHIVE || @pkg.no_shrink?
     Dir.chdir dir do
-      if File.file?("#{CREW_PREFIX}/bin/rdfind")
+      if File.executable?("#{CREW_PREFIX}/bin/rdfind")
         puts 'Using rdfind to convert duplicate files to hard links.'
-        system "#{CREW_PREFIX}/bin/rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false ."
+        system 'rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false .'
       end
+
       # Issues with non-x86_64 in compressing libraries, so just compress
       # non-libraries. Also note that one needs to use "upx -d" on a
       # compressed file to use ldd.
-      # sommelier also isn't happy when sommelier and xwayland are compressed
-      # so don't compress those packages.
-      if File.file?("#{CREW_PREFIX}/bin/upx")
+      if File.executable?("#{CREW_PREFIX}/bin/upx")
         # 1. Find executable binaries but also check for hard linked
         # files by making sure we have a unique set of
         # inodes for the binaries found.
@@ -1192,60 +1186,59 @@ def shrink_dir(dir)
         # 5. If the expansion doesn't error out then it is ok to copy
         # over the original. (This also lets us only avoid compressing
         # hard linked files multiple times.)
-        # Also disable for sommelier.elf and Xwayland.elf since upx
-        # breaks those binaries.
-        @execfiles = `find . -executable -type f ! \\( -name \"*.so*\" -o -name \"*.a\" -o -name \"Xwayland.elf\" -o -name \"sommelier.elf\" \\) -exec head -c4 {} 2>/dev/null \\; -printf ' %i %p\\n'| grep ^.ELF | sort -u -n -s -k2,2 | awk '{print $3}'`.chomp
-        unless @execfiles.to_s.empty?
+
+        @execfiles = `find . -executable -type f ! \\( -name '*.so*' -o -name '*.a' \\) |\
+                          xargs -P#{CREW_NPROC} -n1 sh -c '[ "$(head -c4 ${1})" = "\x7FELF" ] && echo ${1#./}' --
+                     `.lines(chomp: true).reject(&:empty?)
+
+        if @execfiles.any?
           puts 'Using upx to shrink binaries.'
           # Copying in the ThreadPoolExecutor loop fails non-deterministically
-          @execfiles.each_line do |execfilecp|
-            execfilecp.slice! '.'
-            next if execfilecp.chomp.empty?
+          @execfiles.each do |execfile|
+            execfile = File.join(dir, execfile)
+            next unless File.exist?(execfile)
 
-            execfilecp = dir + execfilecp.chomp
-            next unless File.exist?(execfilecp)
-
-            FileUtils.cp execfilecp.to_s, "#{execfilecp}-crewupxtmp"
+            FileUtils.cp execfile, "#{execfile}-crewupxtmp"
           end
+
           begin
             gem 'concurrent-ruby'
           rescue Gem::LoadError
-            puts ' -> install gem concurrent-ruby'
+            puts 'Installing concurrent-ruby gem...'.lightblue
             Gem.install('concurrent-ruby')
             gem 'concurrent-ruby'
           end
+
           require 'concurrent'
+
           pool = Concurrent::ThreadPoolExecutor.new(
             min_threads: 1,
             max_threads: CREW_NPROC,
             max_queue: 0, # unbounded work queue
             fallback_policy: :caller_runs
           )
+
           @execfiles.each_line do |execfile|
             pool.post do
-              execfile.slice! '.'
-              execfile = dir + execfile.chomp
+              execfile = File.join(dir, execfile)
+              next unless File.exist?(execfile)
+
               puts "Attempting to compress #{execfile} ...".orange
+
               # Make tmp file for compression
-              unless system "upx --lzma #{execfile}-crewupxtmp"
-                puts "Compression of #{execfile} failed...".orange if @opt_verbose
-                FileUtils.rm_f "#{execfile}-crewupxtmp"
+              if system "upx --lzma #{execfile}-crewupxtmp && upx -t #{execfile}-crewupxtmp"
+                puts "#{execfile} successfully compressed...".lightgreen
+
+                FileUtils.cp "#{execfile}-crewupxtmp", execfile
+              else
+                warn "Compression of #{execfile} failed...".orange if @opt_verbose
               end
-              if File.file?("#{execfile}-crewupxtmp")
-                puts "Testing compressed #{execfile}...".lightblue if @opt_verbose
-                if system "upx -t #{execfile}-crewupxtmp && cp #{execfile}-crewupxtmp #{execfile}"
-                  puts "#{execfile} successfully compressed...".lightgreen
-                else
-                  FileUtils.rm_f "#{execfile}-crewupxtmp"
-                end
-              end
+            ensure
               FileUtils.rm_f "#{execfile}-crewupxtmp"
             end
           end
           pool.shutdown
           pool.wait_for_termination
-          # Make sure temporary compression copies are deleted.
-          system 'find . -executable -type f -name "*-crewupxtmp" -delete'
         end
       end
     end
@@ -1279,7 +1272,7 @@ def install_package(pkgdir)
         end
       end
     end
-    if File.file?("#{CREW_PREFIX}/bin/rdfind")
+    if File.find?("#{CREW_PREFIX}/bin/rdfind")
       puts 'Using rdfind to convert duplicate files to hard links.'
       system 'rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false .'
     end
@@ -1541,36 +1534,20 @@ end
 
 def archive_package(pwd)
   # Check to see that there is a working zstd
-  if File.file?("#{CREW_PREFIX}/bin/zstd")
-    @crew_prefix_zstd_available = `#{CREW_PREFIX}/bin/zstd --version`.include?('zstd command line interface') ? true : nil
-  end
-  if File.file?("#{CREW_MUSL_PREFIX}/bin/zstd")
-    @crew_musl_prefix_zstd_available = `#{CREW_MUSL_PREFIX}/bin/zstd --version`.include?('zstd command line interface') ? true : nil
-  end
-  if @pkg.no_zstd? || (!@crew_prefix_zstd_available && !@crew_musl_prefix_zstd_available)
-    puts 'Using xz to compress package. This may take some time.'.lightblue
-    pkg_name = "#{@pkg.name}-#{@pkg.version}-chromeos-#{@device[:architecture]}.tar.xz"
-    Dir.chdir CREW_DEST_DIR do
-      system "tar c#{@verbose}Jf #{pwd}/#{pkg_name} *"
-    end
-  else
-    puts 'Using zstd to compress package. This may take some time.'.lightblue
-    pkg_name = "#{@pkg.name}-#{@pkg.version}-chromeos-#{@device[:architecture]}.tar.zst"
-    Dir.chdir CREW_DEST_DIR do
-      # Using same zstd compression options as Arch, which privilege
-      # decompression speed over compression speed.
-      # See https://lists.archlinux.org/pipermail/arch-dev-public/2019-March/029542.html
-      # Use nice so that user can (possibly) do other things during compression.
-      if @crew_prefix_zstd_available
-        puts 'Using standard zstd'.lightblue if @opt_verbose
-        system "tar c#{@verbose} * | nice -n 20 #{CREW_PREFIX}/bin/zstd -c -T0 --ultra -20 - > #{pwd}/#{pkg_name}"
-      elsif @crew_musl_prefix_zstd_available
-        puts 'Using musl zstd'.lightblue if @opt_verbose
-        system "tar c#{@verbose} * | nice -n 20 #{CREW_MUSL_PREFIX}/bin/zstd -c -T0 --ultra -20 - > #{pwd}/#{pkg_name}"
-      end
-    end
-  end
-  system "sha256sum #{pwd}/#{pkg_name} > #{pwd}/#{pkg_name}.sha256"
+  abort "'zstd' is needed for archiving packages. (can be installed with 'crew install zstd')".lightred unless File.executable?("#{CREW_PREFIX}/bin/zstd")
+
+  puts 'Using zstd to compress package. This may take some time.'.lightblue
+  pkg_archive = File.join(pwd, "#{@pkg.name}-#{@pkg.version}-chromeos-#{@device[:architecture]}.tar.zst")
+  pkg_sha256  = "#{pkg_archive}.sha256"
+
+  # Using same zstd compression options as Arch, which privilege
+  # decompression speed over compression speed.
+  # See https://lists.archlinux.org/pipermail/arch-dev-public/2019-March/029542.html
+  # Use nice so that user can (possibly) do other things during compression.
+  system "tar c#{@verbose} * | nice -n 20 zstd -c -T0 --ultra -20 - > #{pkg_archive}", chdir: CREW_DEST_DIR
+
+  sha256sum = Digest::SHA256.hexdigest(File.binread(pkg_archive))
+  File.write(pkg_sha256, "#{sha256sum}  #{pkg_archive}")
 end
 
 def remove(pkgName)
