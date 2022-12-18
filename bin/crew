@@ -1272,7 +1272,7 @@ def install_package(pkgdir)
         end
       end
     end
-    if File.find?("#{CREW_PREFIX}/bin/rdfind")
+    if File.file?("#{CREW_PREFIX}/bin/rdfind")
       puts 'Using rdfind to convert duplicate files to hard links.'
       system 'rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false .'
     end
