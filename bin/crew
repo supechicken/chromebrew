@@ -1218,7 +1218,7 @@ def shrink_dir(dir)
             fallback_policy: :caller_runs
           )
 
-          @execfiles.each_line do |execfile|
+          @execfiles.each do |execfile|
             pool.post do
               execfile = File.join(dir, execfile)
               next unless File.exist?(execfile)
