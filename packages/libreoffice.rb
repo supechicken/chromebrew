@@ -7,7 +7,7 @@ class Libreoffice < Package
   version '7.4.4.1'
   compatibility 'all'
 
-  source_url 'https://gerrit.libreoffice.org/core'
+  source_url 'https://gerrit.libreoffice.org/core.git'
   git_branch 'libreoffice-7.4.4.1'
 
   depends_on 'gtk3'
