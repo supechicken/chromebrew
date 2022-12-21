@@ -12,7 +12,8 @@ class Libreoffice < Package
 
   depends_on 'gtk3'
   depends_on 'hunspell'
-  depends_on 'npsr'
+  depends_on 'nspr'
+  depends_on 'nss'
   depends_on 'qtbase'
   depends_on 'libjpeg'
   depends_on 'sommelier'
