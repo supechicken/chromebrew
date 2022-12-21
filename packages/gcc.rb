@@ -10,7 +10,7 @@ class Gcc < Package
   git_hashtag 'b80a690673272919896ee5939250e50d882f2418'
 
   depends_on 'binutils' => :build
-  # depends_on 'ccache' => :build
+  depends_on 'ccache' => :build
   depends_on 'dejagnu' => :build # for test
   depends_on 'glibc' # R
   depends_on 'gmp' # R
@@ -98,7 +98,7 @@ class Gcc < Package
       ]
     end
 
-    @languages = 'all'
+    @languages = 'ada,c,c++,d,fortran,go,jit,lto,m2,objc,obj-c++'
 
     # Set ccache sloppiness as per
     # https://wiki.archlinux.org/index.php/Ccache#Sloppiness
