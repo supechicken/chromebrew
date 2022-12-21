@@ -23,6 +23,8 @@ class Gcc < Package
 
   no_env_options
   no_patchelf
+  no_shrink
+
   no_zstd if ARCH == 'i686'
 
   @gcc_version = version.partition('.')[0]
