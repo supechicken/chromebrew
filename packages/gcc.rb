@@ -70,6 +70,7 @@ class Gcc < Package
       --enable-__cxa_atexit
       --enable-gnu-indirect-function
 
+      --disable-multilib
       --disable-libssp
       --disable-werror
 
