@@ -137,7 +137,7 @@ class Gcc < Package
   # preserve for check, skip check for current version
   def self.check
     # Dir.chdir('objdir') do
-    #  system "mold -run make -k check -j#{CREW_NPROC} || true"
+    #  system "make -k check -j#{CREW_NPROC} || true"
     #  system '../contrib/test_summary'
     # end
   end
@@ -156,28 +156,28 @@ class Gcc < Package
 
     Dir.chdir('objdir') do
       # gcc-libs install
-      system make_env, "mold -run make -C #{CREW_TGT}/libgcc DESTDIR=#{CREW_DEST_DIR} install-shared"
+      system make_env, "make -C #{CREW_TGT}/libgcc DESTDIR=#{CREW_DEST_DIR} install-shared"
 
       gcc_libs = %w[libatomic libgfortran libgo libgomp libitm
                     libquadmath libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan
                     libsanitizer/tsan libstdc++-v3/src libvtv]
       gcc_libs.each do |lib|
-        system make_env, "mold -run make -C #{CREW_TGT}/#{lib} install-toolexeclibLTLIBRARIES"
+        system make_env, "make -C #{CREW_TGT}/#{lib} install-toolexeclibLTLIBRARIES"
       end
 
-      system make_env, "mold -run make -C #{CREW_TGT}/libobjc install-libs"
-      system make_env, "mold -run make -C #{CREW_TGT}/libstdc++-v3/po install"
-      system make_env, "mold -run make -C #{CREW_TGT}/libphobos install"
+      system make_env, "make -C #{CREW_TGT}/libobjc install-libs"
+      system make_env, "make -C #{CREW_TGT}/libstdc++-v3/po install"
+      system make_env, "make -C #{CREW_TGT}/libphobos install"
 
       # gcc_libs_info
       %w[libgomp libitm libquadmath].each do |lib|
-        system make_env, "mold -run make -C #{CREW_TGT}/#{lib} install-info"
+        system make_env, "make -C #{CREW_TGT}/#{lib} install-info"
       end
 
-      system make_env, "mold -run make install-strip"
+      system make_env, "make install-strip"
 
       # gcc-non-lib install
-      system make_env, "mold -run make -C gcc install-driver install-cpp install-gcc-ar \
+      system make_env, "make -C gcc install-driver install-cpp install-gcc-ar \
         c++.install-common install-headers install-plugin install-lto-wrapper"
 
       %w[gcov gcov-tool].each do |gcov_bin|
@@ -190,13 +190,13 @@ class Gcc < Package
         FileUtils.install "gcc/#{lib}", "#{gcc_libdir}/", mode: 0o755
       end
 
-      system make_env, "mold -run make -C #{CREW_TGT}/libgcc install"
+      system make_env, "make -C #{CREW_TGT}/libgcc install"
 
       %w[src include libsupc++ python].each do |lib|
-        system make_env, "mold -run make -C #{CREW_TGT}/libstdc++-v3/#{lib} install"
+        system make_env, "make -C #{CREW_TGT}/libstdc++-v3/#{lib} install"
       end
 
-      system make_env, "mold -run make install-libcc1"
+      system make_env, "make install-libcc1"
 
       # http://www.linuxfromscratch.org/lfs/view/development/chapter06/gcc.html#contents-gcc
       # move a misplaced file
@@ -205,21 +205,21 @@ class Gcc < Package
       FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/share/gdb/auto-load/usr/lib"
       FileUtils.mv Dir["#{CREW_DEST_LIB_PREFIX}/*gdb.py"], "#{CREW_DEST_PREFIX}/share/gdb/auto-load/usr/lib/"
 
-      system make_env, "mold -run make install-fixincludes"
-      system make_env, "mold -run make -C gcc install-mkheaders"
+      system make_env, "make install-fixincludes"
+      system make_env, "make -C gcc install-mkheaders"
 
-      system make_env, "mold -run make -C lto-plugin install"
+      system make_env, "make -C lto-plugin install"
 
-      system make_env, "mold -run make -C #{CREW_TGT}/libgomp install-nodist_libsubincludeHEADERS"
-      system make_env, "mold -run make -C #{CREW_TGT}/libgomp install-nodist_toolexeclibHEADERS"
-      system make_env, "mold -run make -C #{CREW_TGT}/libitm install-nodist_toolexeclibHEADERS"
-      system make_env, "mold -run make -C #{CREW_TGT}/libquadmath install-nodist_libsubincludeHEADERS"
-      system make_env, "mold -run make -C #{CREW_TGT}/libsanitizer install-nodist_sanincludeHEADERS"
-      system make_env, "mold -run make -C #{CREW_TGT}/libsanitizer install-nodist_toolexeclibHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libgomp install-nodist_libsubincludeHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libgomp install-nodist_toolexeclibHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libitm install-nodist_toolexeclibHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libquadmath install-nodist_libsubincludeHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libsanitizer install-nodist_sanincludeHEADERS"
+      system make_env, "make -C #{CREW_TGT}/libsanitizer install-nodist_toolexeclibHEADERS"
 
       Dir["#{CREW_TGT}/libsanitizer/{a,t,l}san"].each do |dir|
         # This might fail on i686
-        system make_env, "mold -run make -C #{dir} install-nodist_toolexeclibHEADERS"
+        system make_env, "make -C #{dir} install-nodist_toolexeclibHEADERS"
       end
 
       # libiberty is installed from binutils
@@ -228,13 +228,13 @@ class Gcc < Package
       #      make -C libiberty DESTDIR=#{CREW_DEST_DIR} install"
       # install -m644 libiberty/pic/libiberty.a "#{CREW_DEST_PREFIX}/lib"
 
-      system make_env, "mold -run make -C gcc install-man install-info"
+      system make_env, "make -C gcc install-man install-info"
 
-      system make_env, "mold -run make -C libcpp install"
-      system make_env, "mold -run make -C gcc install-po"
+      system make_env, "make -C libcpp install"
+      system make_env, "make -C gcc install-po"
 
       # install the libstdc++ man pages
-      system make_env, "mold -run make -C #{CREW_TGT}/libstdc++-v3/doc doc-install-man"
+      system make_env, "make -C #{CREW_TGT}/libstdc++-v3/doc doc-install-man"
 
       # byte-compile python libraries
       system "python3 -m compileall #{CREW_DEST_PREFIX}/share/gcc-#{@gcc_version}/"
