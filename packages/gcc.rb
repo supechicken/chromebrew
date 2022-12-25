@@ -125,12 +125,12 @@ class Gcc < Package
       configure_env = { LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s)
 
       system configure_env, <<~BUILD.chomp
-        mold -run ../configure #{@gcc_global_opts.chomp} \
+        ../configure #{@gcc_global_opts.chomp} \
           --enable-languages=#{@languages} \
           --program-suffix="-#{@gcc_version}"
       BUILD
 
-      system configure_env, 'mold -run make || mold -run make -j1'
+      system configure_env, 'make || make -j1'
     end
   end
 
