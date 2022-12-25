@@ -58,7 +58,7 @@ class Gcc < Package
   end
 
   def self.build
-    @gcc_global_opts = %W[
+    @gcc_global_opts = <<~BUILD.tr("\n", ' ')
       #{CREW_OPTIONS}
 
       --with-bugurl="https://github.com/chromebrew/chromebrew/issues/new"
@@ -81,21 +81,21 @@ class Gcc < Package
       --enable-checking=release
       --enable-linker-build-id
       --enable-gnu-unique-object
-    ]
+    BUILD
 
     case ARCH
     when 'aarch64', 'armv7l'
-      @gcc_global_opts += %w[
+      @gcc_global_opts += <<~BUILD.tr("\n", ' ')
         --with-float=hard
         --with-cpu=armv7ve+neon-vfpv4
         --with-tune=cortex-a17
         --with-fpu=neon-vfpv4
-      ]
+      BUILD
     when 'x86_64', 'i686'
-      @gcc_global_opts += %w[
+      @gcc_global_opts += <<~BUILD.tr("\n", ' ')
         --with-cpu-32=i686
         --with-cpu-64=x86-64
-      ]
+      BUILD
     end
 
     @languages = 'ada,c,c++,d,fortran,go,jit,lto,m2,objc,obj-c++'
@@ -120,7 +120,7 @@ class Gcc < Package
       configure_env = { LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s)
 
       system configure_env, <<~BUILD.chomp
-        ../configure #{@gcc_global_opts.join(' ')} \
+        ../configure #{@gcc_global_opts.chomp} \
           --enable-languages=#{@languages} \
           --program-suffix="-#{@gcc_version}"
       BUILD
