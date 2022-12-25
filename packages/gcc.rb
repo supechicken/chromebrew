@@ -70,10 +70,10 @@ class Gcc < Package
       --enable-__cxa_atexit
       --enable-gnu-indirect-function
 
-      --disable-bootstrap
       --disable-libssp
       --disable-werror
 
+      --enable-bootstrap
       --enable-shared
       --enable-threads=posix
       --enable-default-pie
