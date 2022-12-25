@@ -98,7 +98,7 @@ class Gcc < Package
       BUILD
     end
 
-    @languages = 'c,c++,d,fortran,go,jit,lto,m2,objc,obj-c++'
+    @languages = 'default'
 
     # Set ccache sloppiness as per
     # https://wiki.archlinux.org/index.php/Ccache#Sloppiness
