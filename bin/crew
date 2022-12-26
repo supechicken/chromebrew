@@ -1259,11 +1259,11 @@ def install_package(pkgdir)
 
     if Dir.exist?('_PREFIX') || Dir.exist?('_HOME')
       # restore unified prefix name to CREW_PREFIX/HOME when installing prebuilt binary
-      FileUtils.mkdir_p File.expand_path('..', CREW_DEST_PREFIX)
-      FileUtils.mkdir_p File.expand_path('..', CREW_DEST_HOME)
+      FileUtils.mkdir_p File.expand_path('..', "./#{CREW_PREFIX}")
+      FileUtils.mkdir_p File.expand_path('..', "./#{HOME}")
 
-      FileUtils.mv '_PREFIX', CREW_DEST_PREFIX if Dir.exist?('_PREFIX')
-      FileUtils.mv '_HOME', CREW_DEST_HOME if Dir.exist?('_HOME')
+      FileUtils.mv '_PREFIX', "./#{CREW_PREFIX}" if Dir.exist?('_PREFIX')
+      FileUtils.mv '_HOME', "./#{HOME}" if Dir.exist?('_HOME')
 
       # also restore path in file/directory list
       mod_directorylist = File.read('dlist').gsub(/^_PREFIX/, CREW_PREFIX.delete_suffix('/')) \
