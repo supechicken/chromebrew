@@ -1546,22 +1546,24 @@ def build_package(pwd)
   # prepare filelist and dlist at CREW_DEST_DIR
   prepare_package CREW_DEST_DIR
 
-  # move files from #{CREW_PREFIX}/#{HOME} to "_PREFIX" for consistent result in custom #{CREW_PREFIX}/#{HOME}
-  FileUtils.mv CREW_DEST_PREFIX, File.join(CREW_DEST_DIR, '_PREFIX') if Dir.exist?(CREW_DEST_PREFIX)
-  FileUtils.mv CREW_DEST_HOME, File.join(CREW_DEST_DIR, '_HOME') if Dir.exist?(CREW_DEST_HOME)
+  Dir.chdir(CREW_DEST_DIR) do
+    # move files from #{CREW_PREFIX}/#{HOME} to "_PREFIX" for consistent result in custom #{CREW_PREFIX}/#{HOME}
+    FileUtils.mv CREW_DEST_PREFIX, File.join(CREW_DEST_DIR, '_PREFIX') if Dir.exist?(CREW_DEST_PREFIX)
+    FileUtils.mv CREW_DEST_HOME, File.join(CREW_DEST_DIR, '_HOME') if Dir.exist?(CREW_DEST_HOME)
 
-  # remove all directories except _PREFIX and _HOME
-  FileUtils.rm_rf Dir["#{CREW_DEST_DIR}/*/"].reject {|dir| dir[0] == '_' }
+    # remove all directories except _PREFIX and _HOME
+    FileUtils.rm_rf Dir["#{CREW_DEST_DIR}/*/"].reject {|dir| dir[0] == '_' }
 
-  # substitute #{CREW_PREFIX}/#{HOME} to "_PREFIX"/"_HOME" in file/directory list
-  mod_filelist = File.read('filelist').gsub(%r[^#{CREW_PREFIX.delete_suffix('/')}], '_PREFIX') \
-                                      .gsub(%r[^#{HOME.delete_suffix('/')}], '_HOME')
+    # substitute #{CREW_PREFIX}/#{HOME} to "_PREFIX"/"_HOME" in file/directory list
+    mod_filelist = File.read('filelist').gsub(%r[^#{CREW_PREFIX.delete_suffix('/')}], '_PREFIX') \
+                                        .gsub(%r[^#{HOME.delete_suffix('/')}], '_HOME')
 
-  mod_filelist = File.read('dlist').gsub(%r[^#{CREW_PREFIX.delete_suffix('/')}], '_PREFIX') \
-                                   .gsub(%r[^#{HOME.delete_suffix('/')}], '_HOME')
+    mod_filelist = File.read('dlist').gsub(%r[^#{CREW_PREFIX.delete_suffix('/')}], '_PREFIX') \
+                                     .gsub(%r[^#{HOME.delete_suffix('/')}], '_HOME')
 
-  File.write('dlist', mod_directorylist)
-  File.write('filelist', mod_filelist)
+    File.write('dlist', mod_directorylist)
+    File.write('filelist', mod_filelist)
+  end
 
   # build package from filelist, dlist and binary files in CREW_DEST_DIR
   puts 'Archiving...'
