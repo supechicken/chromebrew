@@ -1552,7 +1552,7 @@ def build_package(pwd)
     FileUtils.mv CREW_DEST_HOME, File.join(CREW_DEST_DIR, '_HOME') if Dir.exist?(CREW_DEST_HOME)
 
     # remove all directories except _PREFIX and _HOME
-    FileUtils.rm_rf Dir["#{CREW_DEST_DIR}/*/"].reject {|dir| dir[0] == '_' }
+    FileUtils.rm_rf Dir["#{CREW_DEST_DIR}/*/"].reject {|dir| File.basename(dir[0]) == '_' }
 
     # substitute #{CREW_PREFIX}/#{HOME} to "_PREFIX"/"_HOME" in file/directory list
     mod_directorylist = File.read('dlist').gsub(%r[^#{CREW_PREFIX.delete_suffix('/')}], '_PREFIX') \
