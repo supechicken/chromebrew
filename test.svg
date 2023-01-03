@@ -1,4 +1,4 @@
-<svg height="2in" width="3in" xmlns="http://www.w3.org/2000/svg">
+<svg height="2in" style="width: 100%;" xmlns="http://www.w3.org/2000/svg">
   <style>
     svg, foreignObject, div {
       height: 100%;
