@@ -11,6 +11,9 @@
   </style>
   <foreignObject>
     <div xmlns="http://www.w3.org/1999/xhtml">
+      <script>
+        console.log('??????');
+      </script>
       <img src="/images/brew.png" alt="Chromebrew logo" />
       <h1>Chromebrew</h1>
       <p>Package manager for Chrome OS</p>
