@@ -1,5 +1,14 @@
-<?xml-stylesheet type="text/css" href="https://raw.githubusercontent.com/supechicken/chromebrew/test/stylesheet.css"?>
 <svg xmlns="http://www.w3.org/2000/svg">
+  <style>
+    svg, foreignObject, div {
+      height: 100%;
+      width: 100%;
+    }
+
+    * {
+      text-align: center;
+    }
+  </style>
   <foreignObject>
     <div xmlns="http://www.w3.org/1999/xhtml">
       <img src="/images/brew.png" alt="Chromebrew logo" />
