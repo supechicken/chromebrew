@@ -1,6 +1,6 @@
-<svg height="1in" width="100%" xmlns="http://www.w3.org/2000/svg">
+<svg height="2in" width="3in" xmlns="http://www.w3.org/2000/svg">
   <style>
-    foreignObject, div {
+    svg, foreignObject, div {
       height: 100%;
       width: 100%;
     }
