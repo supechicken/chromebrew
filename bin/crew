@@ -45,6 +45,7 @@ DOC = <<~DOCOPT
     crew files [options] <name> ...
     crew help [<command>] [<subcommand>]
     crew install [options] [-k|--keep] [-s|--build-from-source] [-S|--recursive-build] <name> ...
+    crew license
     crew list [options] (available|installed|compatible|incompatible)
     crew postinstall [options] <name> ...
     crew prop
@@ -54,6 +55,7 @@ DOC = <<~DOCOPT
     crew sysinfo [options]
     crew update [options] [<compatible>]
     crew upgrade [options] [-k|--keep] [-s|--build-from-source] [<name> ...]
+    crew version
     crew whatprovides [options] <pattern> ...
 
     -b --include-build-deps  Include build dependencies in output.
@@ -72,7 +74,7 @@ DOC = <<~DOCOPT
 DOCOPT
 
 # All available crew commands.
-@cmds = DOC.scan(/crew ([^\s]+)/).flatten
+@cmds = DOC.scan(/(?<=crew\s).+(?=\s|$)/)
 
 # Verbose options
 @fileutils_verbose = @opt_verbose
@@ -92,12 +94,12 @@ begin
 rescue Docopt::Exit => e
   if ARGV[0]
     case ARGV[0]
-    when '-V', '--version', 'version'
-      puts CREW_VERSION
-      exit 0
-    when '-L', '--license', 'license'
-      puts CREW_LICENSE
-      exit 0
+    when '-V', '--version'
+      command_name = 'version'
+      args = {}
+    when '-L', '--license'
+      command_name = 'license'
+      args = {}
     end
     unless %w[-h --help].include?(ARGV[0])
       puts "Could not understand \"crew #{ARGV.join(' ')}\".".lightred
@@ -1732,9 +1734,7 @@ def const_command(args)
   if args['<name>'].empty?
     const
   else
-    args['<name>'].each do |name|
-      const name
-    end
+    args['<name>'].each { |name| const(name) }
   end
 end
 
@@ -1790,6 +1790,8 @@ def install_command(args)
   end
 end
 
+def license_command(_) = puts CREW_LICENSE
+
 def list_command(args)
   if args['available']
     list_available
@@ -1814,9 +1816,7 @@ def postinstall_command(args)
   end
 end
 
-def prop_command(_)
-  prop
-end
+def prop_command(_) = prop
 
 def reinstall_command(args)
   args['<name>'].each do |name|
@@ -1842,7 +1842,7 @@ def search_command(args)
   end.empty? && list_packages
 end
 
-def sysinfo_command(_args)
+def sysinfo_command(_)
   # newer version of Chrome OS exports info to env by default
   lsb_release = if File.file?('/etc/lsb-release')
                   File.read('/etc/lsb-release').scan(/^(.+?)=(.+)$/).to_h
@@ -1894,6 +1894,7 @@ def update_command(args)
 end
 
 def upgrade_command(args) = upgrade(*args['<name>'], build_from_source: @opt_src)
+def version_command(_)    = puts CREW_VERSION
 
 def whatprovides_command(args)
   args['<pattern>'].each do |name|
@@ -1912,5 +1913,5 @@ Signal.trap('INT') do
 end
 
 load_json
-command_name = args.select { |k, v| v && is_command(k) }.keys[0]
+command_name ||= args.select { |k, v| v && is_command(k) }.keys[0]
 send("#{command_name}_command", args)
