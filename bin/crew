@@ -74,7 +74,7 @@ DOC = <<~DOCOPT
 DOCOPT
 
 # All available crew commands.
-@cmds = DOC.scan(/(?<=crew\s).+(?=\s|$)/)
+@cmds = DOC.split("\n\n")[1].scan(/crew ([^\s]+)/).flatten
 
 # Verbose options
 @fileutils_verbose = @opt_verbose
@@ -100,9 +100,11 @@ rescue Docopt::Exit => e
     when '-L', '--license'
       command_name = 'license'
       args = {}
-    end
-    unless %w[-h --help].include?(ARGV[0])
-      puts "Could not understand \"crew #{ARGV.join(' ')}\".".lightred
+    when '-h', '--help'
+      command_name = 'help'
+      args = {}
+    else
+      warn "Could not understand \"crew #{ARGV.join(' ')}\".".lightred
       # Looking for similar commands
       unless @cmds.include?(ARGV[0])
         similar = @cmds.select { |word| edit_distance(ARGV[0], word) < 4 }
@@ -113,9 +115,12 @@ rescue Docopt::Exit => e
           EOT
         end
       end
+
+      abort e.message
     end
+  else
+    abort e.message
   end
-  abort e.message
 end
 
 # override default color options if specified
@@ -323,8 +328,8 @@ def regexp_search(pkgPat)
   abort "Package #{pkgPat} not found. :(".lightred if results.empty?
 end
 
-def help(pkgName = nil)
-  case pkgName
+def help(cmd = nil)
+  case cmd
   when 'build'
     puts <<~EOT
       Build package(s).
@@ -1773,10 +1778,9 @@ end
 
 def help_command(args)
   if args['<command>']
-    help args['<command>']
+    help args['<command>'], args['']
   else
-    puts 'Usage: crew help <command>'
-    help
+    puts DOC
   end
 end
 
@@ -1852,12 +1856,9 @@ def sysinfo_command(_)
                 end
 
   git_commit_message_format = '%h `%s (%cr)`'
-
-  @sysinfo_markdown_header = <<~MDHEADER
-    <details><summary>Expand</summary>
-
-  MDHEADER
-  @sysinfo_markdown_body = <<~MDBODY
+  sysinfo_markdown          = {}
+  sysinfo_markdown[:header] = '<details><summary>Expand</summary>',
+  sysinfo_markdown[:body]   = <<~MDBODY
     - Architecture: `#{KERN_ARCH}` (`#{ARCH}`)
     - Processor vendor: `#{CPUINFO['vendor_id'] || 'ARM'}`
     - User space: `#{Dir.exist?('/lib64') ? '64' : '32'}-bit`
@@ -1874,14 +1875,12 @@ def sysinfo_command(_)
     - OS version: `#{lsb_release['CHROMEOS_RELEASE_BUILDER_PATH']}`
     - OS channel: `#{lsb_release['CHROMEOS_RELEASE_TRACK']}`
   MDBODY
-  @sysinfo_markdown_footer = <<~MDFOOTER
+  sysinfo_markdown[:footer] = '</details>'
 
-    </details>
-  MDFOOTER
   if @opt_verbose
-    puts @sysinfo_markdown_header, @sysinfo_markdown_body, @sysinfo_markdown_footer
+    puts sysinfo_markdown.keys.join("\n")
   else
-    puts @sysinfo_markdown_body.tr('`', '')
+    puts sysinfo_markdown[:body].delete('`')
   end
 end
 
