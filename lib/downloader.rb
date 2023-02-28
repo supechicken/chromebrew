@@ -83,7 +83,17 @@ def create_http_connection(uri)
         ca_path: SSL_CERT_DIR
   }
 
-  return @connection[uri.host] ||= Net::HTTP.start(uri.host, uri.port, http_opts)
+  unless @connection.key?(uri.host)
+    @connection[uri.host] = Net::HTTP.start(uri.host, uri.port, http_opts)
+
+    warn <<~EOT
+      * Connected to #{uri.host} port #{uri.port}
+      * HTTPS: #{uri.scheme.eql?('https')}
+      *
+    EOT
+  end
+
+  return @connection[uri.host]
 end
 
 def http_downloader(uri, filename = File.basename(url), verbose = false)
@@ -97,7 +107,7 @@ def http_downloader(uri, filename = File.basename(url), verbose = false)
     case
     when response.is_a?(Net::HTTPSuccess)
     when response.is_a?(Net::HTTPRedirection) # follow HTTP redirection
-      puts <<~EOT if verbose
+      warn <<~EOT if verbose
         * Follow HTTP redirection: #{response['Location']}
         *
       EOT
@@ -121,12 +131,6 @@ def http_downloader(uri, filename = File.basename(url), verbose = false)
     progress_bar = ProgressBar.new(file_size)
 
     if verbose
-      warn <<~EOT
-        * Connected to #{uri.host} port #{uri.port}
-        * HTTPS: #{uri.scheme.eql?('https')}
-        *
-      EOT
-
       # parse response's header to readable format
       response.to_hash.each_pair { |k, v| warn "> #{k}: #{v}" }
 
