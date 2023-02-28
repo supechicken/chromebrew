@@ -19,14 +19,6 @@ rescue RuntimeError => e
   end
 end
 
-HTTP_DOWNLOADER_OPTS = {
-  max_retries: CREW_DOWNLOADER_RETRY,
-      use_ssl: uri.scheme.eql?('https'),
-  min_version: :TLS1_2,
-      ca_file: SSL_CERT_FILE,
-      ca_path: SSL_CERT_DIR
-}
-
 def downloader(url, sha256sum, filename = File.basename(url), verbose = false)
   # downloader: wrapper for all Chromebrew downloaders (`net/http`,`curl`...)
   # Usage: downloader <url>, <sha256sum>, <filename::optional>, <verbose::optional>
@@ -83,7 +75,16 @@ end
 
 def create_http_connection(uri)
   @connection ||= {}
-  @connection[uri] = Net::HTTP.start(uri.host, uri.port, HTTP_DOWNLOADER_OPTS) unless @connection.key?(uri)
+
+  unless @connection.key?(uri)
+    @connection[uri] = Net::HTTP.start(uri.host, uri.port, {
+      max_retries: CREW_DOWNLOADER_RETRY,
+          use_ssl: uri.scheme.eql?('https'),
+      min_version: :TLS1_2,
+          ca_file: SSL_CERT_FILE,
+          ca_path: SSL_CERT_DIR
+    })
+  end
 end
 
 def http_downloader(uri, filename = File.basename(url), verbose = false)
