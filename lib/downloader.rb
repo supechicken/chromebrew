@@ -85,6 +85,8 @@ def create_http_connection(uri)
           ca_path: SSL_CERT_DIR
     })
   end
+
+  return @connection[uri]
 end
 
 def http_downloader(uri, filename = File.basename(url), verbose = false)
@@ -94,65 +96,61 @@ def http_downloader(uri, filename = File.basename(url), verbose = false)
   # open http connection
   http = create_http_connection(uri)
 
-  begin
-    http.request(Net::HTTP::Get.new(uri)) do |response|
-      case
-      when response.is_a?(Net::HTTPSuccess)
-      when response.is_a?(Net::HTTPRedirection) # follow HTTP redirection
-        puts <<~EOT if verbose
-          * Follow HTTP redirection: #{response['Location']}
-          *
-        EOT
+  http.request(Net::HTTP::Get.new(uri)) do |response|
+    case
+    when response.is_a?(Net::HTTPSuccess)
+    when response.is_a?(Net::HTTPRedirection) # follow HTTP redirection
+      puts <<~EOT if verbose
+        * Follow HTTP redirection: #{response['Location']}
+        *
+      EOT
 
-        redirect_uri = URI(response['Location'])
+      redirect_uri = URI(response['Location'])
 
-        # add url scheme/host for redirected url based on original url if missing
-        redirect_uri.scheme ||= uri.scheme
-        redirect_uri.host ||= uri.host
+      # add url scheme/host for redirected url based on original url if missing
+      redirect_uri.scheme ||= uri.scheme
+      redirect_uri.host ||= uri.host
 
-        return send(__method__, redirect_uri, filename, verbose)
-      else
-        abort "Download failed with error #{response.code}: #{response.msg}".lightred
-      end
-
-      # get target file size (should be returned by the server)
-      file_size = response['Content-Length'].to_f
-      downloaded_size = 0.0
-
-      # initialize progress bar
-      progress_bar = ProgressBar.new(file_size)
-
-      if verbose
-        warn <<~EOT
-          * Connected to #{uri.host} port #{uri.port}
-          * HTTPS: #{uri.scheme.eql?('https')}
-          *
-        EOT
-
-        # parse response's header to readable format
-        response.to_hash.each_pair { |k, v| warn "> #{k}: #{v}" }
-
-        warn "\n"
-      end
-
-      # read file chunks from server, write it to filesystem
-      File.open(filename, 'wb') do |io|
-        progress_bar_thread = progress_bar.show # print progress bar
-
-        response.read_body do |chunk|
-          downloaded_size += chunk.size # record downloaded size, used for showing progress bar
-          progress_bar.set_downloaded_size(downloaded_size, invalid_size_error: false) if file_size.positive?
-
-          io.write(chunk) # write to file
-        end
-      ensure
-        # stop progress bar, wait for it to terminate
-        progress_bar.progress_bar_showing = false
-        progress_bar_thread.join
-      end
+      return send(__method__, redirect_uri, filename, verbose)
+    else
+      abort "Download failed with error #{response.code}: #{response.msg}".lightred
     end
-  rescue
-    http.finish
+
+    # get target file size (should be returned by the server)
+    file_size = response['Content-Length'].to_f
+    downloaded_size = 0.0
+
+    # initialize progress bar
+    progress_bar = ProgressBar.new(file_size)
+
+    if verbose
+      warn <<~EOT
+        * Connected to #{uri.host} port #{uri.port}
+        * HTTPS: #{uri.scheme.eql?('https')}
+        *
+      EOT
+
+      # parse response's header to readable format
+      response.to_hash.each_pair { |k, v| warn "> #{k}: #{v}" }
+
+      warn "\n"
+    end
+
+    # read file chunks from server, write it to filesystem
+    File.open(filename, 'wb') do |io|
+      progress_bar_thread = progress_bar.show # print progress bar
+
+      response.read_body do |chunk|
+        downloaded_size += chunk.size # record downloaded size, used for showing progress bar
+        progress_bar.set_downloaded_size(downloaded_size, invalid_size_error: false) if file_size.positive?
+
+        io.write(chunk) # write to file
+      end
+    ensure
+      # stop progress bar, wait for it to terminate
+      progress_bar.progress_bar_showing = false
+      progress_bar_thread.join
+    end
   end
 rescue OpenSSL::SSL::SSLError
   # handle SSL errors
