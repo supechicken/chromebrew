@@ -75,18 +75,15 @@ end
 
 def create_http_connection(uri)
   @connection ||= {}
+  http_opts = {
+    max_retries: CREW_DOWNLOADER_RETRY,
+        use_ssl: uri.scheme.eql?('https'),
+    min_version: :TLS1_2,
+        ca_file: SSL_CERT_FILE,
+        ca_path: SSL_CERT_DIR
+  }
 
-  unless @connection.key?(uri)
-    @connection[uri] = Net::HTTP.start(uri.host, uri.port, {
-      max_retries: CREW_DOWNLOADER_RETRY,
-          use_ssl: uri.scheme.eql?('https'),
-      min_version: :TLS1_2,
-          ca_file: SSL_CERT_FILE,
-          ca_path: SSL_CERT_DIR
-    })
-  end
-
-  return @connection[uri]
+  return @connection[uri.host] ||= Net::HTTP.start(uri.host, uri.port, http_opts)
 end
 
 def http_downloader(uri, filename = File.basename(url), verbose = false)
