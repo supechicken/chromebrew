@@ -9,6 +9,8 @@ class Erlang < Package
   source_url 'https://github.com/erlang/otp/releases/download/OTP-25.3/otp_src_25.3.tar.gz'
   source_sha256 '85c447efc1746740df4089d75bc0e47b88d5161d7c44e9fc4c20fa33ea5d19d7'
 
+  no_shrink
+
   depends_on 'openjdk8'
   depends_on 'wxwidgets'
 
