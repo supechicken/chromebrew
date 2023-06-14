@@ -26,20 +26,28 @@ class Package
                      :remove       # Function to perform after package removal.
 
   class << self
-    attr_accessor :name, :cached_build, :in_build, :build_from_source, :in_upgrade
+    attr_accessor :name, :orig_name, :is_alias, :cached_build, :in_build, :build_from_source, :in_upgrade
   end
 
   def self.load_package(pkgFile, pkgName = File.basename(pkgFile, '.rb'))
     # self.load_package: load a package under 'Package' class scope
     #
-    className = pkgName.capitalize
+    is_symlink = File.symlink?(pkgFile)
+
+    if is_symlink
+      origPackage = File.basename(File.readlink(pkgFile), '.rb')
+      className   = origPackage.capitalize
+    else
+      className   = pkgName.capitalize
+    end
 
     # read and eval package script under 'Package' class
     class_eval(File.read(pkgFile, encoding: Encoding::UTF_8), pkgFile) unless const_defined?("Package::#{className}")
 
-    pkgObj = const_get(className)
-    pkgObj.name = pkgName
-
+    pkgObj                = const_get(className)
+    pkgObj.is_alias       = is_symlink
+    pkgObj.name           = pkgName
+    pkgObj.orig_name      = is_symlink ? origPackage : pkgName
     @crew_current_package = @crew_current_package.nil? ? pkgObj.name : @crew_current_package
 
     return pkgObj
