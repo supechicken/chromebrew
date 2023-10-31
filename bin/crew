@@ -11,6 +11,7 @@ require_relative '../lib/util'
 require_relative '../lib/convert_size'
 require_relative '../lib/downloader'
 require_relative '../lib/deb_utils'
+require_relative '../lib/symlink_utils'
 require_relative '../lib/package'
 
 CREW_LICENSE = <<~LICENSESTRING

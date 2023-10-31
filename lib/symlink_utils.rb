@@ -1,3 +1,6 @@
+require 'pathname'
+require 'fileutils'
+
 class SymlinkUtils
   def self.to_relative(dir = CREW_DEST_DIR)
     absolute_symlinks = `find '#{dir}' -type l -printf "%P -> %l\n" | grep -- '-> /'`.scan(/^(.+?) -> (.+)$/).to_h
