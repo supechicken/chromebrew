@@ -1273,10 +1273,14 @@ end
 def shrink_dir(dir)
   unless CREW_NOT_SHRINK_ARCHIVE || @pkg.no_shrink?
     Dir.chdir dir do
-      if File.file?("#{CREW_PREFIX}/bin/rdfind")
+      if File.executable?("#{CREW_PREFIX}/bin/rdfind")
         puts 'Using rdfind to convert duplicate files to hard links.'
-        system "#{CREW_PREFIX}/bin/rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false ."
+        system %W[#{CREW_PREFIX}/bin/rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false .]
       end
+
+      puts 'Converting absolute symlinks to relative.'
+      SymlinkUtils.to_relative(dir)
+
       # Issues with non-x86_64 in compressing libraries, so just compress
       # non-libraries. Also note that one needs to use "upx -d" on a
       # compressed file to use ldd.
