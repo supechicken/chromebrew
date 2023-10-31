@@ -1408,10 +1408,6 @@ def install_package(pkgdir)
           end
         end
       end
-      if File.executable?("#{CREW_PREFIX}/bin/rdfind")
-        puts 'Using rdfind to convert duplicate files to hard links.'
-        system 'rdfind -removeidentinode true -makesymlinks false -makehardlinks true -makeresultsfile false .'
-      end
     end
 
     install_files(".#{CREW_PREFIX}") if Dir.exist?(".#{CREW_PREFIX}")
