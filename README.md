@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="images/brew.png" alt="Chromebrew icon">
+  <img src="images/brew.svg" alt="Chromebrew icon">
   <h1>Chromebrew</h1>
   <p>The Missing Package Manager For Chrome OS</p>
 </div>
