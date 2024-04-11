@@ -43,16 +43,20 @@ class Imagemagick6 < Autotools
     abort "ImageMagick version #{imver} already installed.".lightgreen unless imver.to_s == ''
   end
 
-  pre_configure_options "CFLAGS=' -I#{CREW_PREFIX}/include/gdk-pixbuf-2.0 -I#{CREW_PREFIX}/include/c++/v1/support/xlocale'"
+  pre_configure_options({
+    'CFLAGS' => "#{CREW_COMMON_FLAGS} -I#{CREW_PREFIX}/include/gdk-pixbuf-2.0 -I#{CREW_PREFIX}/include/c++/v1/support/xlocale"
+  })
 
-  configure_options "--disable-dependency-tracking \
-    --with-windows-font-dir=#{CREW_PREFIX}/share/fonts/truetype/msttcorefonts \
-    --with-jemalloc \
-    --with-modules \
-    --enable-hdri \
-    --with-perl \
-    --with-rsvg \
-    --with-x"
+  configure_options %W[
+    --disable-dependency-tracking
+    --with-windows-font-dir=#{CREW_PREFIX}/share/fonts/truetype/msttcorefonts
+    --with-jemalloc
+    --with-modules
+    --enable-hdri
+    --with-perl
+    --with-rsvg
+    --with-x
+  ].join(' ')
 
   def self.install
     system 'make', "DESTDIR=#{CREW_DEST_DIR}", 'install'

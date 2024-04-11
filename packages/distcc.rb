@@ -36,14 +36,18 @@ class Distcc < Autotools
   print_source_bashrc
 
   def self.patch
-    system "sed -i 's/ install-gnome-data//g' Makefile.in"
+    system(%w[sed -i 's/ install-gnome-data//g' Makefile.in])
   end
 
-  pre_configure_options "CFLAGS+=' -DPY_SSIZE_T_CLEAN -fcommon' NATIVE_COMPILER_TRIPLE='#{CREW_TGT}' INCLUDESERVER_PYTHON='#{CREW_PREFIX}/bin/python3'"
+  pre_configure_options({
+    'CFLAGS'                 => "#{CREW_COMMON_FLAGS} -DPY_SSIZE_T_CLEAN -fcommon",
+    'NATIVE_COMPILER_TRIPLE' => CREW_TGT
+    'INCLUDESERVER_PYTHON'   => "#{CREW_PREFIX}/bin/python3"
+  })
+
   configure_options '--enable-rfc2553 --disable-Werror --with-python-sys-prefix'
 
-  def self.install
-    system "make DESTDIR=#{CREW_DEST_DIR} INCLUDESERVER_PYTHON=#{CREW_PREFIX}/bin/python3 install"
+  install_extras lambda do
     # Package symlinks into lib/distcc, not ARCH_LIB/distcc, since that
     # is where distcc looks.
     @distcc_destbin_path = File.join(CREW_DEST_PREFIX, 'lib/distcc/bin')

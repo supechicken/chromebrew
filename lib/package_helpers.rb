@@ -14,7 +14,7 @@ def property(*properties)
   #   {prop_name}            # return the value of {prop_name}
   properties.each do |prop|
     class_eval <<~EOT, __FILE__, __LINE__ + 1
-      def self.#{prop} (#{prop} = nil)
+      def self.#{prop} (#{prop} = nil, &block)
         @#{prop} = #{prop} if #{prop}
         @#{prop}
       end

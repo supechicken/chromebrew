@@ -25,21 +25,26 @@ class Inetutils < Autotools
   depends_on 'ncurses' # R
   depends_on 'readline' # R
 
-  pre_configure_options "CC='gcc -lncursesw -lpthread -ltinfow' CXX='g++ -lncursesw -lpthread -ltinfow'"
-  configure_options "--with-ncurses-include-dir=#{CREW_PREFIX}/include/ncursesw \
-      --with-krb5=#{CREW_PREFIX} \
-      --disable-rpath \
-      --with-wrap \
-      --with-pam \
-      --disable-rexec \
-      --disable-rsh \
-      --enable-encryption \
-      --enable-authentication \
-      --disable-servers \
-      --disable-logger"
+  pre_configure_options({
+    'CC'  => 'gcc -lncursesw -lpthread -ltinfow',
+    'CXX' => 'g++ -lncursesw -lpthread -ltinfow'
+  })
 
-  def self.install
-    system 'make', "DESTDIR=#{CREW_DEST_DIR}", 'install'
+  configure_options %W[
+    --with-ncurses-include-dir=#{CREW_PREFIX}/include/ncursesw
+    --with-krb5=#{CREW_PREFIX}
+    --disable-rpath
+    --with-wrap
+    --with-pam
+    --disable-rexec
+    --disable-rsh
+    --enable-encryption
+    --enable-authentication
+    --disable-servers
+    --disable-logger
+  ].join(' ')
+
+  install_extras do
     FileUtils.install "#{CREW_DEST_PREFIX}/bin/ping", "#{CREW_DEST_PREFIX}/bin/ping.elf", mode: 0o755
     FileUtils.install "#{CREW_DEST_PREFIX}/bin/ping6", "#{CREW_DEST_PREFIX}/bin/ping6.elf", mode: 0o755
     FileUtils.install "#{CREW_DEST_PREFIX}/bin/traceroute", "#{CREW_DEST_PREFIX}/bin/traceroute.elf", mode: 0o755
