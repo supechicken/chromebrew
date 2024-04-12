@@ -25,7 +25,7 @@ class Glibc_latest < Package
       puts '????'
 
       system *%W[
-        mold -run ../configure
+        ../configure
           --build=x86_64-cros-linux-gnu --host=x86_64-cros-linux-gnu --target=x86_64-cros-linux-gnu
           --prefix=/usr/local
           --libdir=/usr/local/lib
