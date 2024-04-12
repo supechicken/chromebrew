@@ -28,6 +28,7 @@ class Glibc_latest < Package
 
       system({ 'CFLAGS' => '-fuse-ld=gold', 'CXXFLAGS' => '-fuse-ld=gold' }, *%W[
         ../configure
+          --disable-sanity-checks
           --build=x86_64-cros-linux-gnu --host=x86_64-cros-linux-gnu --target=x86_64-cros-linux-gnu
           --prefix=/usr/local
           --libdir=/usr/local/lib
