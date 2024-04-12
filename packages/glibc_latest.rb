@@ -27,7 +27,7 @@ class Glibc_latest < Package
 
       puts '????'
 
-      system %W[
+      system *%W[
         mold -run ../configure
           --build=x86_64-cros-linux-gnu --host=x86_64-cros-linux-gnu --target=x86_64-cros-linux-gnu
           --prefix=/usr/local
@@ -93,7 +93,7 @@ class Glibc_latest < Package
 
   def self.install
     %w[glibc-build lib32-glibc-build].each do |build|
-      system %W[mold -run make DESTDIR=#{CREW_DEST_DIR} install], chdir: build
+      system *%W[mold -run make DESTDIR=#{CREW_DEST_DIR} install], chdir: build
     end
   end
 end
