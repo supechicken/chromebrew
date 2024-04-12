@@ -47,9 +47,10 @@ class Glibc_latest < Package
       system 'make'
     end
 
+=begin
     Dir.chdir('lib32-glibc-build') do
-      export CC="gcc -m32 -mstackrealign"
-      export CXX="g++ -m32 -mstackrealign"
+      ENV['CC'] = "gcc -m32 -mstackrealign"
+      export CXX = "g++ -m32 -mstackrealign"
 
       File.open('configparms', 'a') do |io|
         io.write <<~EOT
@@ -82,6 +83,7 @@ class Glibc_latest < Package
 
       system 'make'
     end
+=end
   end
 
   def self.install
