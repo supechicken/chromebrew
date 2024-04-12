@@ -6,7 +6,7 @@ class Glibc_latest < Package
   homepage 'https://www.gnu.org/software/libc'
   compatibility 'all'
   license 'GPL-2.0+ LGPL-2.1+'
-  source_url 'https://sourceware.org/git/glibc.git'
+  source_url 'https://github.com/bminor/glibc.git'
   git_hashtag 'glibc-2.39'
 
   def self.build
@@ -25,8 +25,11 @@ class Glibc_latest < Package
         EOT
       end
 
+      puts '????'
+
       system %W[
         mold -run ../configure
+          --build=x86_64-cros-linux-gnu --host=x86_64-cros-linux-gnu --target=x86_64-cros-linux-gnu
           --prefix=/usr/local
           --libdir=/usr/local/lib
           --libexecdir=/usr/local/lib
@@ -43,6 +46,8 @@ class Glibc_latest < Package
           --disable-profile
           --disable-werror
       ]
+
+      puts '????'
 
       system 'make'
     end
