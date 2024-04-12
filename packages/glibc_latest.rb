@@ -10,9 +10,6 @@ class Glibc_latest < Package
   git_hashtag 'glibc-2.39'
 
   def self.build
-    ENV['CC'] = 'clang'
-    ENV['CXX'] = 'clang++'
-
     FileUtils.mkdir_p %w[glibc-build lib32-glibc-build]
 
     Dir.chdir('glibc-build') do
