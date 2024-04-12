@@ -9,6 +9,8 @@ class Glibc_latest < Package
   source_url 'https://github.com/bminor/glibc.git'
   git_hashtag 'glibc-2.39'
 
+  no_env_options
+
   def self.build
     FileUtils.mkdir_p %w[glibc-build lib32-glibc-build]
 
@@ -24,7 +26,7 @@ class Glibc_latest < Package
 
       puts '????'
 
-      system *%W[
+      system({ 'CFLAGS' => '-fuse-ld=gold', 'CXXFLAGS' => '-fuse-ld=gold' }, *%W[
         ../configure
           --build=x86_64-cros-linux-gnu --host=x86_64-cros-linux-gnu --target=x86_64-cros-linux-gnu
           --prefix=/usr/local
@@ -42,7 +44,7 @@ class Glibc_latest < Package
           --disable-nscd
           --disable-profile
           --disable-werror
-      ]
+      ])
 
       puts '????'
 
