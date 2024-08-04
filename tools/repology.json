@@ -1067,7 +1067,7 @@
     "name": "brave",
     "description": "Next generation Brave browser for macOS, Windows, Linux, Android.",
     "homepage": "https://brave.com/",
-    "version": "1.68.128",
+    "version": "1.68.134",
     "license": "MPL-2",
     "compatibility": "x86_64"
   },
@@ -1451,7 +1451,7 @@
     "name": "chrome",
     "description": "Google Chrome is a fast, easy to use, and secure web browser.",
     "homepage": "https://www.google.com/chrome/",
-    "version": "127.0.6533.72-1",
+    "version": "127.0.6533.88-1",
     "license": "google-chrome",
     "compatibility": "x86_64"
   },
@@ -2035,7 +2035,7 @@
     "name": "curl",
     "description": "Command line tool and library for transferring data with URLs.",
     "homepage": "https://curl.se/",
-    "version": "8.9.0",
+    "version": "8.9.1",
     "license": "curl",
     "compatibility": "all"
   },
@@ -2275,7 +2275,7 @@
     "name": "difftastic",
     "description": "Difftastic is a structural diff tool that compares files based on their syntax.",
     "homepage": "https://github.com/Wilfred/difftastic",
-    "version": "0.52.0",
+    "version": "0.60.0",
     "license": "MIT",
     "compatibility": "all"
   },
@@ -2459,9 +2459,9 @@
     "name": "dropbox",
     "description": "Dropbox simplifies the way you create, share and collaborate.  Bring your photos, docs, and videos anywhere and keep your files safe.",
     "homepage": "https://www.dropbox.com/",
-    "version": "48.4.58",
-    "license": "Dropbox-TOS",
-    "compatibility": "i686,x86_64"
+    "version": "2024.04.17",
+    "license": "GPL3+",
+    "compatibility": "aarch64 armv7l x86_64"
   },
   {
     "name": "dropbox_uploader",
@@ -2478,14 +2478,6 @@
     "version": "0.18.0",
     "license": "Apache License, Version 2.0",
     "compatibility": "x86_64"
-  },
-  {
-    "name": "dstat",
-    "description": "Dstat is a versatile replacement for vmstat, iostat, netstat and ifstat.",
-    "homepage": "http://dag.wiee.rs/home-made/dstat/",
-    "version": "0.7.3",
-    "license": "GPL-2",
-    "compatibility": "all"
   },
   {
     "name": "dtc",
@@ -2539,7 +2531,7 @@
     "name": "ecasound",
     "description": "Ecasound is a software package designed for multitrack audio processing.",
     "homepage": "https://ecasound.seul.org/ecasound/",
-    "version": "1.0.21",
+    "version": "2.9.3",
     "license": "GPL-2",
     "compatibility": "all"
   },
@@ -2686,14 +2678,6 @@
     "version": "43.1",
     "license": "GPL",
     "compatibility": "x86_64 aarch64 armv7l"
-  },
-  {
-    "name": "epydoc",
-    "description": "Epydoc is a tool for generating API documentation for Python modules, based on their docstrings.",
-    "homepage": "https://epydoc.sourceforge.net/",
-    "version": "3.0.1",
-    "license": "MIT",
-    "compatibility": "all"
   },
   {
     "name": "erlang",
@@ -3595,7 +3579,7 @@
     "name": "gcc_build",
     "description": "The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Ada, and Go.",
     "homepage": "https://www.gnu.org/software/gcc/",
-    "version": "14.1.0",
+    "version": "14.2.0",
     "license": "GPL-3, LGPL-3, libgcc, FDL-1.2",
     "compatibility": "all"
   },
@@ -3603,7 +3587,7 @@
     "name": "gcc_dev",
     "description": "The GNU Compiler Collection: Everything (excepting libraries aside from libgccjit)",
     "homepage": "https://www.gnu.org/software/gcc/",
-    "version": "14.1.0",
+    "version": "14.2.0",
     "license": "GPL-3, LGPL-3, libgcc, FDL-1.2",
     "compatibility": "all"
   },
@@ -3611,7 +3595,7 @@
     "name": "gcc_lib",
     "description": "GCC shared libs except libgccjit",
     "homepage": "https://www.gnu.org/software/gcc/",
-    "version": "14.1.0",
+    "version": "14.2.0",
     "license": "GPL-3, LGPL-3, libgcc, FDL-1.2",
     "compatibility": "all"
   },
@@ -3627,7 +3611,7 @@
     "name": "gcloud",
     "description": "Command-line interface for Google Cloud Platform products and services",
     "homepage": "https://cloud.google.com/sdk/gcloud/",
-    "version": "485.0.0",
+    "version": "486.0.0",
     "license": "Apache-2.0",
     "compatibility": "all"
   },
@@ -3915,7 +3899,7 @@
     "name": "git",
     "description": "Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.",
     "homepage": "https://git-scm.com/",
-    "version": "2.45.2",
+    "version": "2.46.0",
     "license": "GPL-2",
     "compatibility": "all"
   },
@@ -3939,7 +3923,7 @@
     "name": "github_cli",
     "description": "Official Github CLI tool",
     "homepage": "https://cli.github.com/",
-    "version": "2.52.0",
+    "version": "2.54.0",
     "license": "MIT",
     "compatibility": "all"
   },
@@ -3995,7 +3979,7 @@
     "name": "glab",
     "description": "A GitLab CLI tool bringing GitLab to your command line",
     "homepage": "https://gitlab.com/gitlab-org/cli",
-    "version": "1.43.0",
+    "version": "1.45.0",
     "license": "MIT",
     "compatibility": "all"
   },
@@ -4939,7 +4923,7 @@
     "name": "gvim",
     "description": "Vim is a highly configurable text editor built to make creating and changing any kind of text very efficient. (with advanced features, such as a GUI)",
     "homepage": "https://www.vim.org/",
-    "version": "9.1.0568",
+    "version": "9.1.0636",
     "license": "GPL-2",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -5358,14 +5342,6 @@
     "version": "1.25-1",
     "license": "MIT",
     "compatibility": "x86_64"
-  },
-  {
-    "name": "imagemagick6",
-    "description": "Use ImageMagick to create, edit, compose, or convert bitmap images.",
-    "homepage": "http://www.imagemagick.org/script/index.php",
-    "version": "6.9.13-1",
-    "license": "imagemagick",
-    "compatibility": "x86_64 aarch64 armv7l"
   },
   {
     "name": "imagemagick7",
@@ -6181,14 +6157,6 @@
     "homepage": "https://github.com/ivmai/libatomic_ops",
     "version": "7.8.0",
     "license": "GPL-2 and all-rights-reserved",
-    "compatibility": "all"
-  },
-  {
-    "name": "libaudiofile",
-    "description": "The Audio File Library is a C-based library for reading and writing audio files in many common formats.",
-    "homepage": "https://audiofile.68k.org/",
-    "version": "b62c90",
-    "license": "LGPL-2.1",
     "compatibility": "all"
   },
   {
@@ -7971,7 +7939,7 @@
     "name": "libssp",
     "description": "Libssp is a part of the GCC toolkit.",
     "homepage": "https://gcc.gnu.org/",
-    "version": "14.1.0",
+    "version": "14.2.0",
     "license": "GPL-3, LGPL-3, libgcc, FDL-1.2",
     "compatibility": "all"
   },
@@ -8379,7 +8347,7 @@
     "name": "libx11",
     "description": "C interface to the X window system",
     "homepage": "https://x.org/wiki/",
-    "version": "1.8.7",
+    "version": "1.8.10",
     "license": "X11",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -8755,7 +8723,7 @@
     "name": "links",
     "description": "Links is a lynx-like text WWW browser with tables and frames.",
     "homepage": "http://links.twibright.com/",
-    "version": "2.28",
+    "version": "2.30",
     "license": "GPL-2",
     "compatibility": "all"
   },
@@ -9331,7 +9299,7 @@
     "name": "mesa",
     "description": "Open-source implementation of the OpenGL specification",
     "homepage": "https://www.mesa3d.org",
-    "version": "24.1.4",
+    "version": "24.1.5",
     "license": "MIT",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -9347,9 +9315,17 @@
     "name": "mesonbuild",
     "description": "Meson is an open source build system meant to be both extremely fast and user friendly.",
     "homepage": "https://mesonbuild.com/",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "license": "Apache-2.0",
     "compatibility": "all"
+  },
+  {
+    "name": "metadata_cleaner",
+    "description": "Python GTK application to view and clean metadata in files, using mat2",
+    "homepage": "https://metadatacleaner.romainvigier.fr/",
+    "version": "2.5.6",
+    "license": "GPL-3",
+    "compatibility": "x86_64"
   },
   {
     "name": "metasploit",
@@ -10795,7 +10771,7 @@
     "name": "opera",
     "description": "Opera is a multi-platform web browser based on Chromium and developed by Opera Software.",
     "homepage": "https://www.opera.com/",
-    "version": "112.0.5197.30",
+    "version": "112.0.5197.39",
     "license": "OPERA-2018",
     "compatibility": "x86_64"
   },
@@ -12448,6 +12424,14 @@
     "compatibility": "all"
   },
   {
+    "name": "py3_dool",
+    "description": "Dool is a command line tool to monitor many aspects of your system: CPU, Memory, Network, Load Average, etc.",
+    "homepage": "https://github.com/scottchiefbaker/dool",
+    "version": "1.3.2",
+    "license": "GPL3+",
+    "compatibility": "all"
+  },
+  {
     "name": "py3_ebooklib",
     "description": "Ebooklib is a Python E-book library for handling books in EPUB2/EPUB3 format.",
     "homepage": "https://docs.sourcefabric.org/projects/ebooklib/",
@@ -12760,10 +12744,18 @@
     "compatibility": "all"
   },
   {
+    "name": "py3_mat2",
+    "description": "A handy tool to trash your metadata",
+    "homepage": "https://0xacab.org/jvoisin/mat2",
+    "version": "0.13.4",
+    "license": "MIT",
+    "compatibility": "x86_64"
+  },
+  {
     "name": "py3_mercurial",
     "description": "Mercurial is a free, distributed source control management tool. It efficiently handles projects of any size and offers an easy and intuitive interface.",
     "homepage": "https://www.mercurial-scm.org/",
-    "version": "6.7.4",
+    "version": "6.8.1",
     "license": "GPL-2+",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13651,15 +13643,15 @@
     "name": "qt5_base",
     "description": "Qt Base (Core, Gui, Widgets, Network, ...)",
     "homepage": "https://code.qt.io/cgit/qt/qtbase",
-    "version": "5.15.11-ea7a183",
-    "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception and LGPL-3",
+    "version": "kde-5.15.14-9f9a56d",
+    "license": "GPL-2",
     "compatibility": "x86_64 aarch64 armv7l"
   },
   {
     "name": "qt5_charts",
     "description": "Qt Charts",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-e17308d",
+    "version": "kde-5.15.14-7315c48",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13667,7 +13659,7 @@
     "name": "qt5_declarative",
     "description": "Provides QML and Quick declaratives.",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-1b0e366",
+    "version": "kde-5.15.14-50c8def",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13675,7 +13667,7 @@
     "name": "qt5_imageformats",
     "description": "Qt Image Formats",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-b22bf4d",
+    "version": "kde-5.15.14-4e4f5fc",
     "license": "GPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13683,7 +13675,7 @@
     "name": "qt5_location",
     "description": "Qt Location and Positioning",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-48a17e8",
+    "version": "kde-5.15.14-3beb9c8",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13691,7 +13683,7 @@
     "name": "qt5_multimedia",
     "description": "Qt Multimedia",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-f587b18",
+    "version": "kde-5.15.14-53069c9",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13699,7 +13691,7 @@
     "name": "qt5_networkauth",
     "description": "Qt Network Authentication",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-lts-lgpl",
+    "version": "kde-5.15.14-28180f2",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13707,7 +13699,7 @@
     "name": "qt5_quickcontrols",
     "description": "Reusable Qt Quick based UI controls to create classic desktop-style user interfaces",
     "homepage": "https://www.qt.io",
-    "version": "5.15.11-dcc9055",
+    "version": "kde-5.15.14-9325659",
     "license": "GPL3 LGPL3 FDL custom",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13715,7 +13707,7 @@
     "name": "qt5_script",
     "description": "Qt Script Tools",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.15",
+    "version": "5.15.17",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13723,7 +13715,7 @@
     "name": "qt5_serialport",
     "description": "Qt Serial Port",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-3380465",
+    "version": "kde-5.15.14-34c19c6",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13731,7 +13723,7 @@
     "name": "qt5_svg",
     "description": "Provides classes for displaying the contents of SVG files.",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-7d6e373",
+    "version": "kde-5.15.14-690128b",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13739,7 +13731,7 @@
     "name": "qt5_tools",
     "description": "Qt Tools",
     "homepage": "https://github.com/qt/qttools",
-    "version": "5.15.11-38ae810",
+    "version": "kde-5.15.14-f82ed36",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13747,7 +13739,7 @@
     "name": "qt5_wayland",
     "description": "Qt Wayland",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-4de268c",
+    "version": "kde-5.15.14-11e099c",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13755,7 +13747,7 @@
     "name": "qt5_webchannel",
     "description": "Provides access to QObject or QML objects from HTML clients for seamless integration of Qt applications with HTML/JavaScript clients",
     "homepage": "https://www.qt.io",
-    "version": "5.15.11-f84887c-1",
+    "version": "kde-5.15.14-fca8308",
     "license": "GPL3 LGPL3 FDL custom",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13771,7 +13763,7 @@
     "name": "qt5_webglplugin",
     "description": "Qt WebGL Plugin",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-ddcff45",
+    "version": "kde-5.15.14-3681356",
     "license": "GPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13779,7 +13771,7 @@
     "name": "qt5_websockets",
     "description": "Qt Websockets",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-d41bb9f",
+    "version": "kde-5.15.14-dbbdc64",
     "license": "GPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13787,7 +13779,7 @@
     "name": "qt5_x11extras",
     "description": "Provides classes for developing for the X11 platform.",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-5fb2e06",
+    "version": "kde-5.15.14-6c3605f",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -13795,7 +13787,7 @@
     "name": "qt5_xmlpatterns",
     "description": "Qt XML Patterns",
     "homepage": "https://www.qt.io/",
-    "version": "5.15.11-lts-lgpl",
+    "version": "kde-5.15.14-087f6f3",
     "license": "FDL, GPL-2, GPL-3, GPL-3-with-qt-exception, LGPL-2.1 and LGPL-3",
     "compatibility": "x86_64 aarch64 armv7l"
   },
@@ -14595,7 +14587,7 @@
     "name": "signal_desktop",
     "description": "Private Messenger for Windows, Mac, and Linux",
     "homepage": "https://signal.org/",
-    "version": "7.17.0",
+    "version": "7.18.0",
     "license": "AGPL-3.0",
     "compatibility": "x86_64"
   },
@@ -15299,7 +15291,7 @@
     "name": "telegram",
     "description": "Telegram is a messaging app with a focus on speed and security, it's super-fast, simple and free.",
     "homepage": "https://telegram.org/",
-    "version": "5.2.3",
+    "version": "5.3.0",
     "license": "BSD, LGPL-2+ and GPL-3-with-openssl-exception",
     "compatibility": "x86_64"
   },
@@ -15355,7 +15347,7 @@
     "name": "terraform",
     "description": "Terraform is a tool for building, changing, and combining infrastructure safely and efficiently.",
     "homepage": "https://www.terraform.io/",
-    "version": "1.9.2",
+    "version": "1.9.3",
     "license": "Apache-2.0, BSD-2, BSD-4, ECL-2.0, imagemagick, ISC, JSON, MIT, MIT-with-advertising, MPL-2.0 and unicode",
     "compatibility": "all"
   },
@@ -15867,7 +15859,7 @@
     "name": "upx",
     "description": "Extendable, high-performance executable packer for several executable formats",
     "homepage": "https://github.com/upx/upx",
-    "version": "4.2.3",
+    "version": "4.2.4",
     "license": "custom GPL2",
     "compatibility": "all"
   },
@@ -16059,7 +16051,7 @@
     "name": "vim",
     "description": "Vim is a highly configurable text editor built to make creating and changing any kind of text very efficient.",
     "homepage": "https://www.vim.org/",
-    "version": "9.1.0568",
+    "version": "9.1.0636",
     "license": "GPL-2",
     "compatibility": "all"
   },
@@ -16067,7 +16059,7 @@
     "name": "vim_runtime",
     "description": "Vim is a highly configurable text editor built to make creating and changing any kind of text very efficient. (shared runtime)",
     "homepage": "https://www.vim.org/",
-    "version": "9.1.0568",
+    "version": "9.1.0636",
     "license": "GPL-2",
     "compatibility": "all"
   },
@@ -16083,7 +16075,7 @@
     "name": "vivaldi",
     "description": "Vivaldi is a new browser that blocks unwanted ads, protects you from trackers, and puts you in control with unique built-in features.",
     "homepage": "https://vivaldi.com/",
-    "version": "6.8.3381.48-1",
+    "version": "6.8.3381.50-1",
     "license": "Vivaldi",
     "compatibility": "x86_64 aarch64 armv7l"
   },
