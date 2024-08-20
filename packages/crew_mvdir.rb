@@ -8,7 +8,6 @@ class Crew_mvdir < Package
   compatibility 'all'
   source_url 'https://github.com/supechicken/crew-mvdir.git'
   git_branch 'main'
-  binary_compression 'tar.zst'
 
   depends_on 'glibc' # R
 
