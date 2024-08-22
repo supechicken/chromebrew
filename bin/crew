@@ -55,9 +55,8 @@ binding.pry if CREW_DEBUG
 
 begin
   require_relative '../lib/crew_mvdir'
-  HAVE_CREW_MVDIR=true
 rescue LoadError
-  HAVE_CREW_MVDIR=false
+  warn 'crew-mvdir is not installed. Please install it with \'crew install crew_mvdir\' for improved installation performance'.yellow
 end
 
 require_relative '../lib/crewlog'
@@ -1046,15 +1045,12 @@ def time_difference(start_time = nil, end_time = nil)
 end
 
 def install_files(src, dst = File.join(CREW_PREFIX, src.delete_prefix('./usr/local')))
-  if Dir.exist?(src)
-    if HAVE_CREW_MVDIR && !CREW_DISABLE_MVDIR
-      crew_mvdir src, dst, verbose: @verbose
-    else
-      warn 'crew-mvdir is not installed. Please install it with \'crew install crew_mvdir\' for improved installation performance'.yellow unless (@pkg.name == 'crew_mvdir') || CREW_DISABLE_MVDIR
-      system "cd #{src}; tar -cf - ./* | (cd #{dst}; tar -x#{@verbose}p --keep-directory-symlink -f -)", exception: true
-    end
+  abort "#{src} directory does not exist.".lightred unless Dir.exist?(src)
+
+  if CREW_DISABLE_MVDIR || !defined?(crew_mvdir)
+    system "cd #{src}; tar -cf - ./* | (cd #{dst}; tar -x#{@verbose}p --keep-directory-symlink -f -)", exception: true
   else
-    abort "#{src} directory does not exist.".lightred
+    crew_mvdir src, dst, verbose: @verbose
   end
 end
 
