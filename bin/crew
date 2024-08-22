@@ -52,7 +52,6 @@ require_gem 'pry-byebug' if CREW_DEBUG
 # The following line can be used anywhere as a breakpoint.
 binding.pry if CREW_DEBUG
 
-
 begin
   require_relative '../lib/crew_mvdir'
 rescue LoadError
