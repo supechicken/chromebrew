@@ -12,7 +12,7 @@ class Crew_mvdir < Package
   depends_on 'glibc' # R
 
   def self.build
-    system *%w[mold -run ./build.sh]
+    system 'mold', '-run', './build.sh'
   end
 
   def self.install
