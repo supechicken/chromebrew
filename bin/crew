@@ -55,7 +55,7 @@ binding.pry if CREW_DEBUG
 begin
   require_relative '../lib/crew_mvdir'
 rescue LoadError
-  warn 'crew-mvdir is not installed. Please install it with \'crew install crew_mvdir\' for improved installation performance'.yellow
+  warn 'crew-mvdir is not installed. Please install it with \'crew install crew_mvdir\' for improved installation performance.'.yellow
 end
 
 require_relative '../lib/crewlog'
