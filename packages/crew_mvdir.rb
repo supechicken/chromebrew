@@ -6,8 +6,8 @@ class Crew_mvdir < Package
   version '0.3' # Do not use @_ver here, it will break the installer.
   license 'GPL-3'
   compatibility 'all'
-  source_url 'https://github.com/supechicken/crew-mvdir.git'
-  git_hashtag 'e2b6b3fed81db907690a14f9953bb725b57b4e96'
+  source_url 'https://github.com/chromebrew/crew-mvdir.git'
+  git_hashtag 'v0.3'
 
   depends_on 'glibc' # R
 
