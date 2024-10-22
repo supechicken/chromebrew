@@ -7,7 +7,7 @@ class Crew_mvdir < Package
   license 'GPL-3'
   compatibility 'all'
   source_url 'https://github.com/chromebrew/crew-mvdir.git'
-  git_hashtag 'v0.3'
+  git_hashtag version
 
   depends_on 'glibc' # R
 
