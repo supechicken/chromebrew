@@ -1800,6 +1800,11 @@ url: https://github.com/clvv/fasd/releases
 activity: none
 ---
 kind: url
+name: fastfetch
+url: https://github.com/fastfetch-cli/fastfetch/releases
+activity: high
+---
+kind: url
 name: faultstat
 url: https://kernel.ubuntu.com/~cking/tarballs/faultstat/
 activity: low
@@ -2293,6 +2298,11 @@ kind: url
 name: geany_plugins
 url: https://download.geany.org/
 activity: medium
+---
+kind: url
+name: geary
+url: https://gitlab.gnome.org/GNOME/geary
+activity: low
 ---
 kind: url
 name: gedit
@@ -3425,11 +3435,6 @@ url: https://salsa.debian.org/iso-codes-team/iso-codes/-/tags
 activity: low
 ---
 kind: url
-name: itstool
-url: https://github.com/itstool/itstool/releases
-activity: low
----
-kind: url
 name: iw
 url: https://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git/
 activity: low
@@ -3522,6 +3527,11 @@ activity: medium
 kind: url
 name: jobscheduler
 url: https://sourceforge.net/projects/jobscheduler/files/
+activity: medium
+---
+kind: url
+name: joplin
+url: https://joplinapp.org/help/install/
 activity: medium
 ---
 kind: url
@@ -3732,6 +3742,11 @@ activity: low
 kind: url
 name: less
 url: http://www.greenwoodsoftware.com/less
+activity: low
+---
+kind: url
+name: lesspipe
+url: https://github.com/wofr06/lesspipe/releases
 activity: low
 ---
 kind: url
@@ -5741,11 +5756,6 @@ url: https://gitlab.freedesktop.org/mesa/demos/-/tags
 activity: none
 ---
 kind: url
-name: mesonbuild
-url: https://github.com/mesonbuild/meson/releases
-activity: high
----
-kind: url
 name: metadata_cleaner
 url: https://gitlab.com/rmnvgr/metadata-cleaner/-/tags
 activity: low
@@ -6251,6 +6261,11 @@ url: https://github.com/l3ib/nitrogen/releases
 activity: none
 ---
 kind: url
+name: nlopt
+url: https://github.com/stevengj/nlopt/releases
+activity: low
+---
+kind: url
 name: nmap
 url: https://nmap.org/dist
 activity: low
@@ -6371,6 +6386,11 @@ url: https://github.com/ONLYOFFICE/appimage-desktopeditors/releases
 activity: medium
 ---
 kind: url
+name: oorexx
+url: https://sourceforge.net/projects/oorexx/files/oorexx/
+activity: medium
+---
+kind: url
 name: opam
 url: https://github.com/ocaml/opam/releases
 activity: medium
@@ -6442,6 +6462,11 @@ activity: medium
 ---
 kind: url
 name: openjdk22
+url: https://www.azul.com/downloads/?package=jdk#zulu
+activity: medium
+---
+kind: url
+name: openjdk23
 url: https://www.azul.com/downloads/?package=jdk#zulu
 activity: medium
 ---
@@ -6996,6 +7021,11 @@ url: https://cpan.metacpan.org/authors/id/G/GR/GRANTM/
 activity: none
 ---
 kind: url
+name: perl_xml_xpath
+url: https://metacpan.org/pod/XML::XPath
+activity: low
+---
+kind: url
 name: perl_yaml_tiny
 url: https://metacpan.org/pod/YAML::Tiny
 activity: none
@@ -7356,6 +7386,11 @@ url: https://github.com/pre-commit/identify/tags
 activity: medium
 ---
 kind: url
+name: py3_itstool
+url: https://github.com/itstool/itstool/releases
+activity: low
+---
+kind: url
 name: py3_lxml
 url: https://github.com/lxml/lxml/releases
 activity: high
@@ -7368,6 +7403,11 @@ activity: low
 kind: url
 name: py3_mercurial
 url: https://www.mercurial-scm.org/release
+activity: high
+---
+kind: url
+name: py3_meson
+url: https://github.com/mesonbuild/meson/releases
 activity: high
 ---
 kind: url
@@ -7389,6 +7429,11 @@ kind: url
 name: py3_pre_commit
 url: https://github.com/pre-commit/pre-commit/releases
 activity: medium
+---
+kind: url
+name: py3_pygobject
+url: https://gitlab.gnome.org/GNOME/pygobject/tags
+activity: high
 ---
 kind: url
 name: py3_pylint
@@ -7418,6 +7463,11 @@ activity: medium
 kind: url
 name: py3_sphinx_rtd_theme
 url: https://github.com/readthedocs/sphinx_rtd_theme/tags
+activity: medium
+---
+kind: url
+name: py3_twine
+url: https://github.com/pypa/twine/releases
 activity: medium
 ---
 kind: url
@@ -7454,11 +7504,6 @@ kind: url
 name: pyconfigure
 url: https://ftpmirror.gnu.org/pyconfigure/
 activity: none
----
-kind: url
-name: pygobject
-url: https://gitlab.gnome.org/GNOME/pygobject/tags
-activity: high
 ---
 kind: url
 name: pygobject2
@@ -7856,6 +7901,11 @@ url: https://github.com/docopt/docopt/releases
 activity: none
 ---
 kind: url
+name: ruby_gem_compiler
+url: https://github.com/luislavena/gem-compiler/releases
+activity: low
+---
+kind: url
 name: ruby_glib2
 url: https://rubygems.org/gems/glib2
 activity: medium
@@ -7883,6 +7933,11 @@ activity: low
 kind: url
 name: ruby_rubocop
 url: https://github.com/rubocop/rubocop/releases
+activity: medium
+---
+kind: url
+name: ruby_ruby_libversion
+url: https://github.com/Zopolis4/ruby-libversion/tags
 activity: medium
 ---
 kind: url
@@ -7973,7 +8028,7 @@ activity: high
 kind: url
 name: sccache
 url: https://github.com/mozilla/sccache/releases
-activity: low
+activity: medium
 ---
 kind: url
 name: scdoc
@@ -8951,6 +9006,11 @@ url: https://gitlab.freedesktop.org/upower/upower/-/tags
 activity: none
 ---
 kind: url
+name: upscayl
+url: https://github.com/upscayl/upscayl/releases
+activity: medium
+---
+kind: url
 name: upx
 url: https://github.com/upx/upx/releases/
 activity: low
@@ -9739,6 +9799,11 @@ kind: url
 name: ytree
 url: https://www.han.de/~werner/ytree.html
 activity: high
+---
+kind: url
+name: yyjson
+url: https://github.com/ibireme/yyjson/releases
+activity: medium
 ---
 kind: url
 name: zathura

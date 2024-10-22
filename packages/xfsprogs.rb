@@ -3,7 +3,7 @@ require 'package'
 class Xfsprogs < Package
   description 'XFS filesystem utilities'
   homepage 'https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/'
-  version '6.9.0-icu75.1'
+  version "6.11.0-#{CREW_ICU_VER}"
   license 'LGPL-2.1'
   compatibility 'x86_64 aarch64 armv7l'
   source_url 'https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git'
@@ -11,9 +11,9 @@ class Xfsprogs < Package
   binary_compression 'tar.zst'
 
   binary_sha256({
-    aarch64: 'e5a3e3de99d56f030e90787948ac068288526ea51497cff7aba219fa6bfa0a26',
-     armv7l: 'e5a3e3de99d56f030e90787948ac068288526ea51497cff7aba219fa6bfa0a26',
-     x86_64: 'e2e2c14581d1f0133124bc569958d84b6da6531af130d2e86341adbe549d8d1e'
+    aarch64: 'ec6b21bb4fc6d89796cd0473528f9d263ea0ff0dcea5b9f58fba3bdab9a97fc5',
+     armv7l: 'ec6b21bb4fc6d89796cd0473528f9d263ea0ff0dcea5b9f58fba3bdab9a97fc5',
+     x86_64: '60fe2d2aee8bdc9166ab6d296fe13acff482ae5168d2ab1f178e562df744ae98'
   })
 
   depends_on 'gcc_lib' # R
@@ -27,7 +27,7 @@ class Xfsprogs < Package
 
   def self.build
     system 'make configure'
-    system "DEBUG=-DNDEBUG ./configure #{CREW_OPTIONS}"
+    system "DEBUG=-DNDEBUG ./configure #{CREW_CONFIGURE_OPTIONS}"
     system 'make'
   end
 

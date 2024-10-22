@@ -3,21 +3,22 @@ require 'buildsystems/pip'
 class Py3_pyyaml < Pip
   description 'PyYAML is a YAML parser and emitter for Python.'
   homepage 'https://pyyaml.org/'
-  version '6.0.2-py3.12'
+  version "6.0.2-#{CREW_PY_VER}"
   license 'MIT'
   compatibility 'all'
-  source_url 'https://github.com/yaml/pyyaml.git'
-  git_hashtag version.split('-').first
+  source_url 'SKIP'
   binary_compression 'tar.zst'
 
   binary_sha256({
-    aarch64: '2215ad3e68ae779056258955c89d1a466e88312460ef608ea406d13b3e61780a',
-     armv7l: '2215ad3e68ae779056258955c89d1a466e88312460ef608ea406d13b3e61780a',
-       i686: 'ad0733204a5bb9fb168eb2164a0576a56d97cf7d5027a5226af404f49481fbcd',
-     x86_64: '1565ef6f148ff8c7c5578dc81a76f551f12e4f3b8e53d1aec8d0e4eda4196ee7'
+    aarch64: 'bc8bdf7e1975ac702f5db16b7842eb981ac14fec43a5c1d38524171061081550',
+     armv7l: 'bc8bdf7e1975ac702f5db16b7842eb981ac14fec43a5c1d38524171061081550',
+       i686: 'fcfcf65c6d2e02196a3918e0a1700fe0649f3cb4a81227c66389d9704355117c',
+     x86_64: 'de32c1ba7ee0d6800f042060aa655aaa5a7d67f467ada70b756a82f31e766277'
   })
 
   depends_on 'glibc' # R
   depends_on 'libyaml' # R
   depends_on 'python3' => :build
+
+  no_source_build
 end

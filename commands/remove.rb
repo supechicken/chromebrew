@@ -1,11 +1,13 @@
 require 'fileutils'
+require 'json'
 require_relative '../lib/const'
+require_relative '../lib/convenience_functions'
 require_relative '../lib/package'
 require_relative '../lib/package_utils'
 
 class Command
-  def self.remove(pkg, verbose)
-    device_json = PackageUtils.load_json
+  def self.remove(pkg, verbose = CREW_VERBOSE)
+    device_json = JSON.load_file(File.join(CREW_CONFIG_PATH, 'device.json'))
 
     # Make sure the package is actually installed before we attempt to remove it.
     unless PackageUtils.installed?(pkg.name)
@@ -17,7 +19,7 @@ class Command
     # their dependencies, as those are needed for ruby and crew to run,
     # and thus should not be removed.
     # essential_deps = recursive_deps(CREW_ESSENTIAL_PACKAGES)
-    essential_deps = device_json[:essential_deps]
+    essential_deps = device_json['essential_deps']
     crewlog "Essential Deps are #{essential_deps}."
     if essential_deps.include?(pkg.name)
       return if pkg.in_upgrade
@@ -38,10 +40,16 @@ class Command
     # Use gem to first try to remove gems...
     if pkg.name.start_with?('ruby_')
       @gem_name = pkg.name.sub('ruby_', '').sub('_', '-')
-      if Kernel.system "gem list -i \"^#{@gem_name}\$\""
-        puts "Uninstalling #{@gem_name} before updating. It's ok if this fails.".orange
+      if Kernel.system "gem list -i \"^#{@gem_name}\$\"", %i[out err] => File::NULL
+        puts "Uninstalling #{@gem_name} before removing gem files. It's ok if this fails.".orange
         system "gem uninstall -aIx --abort-on-dependent #{@gem_name}", exception: false
       end
+    end
+
+    # Use pip to first try to remove python packages if package uses pip.
+    if pkg.name.start_with?('py3_')
+      pkg_file = Dir["{#{CREW_LOCAL_REPO_ROOT}/packages,#{CREW_PACKAGES_PATH}}/#{pkg.name}.rb"].max { |a, b| File.mtime(a) <=> File.mtime(b) }
+      system "python3 -s -m pip uninstall #{pkg.name.gsub('py3_', '')} -y", exception: false if Kernel.system "grep -q \"^require 'buildsystems/pip\" #{pkg_file}"
     end
 
     # Remove the files and directories installed by the package.
@@ -60,13 +68,8 @@ class Command
           # all packages and dependent packages of CREW_ESSENTIAL_PACKAGES.
           essential_deps_exclude_froms = essential_deps.map { |i| File.file?("#{File.join(CREW_META_PATH, i.to_s)}.filelist") ? "--exclude-from=#{File.join(CREW_META_PATH, i.to_s)}.filelist" : '' }.join(' ')
 
-          # When making a list of all files from crew filelists we again
-          # ignore all files from packages and dependent packages of
-          # CREW_ESSENTIAL_PACKAGES.
-          essential_deps_excludes = essential_deps.map { |i| File.file?("#{File.join(CREW_META_PATH, i.to_s)}.filelist") ? "--exclude=#{File.join(CREW_META_PATH, i.to_s)}.filelist" : '' }.join(' ')
-
           package_files = `grep -h #{essential_deps_exclude_froms} \"^#{CREW_PREFIX}\\|^#{HOME}\" #{flist}`.split("\n").uniq.sort
-          all_other_files = `grep -h --exclude #{pkg.name}.filelist #{essential_deps_excludes} \"^#{CREW_PREFIX}\\|^#{HOME}\" #{CREW_META_PATH}/*.filelist`.split("\n").uniq.sort
+          all_other_files = `grep -h --exclude #{pkg.name}.filelist \"^#{CREW_PREFIX}\\|^#{HOME}\" #{CREW_META_PATH}/*.filelist 2>/dev/null`.split("\n").uniq.sort
 
           # We want the difference of these arrays.
           unique_to_package_files = package_files - all_other_files
@@ -79,7 +82,7 @@ class Command
             puts package_files_that_overlap.join("\n").orange
           end
           unique_to_package_files.each do |file|
-            puts "Removing file #{file}".yellow if CREW_VERBOSE
+            puts "Removing file #{file}".yellow if verbose
             FileUtils.remove_file file, exception: false
           end
           FileUtils.remove_file flist
@@ -100,10 +103,10 @@ class Command
 
     # Remove the package from the list of installed packages in device.json.
     puts "Removing package #{pkg.name} from device.json".yellow if verbose
-    device_json[:installed_packages].delete_if { |entry| entry[:name] == pkg.name }
+    device_json['installed_packages'].delete_if { |entry| entry['name'] == pkg.name }
 
     # Update device.json with our changes.
-    PackageUtils.save_json(device_json)
+    ConvenienceFunctions.save_json(device_json)
 
     # Perform any operations required after package removal.
     pkg.postremove

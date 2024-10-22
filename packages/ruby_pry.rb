@@ -1,10 +1,9 @@
 require 'buildsystems/ruby'
-require 'highline/import'
 
 class Ruby_pry < RUBY
   description 'Pry is a runtime developer console and IRB alternative with powerful introspection capabilities.'
   homepage 'https://github.com/pry/pry'
-  version '0.14.2-ruby-3.3'
+  version "0.14.2-#{CREW_RUBY_VER}"
   license 'MIT'
   compatibility 'all'
   source_url 'SKIP'
@@ -13,7 +12,7 @@ class Ruby_pry < RUBY
   no_compile_needed
 
   ruby_install_extras do
-    File.write "#{HOME}/.pryrc", <<~PRY_DEBUG_EOF
+    File.write File.join(HOME, '.pryrc'), <<~PRY_DEBUG_EOF
       if defined?(PryByebug)
         Pry.commands.alias_command 'c', 'continue'
         Pry.commands.alias_command 's', 'step'
@@ -28,14 +27,6 @@ class Ruby_pry < RUBY
   end
 
   def self.postremove
-    config_file = "#{HOME}/.pryrc"
-    if File.file? config_file
-      if agree("Would you like to remove the #{name} config file: #{config_file}? ")
-        FileUtils.rm_rf config_file
-        puts "#{config_file} removed.".lightgreen
-      else
-        puts "#{config_file} saved.".lightgreen
-      end
-    end
+    Package.agree_to_remove("#{HOME}/.pryrc")
   end
 end

@@ -1,46 +1,42 @@
 #!/bin/bash -e
 # This is for use as a Github CI Pull Request Unit Test.
-echo "ALL_CHANGED FILES: ${ALL_CHANGED_FILES}."
-echo "CHANGED_PACKAGES: ${CHANGED_PACKAGES}."
+set -e
+echo "CHANGED_PACKAGES: ${CHANGED_PACKAGES}"
 cd /usr/local/lib/crew/packages/
+yes | crew update
 yes | crew upgrade
+git clone --depth=1 --branch="$CREW_BRANCH" "$CREW_REPO" ~/build_test
+# crew wont let you build if you're in the installation directory.
+(cd ~/build_test && yes | CREW_CACHE_ENABLED=1 crew build -vf ~/build_test/packages/hello_world_chromebrew.rb)
 yes | crew install vim
 yes | crew remove vim
-ruby ../tests/commands/const.rb
-ruby ../tests/commands/help.rb
-ruby ../tests/commands/list.rb
-ruby ../tests/commands/prop.rb
-ruby ../tests/commands/remove.rb
-ruby ../tests/lib/docopt.rb
-if [[ -n ${ALL_CHANGED_FILES-} ]]; then
-  # for file in ${ALL_CHANGED_FILES}; do
-    # ruby ../tests/prop_test "$file"
-    # ruby ../tests/buildsystem_test "$file"
-  # done
-  if [[ -n ${CHANGED_PACKAGES-} ]]; then
-    all_compatible_packages=$(crew list -d compatible)
-    for pkg in ${CHANGED_PACKAGES}
-      do
-      # Only check packages compatible with the architecture
-      # being run on.
-      if echo "${all_compatible_packages}" | grep "^${pkg}$"; then
-        ruby ../tests/prop_test "${pkg}"
-        ruby ../tests/buildsystem_test "${pkg}"
-        echo "Testing install/removal of compatible package ${pkg}."
-        yes | time crew install "${pkg}"
-        # Removal of essential packages is expected to fail.
-        if [[ $(crew list -d essential) == *"${pkg}"* ]]; then
-         yes | time crew remove "${pkg}" || true
-        else
-         yes | time crew remove "${pkg}"
-        fi
+rake -C..
+if [[ -n ${CHANGED_PACKAGES-} ]]; then
+  all_compatible_packages=$(crew list -d compatible)
+  all_installed_packages=$(crew list -d installed)
+  for pkg in ${CHANGED_PACKAGES}
+    do
+    # Only check packages compatible with the architecture being run on.
+    if echo "${all_compatible_packages}" | grep "^${pkg}$"; then
+      ruby ../tests/prop_test "${pkg}"
+      ruby ../tests/buildsystem_test "${pkg}"
+      if echo "${all_installed_packages}" | grep "^${pkg}$"; then
+        echo "Testing reinstall of ${pkg}."
+        yes | time crew reinstall "${pkg}"
       else
-        echo "${pkg^} is not compatible."
+        echo "Testing install of ${pkg}."
+        yes | time crew install "${pkg}"
       fi
-    done
-  fi
+      # Removal of essential packages is expected to fail.
+      if [[ $(crew list -d essential) == *"${pkg}"* ]]; then
+        echo "Testing removal of essential package ${pkg}."
+        yes | time crew remove "${pkg}" || true
+      else
+        echo "Testing removal of ${pkg}."
+        yes | time crew remove "${pkg}"
+      fi
+    else
+      echo "${pkg^} is not compatible."
+    fi
+  done
 fi
-cd ~
-git clone --depth=1 https://github.com/chromebrew/chromebrew.git build_test
-cd build_test
-yes | CREW_CACHE_ENABLED=1 crew build -vf packages/hello_world_chromebrew.rb
