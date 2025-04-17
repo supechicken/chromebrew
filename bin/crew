@@ -772,16 +772,16 @@ def determine_conflicts(dir, pkg)
     if File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
       puts 'Checking for conflicts with files from installed packages...'.orange
       #sanitized_filelist = File.readlines("#{dir}/filelist", chomp: true).reject {|l| l.start_with?('#') }
+      puts 'Start!'
       filelist = File.readlines("#{dir}/filelist").reject {|l| l.start_with?('#') }
-      Dir["#{CREW_META_PATH}/*.filelist"].each do |f|
-        if filelist & File.readlines(f)
-          puts 'HHHHHH???'
-        end
-      end
+      conflicts = Dir["#{CREW_META_PATH}/*.filelist"].map {|f| [filelist & File.readlines(f)].reject(&:empty?) }
+      puts 'Stop!'
 
+      puts 'Start!'
       conflictscmd = `grep --exclude=#{File.join(CREW_META_PATH, "#{pkg}.filelist")} --exclude=#{CREW_META_PATH}/\\\*_build.filelist -Fxf #{dir}/filelist #{CREW_META_PATH}/*.filelist`
       conflicts = conflictscmd.gsub(/(\.filelist|#{CREW_META_PATH})/, '').split("\n")
       conflicts.reject!(&:empty?)
+      puts 'Stop!'
     end
   elsif File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
     puts "Checking for conflicts of #{pkg} with files from installed packages...".orange
