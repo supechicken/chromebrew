@@ -776,7 +776,7 @@ def determine_conflicts(dir, pkg)
       require 'benchmark'
 
       puts 'old implementation:'
-      puts Benchmark.measure do
+      puts (Benchmark.measure do
         conflicts = []
         Dir[CREW_META_PATH + '*.filelist'].each do |packageList|
           packageName = File.basename packageList, '.filelist'
@@ -788,11 +788,11 @@ def determine_conflicts(dir, pkg)
             end
           end
         end
-      end
+      end)
 
       puts 'intersection:'
 
-      puts Benchmark.measure do
+      puts (Benchmark.measure do
         filelist = File.readlines("#{dir}/filelist").reject {|l| l.start_with?('#') }
         conflicts = []
         Dir["#{CREW_META_PATH}/*.filelist"].each do |f|
@@ -800,14 +800,14 @@ def determine_conflicts(dir, pkg)
 
           conflicts += [filelist & File.readlines(f)].reject(&:empty?)
         end
-      end
+      end)
 
       puts 'grep:'
-      puts Benchmark.measure do
+      puts (Benchmark.measure do
         conflictscmd = `grep --exclude=#{File.join(CREW_META_PATH, "#{pkg}.filelist")} --exclude=#{CREW_META_PATH}/\\\*_build.filelist -Fxf #{dir}/filelist #{CREW_META_PATH}/*.filelist`
         conflicts = conflictscmd.gsub(/(\.filelist|#{CREW_META_PATH})/, '').split("\n")
         conflicts.reject!(&:empty?)
-      end
+      end)
       puts 'Stop!'
     end
   elsif File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
