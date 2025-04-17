@@ -772,9 +772,9 @@ def determine_conflicts(dir, pkg)
     if File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
       puts 'Checking for conflicts with files from installed packages...'.orange
       #sanitized_filelist = File.readlines("#{dir}/filelist", chomp: true).reject {|l| l.start_with?('#') }
-      filelist = File.readlines(f, chomp: true).reject {|l| l.start_with?('#') }
+      filelist = File.readlines("#{dir}/filelist").reject {|l| l.start_with?('#') }
       Dir["#{CREW_META_PATH}/*.filelist"].each do |f|
-        if filelist & File.readlines(f, chomp: true)
+        if filelist & File.readlines(f)
           puts 'HHHHHH???'
         end
       end
