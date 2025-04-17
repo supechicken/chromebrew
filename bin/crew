@@ -772,15 +772,42 @@ def determine_conflicts(dir, pkg)
     if File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
       puts 'Checking for conflicts with files from installed packages...'.orange
       #sanitized_filelist = File.readlines("#{dir}/filelist", chomp: true).reject {|l| l.start_with?('#') }
-      puts 'Start!'
-      filelist = File.readlines("#{dir}/filelist").reject {|l| l.start_with?('#') }
-      conflicts = Dir["#{CREW_META_PATH}/*.filelist"].map {|f| [filelist & File.readlines(f)].reject(&:empty?) }
-      puts 'Stop!'
 
-      puts 'Start!'
-      conflictscmd = `grep --exclude=#{File.join(CREW_META_PATH, "#{pkg}.filelist")} --exclude=#{CREW_META_PATH}/\\\*_build.filelist -Fxf #{dir}/filelist #{CREW_META_PATH}/*.filelist`
-      conflicts = conflictscmd.gsub(/(\.filelist|#{CREW_META_PATH})/, '').split("\n")
-      conflicts.reject!(&:empty?)
+      require 'benchmark'
+
+      puts 'old implementation:'
+      Benchmark.measure do
+        conflicts = []
+        Dir[CREW_META_PATH + '*.filelist'].each do |packageList|
+          packageName = File.basename packageList, '.filelist'
+          File.readlines('filelist').each do |item|
+            File.readlines(packageList).each do |line|
+              if line == item && packageName != @pkg.name
+                conflicts << [packageName, item.chomp]
+              end
+            end
+          end
+        end
+      end
+
+      puts 'intersection:'
+
+      Benchmark.measure do
+        filelist = File.readlines("#{dir}/filelist").reject {|l| l.start_with?('#') }
+        conflicts = []
+        Dir["#{CREW_META_PATH}/*.filelist"].each do |f|
+          next if f == File.join(CREW_META_PATH, "#{pkg}.filelist") || f.end_with?('_build.filelist')
+
+          conflicts += [filelist & File.readlines(f)].reject(&:empty?)
+        end
+      end
+
+      puts 'grep:'
+      Benchmark.measure do
+        conflictscmd = `grep --exclude=#{File.join(CREW_META_PATH, "#{pkg}.filelist")} --exclude=#{CREW_META_PATH}/\\\*_build.filelist -Fxf #{dir}/filelist #{CREW_META_PATH}/*.filelist`
+        conflicts = conflictscmd.gsub(/(\.filelist|#{CREW_META_PATH})/, '').split("\n")
+        conflicts.reject!(&:empty?)
+      end
       puts 'Stop!'
     end
   elsif File.file?(File.join(CREW_META_PATH, "#{pkg}.filelist"))
