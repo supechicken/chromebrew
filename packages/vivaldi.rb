@@ -9,6 +9,21 @@ class Vivaldi < Package
   compatibility 'aarch64 armv7l x86_64'
   min_glibc '2.37'
 
+  source_url({
+    aarch64: "https://downloads.vivaldi.com/stable/vivaldi-stable_#{version}_armhf.deb",
+     armv7l: "https://downloads.vivaldi.com/stable/vivaldi-stable_#{version}_armhf.deb",
+     x86_64: "https://downloads.vivaldi.com/stable/vivaldi-stable_#{version}_amd64.deb"
+  })
+
+  source_sha256({
+    aarch64: '898d88fd7cddc6dd6076604d01f1ced24d4622790fba0768faa5908593b958a1',
+     armv7l: '898d88fd7cddc6dd6076604d01f1ced24d4622790fba0768faa5908593b958a1',
+     x86_64: '9093453d78997a48e87c6b4a15b19cf3973cc90ca6867b64081ba1ca5c100691'
+  })
+
+  no_compile_needed
+  no_shrink
+
   depends_on 'cras'
   depends_on 'gtk3'
   depends_on 'gsettings_desktop_schemas'
@@ -17,20 +32,6 @@ class Vivaldi < Package
   depends_on 'xdg_base'
   depends_on 'xdg_utils'
   depends_on 'sommelier'
-
-  no_compile_needed
-  no_shrink
-
-  case ARCH
-  when 'aarch64', 'armv7l'
-    arch = 'armhf'
-    source_sha256 '898d88fd7cddc6dd6076604d01f1ced24d4622790fba0768faa5908593b958a1'
-  when 'x86_64'
-    arch = 'amd64'
-    source_sha256 '9093453d78997a48e87c6b4a15b19cf3973cc90ca6867b64081ba1ca5c100691'
-  end
-
-  source_url "https://downloads.vivaldi.com/stable/vivaldi-stable_#{version}_#{arch}.deb"
 
   def self.patch
     # ERROR: ld.so: object '/home/chronos/user/.local/lib/vivaldi/media-codecs-89.0.4389.82/libffmpeg.so' from LD_PRELOAD cannot be preloaded
