@@ -1,15 +1,16 @@
 require 'package'
+require 'convenience_functions'
 
 class Google_chrome_unstable < Package
-  @update_channel = 'unstable'
   description 'Google Chrome is a fast, easy to use, and secure web browser. (Dev Channel)'
   homepage 'https://www.google.com/chrome/'
-  version '129.0.6628.3-1'
+  @update_channel = 'unstable'
+  version '137.0.7127.2-1'
   license 'google-chrome'
   compatibility 'x86_64'
   min_glibc '2.28'
   source_url "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-#{@update_channel}/google-chrome-#{@update_channel}_#{@version}_amd64.deb"
-  source_sha256 '04ecad6568443416e347833cd9733b9866bb5b0465e34a93d6442eb75bc51d26'
+  source_sha256 '6e30e4a33e8a5b4991d9594f008dc43165d4c72ac4b1612f2541d3c5a40b7812'
 
   depends_on 'nss'
   depends_on 'cairo'
@@ -30,6 +31,10 @@ class Google_chrome_unstable < Package
   end
 
   def self.postinstall
-    ExitMessage.add "\nType 'google-chrome-#{@update_channel}' to get started.\n".lightblue
+    ConvenienceFunctions.set_default_browser("Chrome (#{@update_channel.capitialize})", "google-chrome-#{@update_channel}")
+  end
+
+  def self.preremove
+    ConvenienceFunctions.unset_default_browser("Chrome (#{@update_channel.capitialize})", "google-chrome-#{@update_channel}")
   end
 end
