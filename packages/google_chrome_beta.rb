@@ -1,15 +1,16 @@
 require 'package'
+require 'convenience_functions'
 
 class Google_chrome_beta < Package
-  @update_channel = 'beta'
   description 'Google Chrome is a fast, easy to use, and secure web browser. (Beta Channel)'
   homepage 'https://www.google.com/chrome/'
-  version '128.0.6613.18-1'
+  @update_channel = 'beta'
+  version '136.0.7103.33-1'
   license 'google-chrome'
   compatibility 'x86_64'
   min_glibc '2.28'
   source_url "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-#{@update_channel}/google-chrome-#{@update_channel}_#{@version}_amd64.deb"
-  source_sha256 'ca9bce2d3c8b6b2e092f28a73af01e7d95de093108ab40609e0390d0dd1a4ba3'
+  source_sha256 '154a542d65524f4b8f4449921b9e8d16d6ec093e77d4e22fe103bde0df2a8dfb'
 
   depends_on 'nss'
   depends_on 'cairo'
@@ -30,6 +31,10 @@ class Google_chrome_beta < Package
   end
 
   def self.postinstall
-    ExitMessage.add "\nType 'google-chrome-#{@update_channel}' to get started.\n".lightblue
+    ConvenienceFunctions.set_default_browser("Chrome (#{@update_channel.capitialize})", "google-chrome-#{@update_channel}")
+  end
+
+  def self.preremove
+    ConvenienceFunctions.unset_default_browser("Chrome (#{@update_channel.capitialize})", "google-chrome-#{@update_channel}")
   end
 end
