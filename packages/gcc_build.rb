@@ -53,6 +53,9 @@ class Gcc_build < Package
 
   @gcc_version = version.split('-')[0].partition('.')[0]
 
+  # Prefix ccache to path.
+  @path = "#{CREW_LIB_PREFIX}/ccache/bin:#{CREW_PREFIX}/bin:/usr/bin:/bin"
+
   def self.patch
     # This fixes a PATH_MAX undefined error which breaks libsanitizer
     # "libsanitizer/asan/asan_linux.cpp:217:21: error: ‘PATH_MAX’ was not declared in this scope"
@@ -95,58 +98,64 @@ class Gcc_build < Package
   end
 
   def self.build
-    @gcc_global_opts = <<~OPT.chomp
-      --build=#{CREW_TARGET} \
-      --host=#{CREW_TARGET} \
-      --target=#{CREW_TARGET} \
-      --disable-bootstrap \
-      --disable-install-libiberty \
-      --disable-libmpx \
-      --disable-libssp \
-      --disable-multilib \
-      --disable-werror \
-      --enable-cet=auto \
-      --enable-checking=release \
-      --enable-clocale=gnu \
-      --enable-default-pie \
-      --enable-default-ssp \
-      --enable-gnu-indirect-function \
-      --enable-gnu-unique-object \
-      --enable-host-shared \
-      --enable-lto \
-      --enable-plugin \
-      --enable-shared \
-      --enable-symvers \
-      --enable-static \
-      --enable-threads=posix \
-      --with-gcc-major-version-only \
-      --with-gmp \
-      --with-isl \
-      --with-mpc \
-      --with-mpfr \
-      --with-pic \
-      --with-system-libunwind \
-      --with-system-zlib
-    OPT
+    gcc_global_opts = %W[
+      --build=#{CREW_TARGET}
+      --host=#{CREW_TARGET}
+      --target=#{CREW_TARGET}
 
-    @cflags = @cxxflags = '-fPIC -pipe'
-    # @languages = 'c,c++,jit,objc,fortran,go'
+      --disable-install-libiberty
+      --disable-libssp
+      --disable-libstdcxx-pch
+      --disable-multilib
+      --disable-werror
+
+      --enable-__cxa_atexit
+      --enable-cet=auto
+      --enable-checking=release
+      --enable-clocale=gnu
+      --enable-default-pie
+      --enable-default-ssp
+      --enable-gnu-indirect-function
+      --enable-gnu-unique-object
+      --enable-libstdcxx-backtrace
+      --enable-link-serialization=1
+      --enable-linker-build-id
+      --enable-host-pie
+      --enable-host-shared
+      --enable-lto
+      --enable-plugin
+      --enable-shared
+      --enable-symvers
+      --enable-threads=posix
+
+      --with-gcc-major-version-only
+      --with-gmp
+      --with-isl
+      --with-mpc
+      --with-mpfr
+      --with-pic
+      --with-system-libunwind
+      --with-system-zlib
+    ].join(' ')
+
+    cflags = cxxflags = '-fPIC -pipe'
+
+    # languages = 'c,c++,jit,objc,fortran,go'
     # go build fails on 20220305 snapshot
-    @languages = 'c,c++,jit,objc,fortran'
+    languages = 'c,c++,jit,objc,obj-c++,fortran,go'
+
     case ARCH
     when 'armv7l', 'aarch64'
-      @archflags = '--with-arch=armv7-a+fp --with-float=hard --with-tune=cortex-a15 --with-fpu=vfpv3-d16'
+      archflags = '--with-arch=armv7-a+fp --with-float=hard --with-tune=cortex-a15 --with-fpu=vfpv3-d16'
     when 'x86_64'
-      @archflags = '--with-arch-64=x86-64'
+      archflags = '--with-arch-64=x86-64'
     when 'i686'
-      @archflags = '--with-arch-32=i686'
+      archflags = '--with-arch-32=i686'
     end
 
     # Set ccache sloppiness as per
     # https://wiki.archlinux.org/index.php/Ccache#Sloppiness
     system 'ccache --set-config=sloppiness=file_macro,locale,time_macros'
-    # Prefix ccache to path.
-    @path = "#{CREW_LIB_PREFIX}/ccache/bin:#{CREW_PREFIX}/bin:/usr/bin:/bin"
 
     # Install prereqs using the standard gcc method so they can be
     # linked statically.
@@ -161,18 +170,19 @@ class Gcc_build < Package
                     NM: 'gcc-nm',
                     AR: 'gcc-ar',
                 RANLIB: 'gcc-ranlib',
-                CFLAGS: @cflags,
-              CXXFLAGS: @cxxflags,
+                CFLAGS: cflags,
+              CXXFLAGS: cxxflags,
                LDFLAGS: "-L#{CREW_LIB_PREFIX}/lib -Wl,-rpath=#{CREW_LIB_PREFIX}",
                   PATH: @path
         }.transform_keys(&:to_s)
 
       system configure_env, <<~BUILD.chomp
-        mold -run ../configure #{CREW_CONFIGURE_OPTIONS} \
-          #{@gcc_global_opts} \
-          #{@archflags} \
+        ../configure #{CREW_CONFIGURE_OPTIONS} \
+          #{gcc_global_opts} \
+          #{archflags} \
+          --enable-bootstrap \
           --with-native-system-header-dir=#{CREW_PREFIX}/include \
-          --enable-languages=#{@languages} \
+          --enable-languages=#{languages} \
           --program-suffix=-#{@gcc_version}
       BUILD
 
@@ -207,10 +217,10 @@ class Gcc_build < Package
       # gcc-libs install
       system make_env, "make -C #{CREW_TARGET}/libgcc DESTDIR=#{CREW_DEST_DIR} install-shared"
 
-      @gcc_libs = %w[libatomic libgfortran libgo libgomp libitm
-                     libquadmath libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan
-                     libsanitizer/tsan libstdc++-v3/src libvtv]
-      @gcc_libs.each do |lib|
+      gcc_libs = %w[libatomic libgfortran libgo libgomp libitm
+                    libquadmath libsanitizer/asan libsanitizer/lsan libsanitizer/ubsan
+                    libsanitizer/tsan libstdc++-v3/src libvtv]
+      gcc_libs.each do |lib|
         system make_env, "make -C #{CREW_TARGET}/#{lib} \
           DESTDIR=#{CREW_DEST_DIR} install-toolexeclibLTLIBRARIES", exception: false
       end
