@@ -62,6 +62,7 @@ class Gcc_build < Package
     # This is defined in https://chromium.googlesource.com/chromiumos/third_party/kernel/+/refs/heads/chromeos-5.4/include/uapi/linux/limits.h
     # and is defined as per suggested method here: https://github.com/ZefengWang/cross-tool-chain-build
     # The following is due to sed not passing newlines right.
+    system 'filefix'
     return unless system 'grep -q 4096 libsanitizer/asan/asan_linux.cpp', exception: false
 
     system "sed -i '77a #endif' libsanitizer/asan/asan_linux.cpp"
@@ -129,6 +130,7 @@ class Gcc_build < Package
       --enable-threads=posix
 
       --with-gcc-major-version-only
+      --with-build-config=bootstrap-lto
       --with-gmp
       --with-isl
       --with-mpc
@@ -142,7 +144,7 @@ class Gcc_build < Package
 
     # languages = 'c,c++,jit,objc,fortran,go'
     # go build fails on 20220305 snapshot
-    languages = 'c,c++,jit,objc,obj-c++,fortran,go'
+    languages = 'c,c++,jit,objc,obj-c++,fortran'
 
     case ARCH
     when 'armv7l', 'aarch64'
@@ -167,9 +169,9 @@ class Gcc_build < Package
       configure_env =
         {
           LIBRARY_PATH: CREW_LIB_PREFIX,
-                    NM: 'gcc-nm',
-                    AR: 'gcc-ar',
-                RANLIB: 'gcc-ranlib',
+                    CC: 'clang',
+                   CXX: 'clang++',
+                    LD: 'ld.mold',
                 CFLAGS: cflags,
               CXXFLAGS: cxxflags,
                LDFLAGS: "-L#{CREW_LIB_PREFIX}/lib -Wl,-rpath=#{CREW_LIB_PREFIX}",
@@ -183,13 +185,14 @@ class Gcc_build < Package
           --enable-bootstrap \
           --with-native-system-header-dir=#{CREW_PREFIX}/include \
           --enable-languages=#{languages} \
+          --with-ld=/usr/local/bin/ld.mold \
           --program-suffix=-#{@gcc_version}
       BUILD
 
       # LIBRARY_PATH=#{CREW_LIB_PREFIX} needed for x86_64 to avoid:
       # /usr/local/bin/ld: cannot find crti.o: No such file or directory
       # /usr/local/bin/ld: cannot find /usr/lib64/libc_nonshared.a
-      system({ LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s), "make -j #{CREW_NPROC} || make -j1")
+      system({ LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s), "make bootstrap -j #{CREW_NPROC} && make all-gcc -j #{CREW_NPROC}")
     end
   end
 
