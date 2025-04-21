@@ -144,7 +144,7 @@ class Gcc_build < Package
 
     # languages = 'c,c++,jit,objc,fortran,go'
     # go build fails on 20220305 snapshot
-    languages = 'c,c++,jit,objc,obj-c++,fortran'
+    languages = 'c,c++,jit,objc,obj-c++,fortran,go'
 
     case ARCH
     when 'armv7l', 'aarch64'
@@ -169,9 +169,8 @@ class Gcc_build < Package
       configure_env =
         {
           LIBRARY_PATH: CREW_LIB_PREFIX,
-                    CC: 'clang',
-                   CXX: 'clang++',
-                    LD: 'ld.mold',
+                    CC: 'ccache clang',
+                   CXX: 'ccache clang',
                 CFLAGS: cflags,
               CXXFLAGS: cxxflags,
                LDFLAGS: "-L#{CREW_LIB_PREFIX}/lib -Wl,-rpath=#{CREW_LIB_PREFIX}",
@@ -179,13 +178,12 @@ class Gcc_build < Package
         }.transform_keys(&:to_s)
 
       system configure_env, <<~BUILD.chomp
-        ../configure #{CREW_CONFIGURE_OPTIONS} \
+        mold -run ../configure #{CREW_CONFIGURE_OPTIONS} \
           #{gcc_global_opts} \
           #{archflags} \
           --enable-bootstrap \
           --with-native-system-header-dir=#{CREW_PREFIX}/include \
           --enable-languages=#{languages} \
-          --with-ld=/usr/local/bin/ld.mold \
           --program-suffix=-#{@gcc_version}
       BUILD
 
