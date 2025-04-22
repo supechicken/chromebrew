@@ -48,8 +48,11 @@ class Gcc_build < Package
   depends_on 'mpfr' # R
   depends_on 'zlib' # R
   depends_on 'zstd' # R
+  depends_on 'gcc_lib' # R
 
+  no_shrink
   no_env_options
+  conflicts_ok
 
   @gcc_version = version.split('-')[0].partition('.')[0]
 
@@ -170,7 +173,8 @@ class Gcc_build < Package
         {
           LIBRARY_PATH: CREW_LIB_PREFIX,
                     CC: 'ccache clang',
-                   CXX: 'ccache clang',
+                   CXX: 'ccache clang++',
+                   LD: 'ld.mold',
                 CFLAGS: cflags,
               CXXFLAGS: cxxflags,
                LDFLAGS: "-L#{CREW_LIB_PREFIX}/lib -Wl,-rpath=#{CREW_LIB_PREFIX}",
@@ -190,7 +194,7 @@ class Gcc_build < Package
       # LIBRARY_PATH=#{CREW_LIB_PREFIX} needed for x86_64 to avoid:
       # /usr/local/bin/ld: cannot find crti.o: No such file or directory
       # /usr/local/bin/ld: cannot find /usr/lib64/libc_nonshared.a
-      system({ LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s), "make bootstrap -j #{CREW_NPROC} && make all-gcc -j #{CREW_NPROC}")
+      system({ LIBRARY_PATH: CREW_LIB_PREFIX, PATH: @path }.transform_keys(&:to_s), "mold -run make bootstrap -j #{CREW_NPROC} && mold -run make all-gcc -j #{CREW_NPROC}")
     end
   end
 
