@@ -41,6 +41,6 @@ class Julia < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.julia")
+    agree_to_remove("#{HOME}/.julia")
   end
 end

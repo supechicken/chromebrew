@@ -68,11 +68,11 @@ class Rust < Package
 
   def self.postremove
     # This replicates the actions of 'rustup self uninstall'.
-    Package.agree_to_remove("#{HOME}/.rustup")
+    agree_to_remove("#{HOME}/.rustup")
     # Delete RUSTUP_HOME
-    Package.agree_to_remove("#{CREW_PREFIX}/share/rustup")
-    Package.agree_to_remove("#{HOME}/.cargo")
+    agree_to_remove("#{CREW_PREFIX}/share/rustup")
+    agree_to_remove("#{HOME}/.cargo")
     # Delete CARGO_HOME
-    Package.agree_to_remove("#{CREW_PREFIX}/share/cargo")
+    agree_to_remove("#{CREW_PREFIX}/share/cargo")
   end
 end

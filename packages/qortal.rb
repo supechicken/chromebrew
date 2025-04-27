@@ -44,6 +44,6 @@ class Qortal < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/share/qortal")
+    agree_to_remove("#{CREW_PREFIX}/share/qortal")
   end
 end

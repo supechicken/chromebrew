@@ -61,7 +61,7 @@ class Clamtk < Package
     config_dir = "#{HOME}/.clamtk"
     if Dir.exist? config_dir
       puts 'WARNING: This will remove all clamtk config!'.orange
-      Package.agree_to_remove(config_dir)
+      agree_to_remove(config_dir)
     end
   end
 end

@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/zlib.rb")
+PackageUtils.load_package("#{__dir__}/zlib.rb")
 
 class Minizip < Package
   description 'Minizip is a simple package to zip/unzip files, from zlib.'

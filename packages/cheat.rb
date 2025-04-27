@@ -37,6 +37,6 @@ class Cheat < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/cheat")
+    agree_to_remove("#{CREW_PREFIX}/.config/cheat")
   end
 end

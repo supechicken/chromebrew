@@ -35,6 +35,6 @@ class Zed < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/zed")
+    agree_to_remove("#{CREW_PREFIX}/.config/zed")
   end
 end

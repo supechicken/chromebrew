@@ -49,7 +49,7 @@ class Command
     if to_copy && !force
       # This pulls the operation from the calling function.
       operation = caller_locations(1, 2)[0].to_s.split[3].split('_')[0].split('#')[1]
-      if Package.agree_default_yes("\nWould you like to copy #{name}.rb to crew and start the #{operation}")
+      if MiscFunctions.show_prompt("\nWould you like to copy #{name}.rb to crew and start the #{operation}?")
         to_copy = true
       else
         return false

@@ -27,6 +27,6 @@ class Ruby_pry < RUBY
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.pryrc")
+    agree_to_remove("#{HOME}/.pryrc")
   end
 end

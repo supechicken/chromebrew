@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/tilp2.rb")
+PackageUtils.load_package("#{__dir__}/tilp2.rb")
 
 class Tilp < Package
   description Tilp2.description

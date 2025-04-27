@@ -37,6 +37,6 @@ class Stellarium < CMake
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.stellarium")
+    agree_to_remove("#{HOME}/.stellarium")
   end
 end

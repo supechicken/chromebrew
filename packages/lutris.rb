@@ -45,7 +45,7 @@ class Lutris < Meson
 
   def self.postremove
     puts 'WARNING: This will remove all your games!'.orange
-    Package.agree_to_remove("#{HOME}/Games")
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/.local/share/lutris")
+    agree_to_remove("#{HOME}/Games")
+    agree_to_remove("#{CREW_PREFIX}/.config/.local/share/lutris")
   end
 end

@@ -42,8 +42,8 @@ class Freecad < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.cache/FreeCAD")
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/FreeCAD")
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/.local/share/FreeCAD")
+    agree_to_remove("#{CREW_PREFIX}/.cache/FreeCAD")
+    agree_to_remove("#{CREW_PREFIX}/.config/FreeCAD")
+    agree_to_remove("#{CREW_PREFIX}/.config/.local/share/FreeCAD")
   end
 end

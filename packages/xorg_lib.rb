@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/libx11.rb")
+PackageUtils.load_package("#{__dir__}/libx11.rb")
 
 class Xorg_lib < Package
   description 'A collection of xorg libraries.'

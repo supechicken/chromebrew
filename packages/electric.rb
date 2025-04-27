@@ -33,6 +33,6 @@ class Electric < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/electric.log")
+    agree_to_remove("#{HOME}/electric.log")
   end
 end

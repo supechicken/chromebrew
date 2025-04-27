@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/avocado_framework.rb")
+PackageUtils.load_package("#{__dir__}/avocado_framework.rb")
 
 class Avocado < Package
   description Avocado_framework.description

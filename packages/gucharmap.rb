@@ -1,5 +1,5 @@
 require 'buildsystems/meson'
-Package.load_package("#{__dir__}/unicode_character_database.rb")
+PackageUtils.load_package("#{__dir__}/unicode_character_database.rb")
 
 class Gucharmap < Meson
   description 'GNOME Character Map, based on the Unicode Character Database.'

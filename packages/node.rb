@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/nodebrew.rb")
+PackageUtils.load_package("#{__dir__}/nodebrew.rb")
 
 class Node < Package
   description 'As an asynchronous event driven JavaScript runtime, Node is designed to build scalable network applications.'

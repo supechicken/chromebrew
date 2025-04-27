@@ -64,7 +64,7 @@ class Gcloud < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.config/gcloud")
-    Package.agree_to_remove("#{CREW_PREFIX}/share/gcloud")
+    agree_to_remove("#{HOME}/.config/gcloud")
+    agree_to_remove("#{CREW_PREFIX}/share/gcloud")
   end
 end

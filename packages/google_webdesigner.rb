@@ -34,6 +34,6 @@ class Google_webdesigner < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.local/share/google-web-designer")
+    agree_to_remove("#{HOME}/.local/share/google-web-designer")
   end
 end

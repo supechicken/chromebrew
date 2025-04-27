@@ -46,6 +46,6 @@ class Rqlite < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.rqlite")
+    agree_to_remove("#{HOME}/.rqlite")
   end
 end

@@ -4,7 +4,7 @@
 require 'package'
 
 class Libclc < Package
-  llvm_build_obj = Package.load_package("#{__dir__}/#{CREW_LLVM_VER}_build.rb")
+  llvm_build_obj = PackageUtils.load_package("#{__dir__}/#{CREW_LLVM_VER}_build.rb")
   description 'Library requirements of the OpenCL C programming language'
   homepage 'https://libclc.llvm.org/'
   version '20.1.3'

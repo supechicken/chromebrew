@@ -49,7 +49,7 @@ def check_for_updated_python_packages
   packages_without_pypi_versions = []
   relevant_pip_packages.each_with_index do |package, index|
     pool.post do
-      pkg = Package.load_package(package)
+      pkg = PackageUtils.load_package(package)
       pip_name = pkg.name.sub('py3_', '').gsub('_', '-')
       next if ignored_packages.include?(pip_name)
       # The \e[1A\e[K[] is to ensure the concurrency doesn't mess up the order of the printed status updates.
@@ -80,7 +80,7 @@ def update_package_files(updateable_packages)
   return if updateable_packages.empty?
 
   updateable_packages.each_pair do |package, new_version|
-    pkg = Package.load_package(package)
+    pkg = PackageUtils.load_package(package)
     puts "Updating #{pkg.name.gsub('_', '-')} from #{pkg.version} to #{new_version}".lightblue
     file = File.read(package)
     file.sub!(PackageUtils.get_clean_version(pkg.version), new_version)

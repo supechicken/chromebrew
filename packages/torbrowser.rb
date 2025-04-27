@@ -40,6 +40,6 @@ class Torbrowser < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/share/torbrowser")
+    agree_to_remove("#{CREW_PREFIX}/share/torbrowser")
   end
 end

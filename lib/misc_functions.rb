@@ -4,6 +4,30 @@ require 'matrix'
 require_relative 'color'
 
 class MiscFunctions
+  class InvalidInputValueError < StandardError; end
+
+  def self.show_prompt(prompt, default: true)
+    puts "#{prompt} [#{default ? 'Y/n' : 'y/N'}]: ".yellow
+
+    Timeout.timeout(CREW_AGREE_TIMEOUT_SECONDS) do
+      case $stdin.gets(chomp: true)
+      when /^(y|yes)$/i
+        return true
+      when /^(n|no)$/i
+        return false
+      when ''
+        return default
+      else
+        raise InvalidInputValueError
+      end
+    end
+  rescue InvalidInputValueError
+    warn 'Please enter "y"/"yes" or "n"/"no".'.yellow
+    return show_prompt(message, default:)
+  rescue Timeout::Error
+    return default
+  end
+
   def self.human_size(bytes)
     kilobyte = 1024.0
     megabyte = kilobyte * kilobyte

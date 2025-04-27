@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/gstreamer.rb")
+PackageUtils.load_package("#{__dir__}/gstreamer.rb")
 
 class Gst_plugins_bad < Package
   description 'Multimedia graph framework - bad plugins'

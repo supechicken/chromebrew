@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/glibc_build235.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build235.rb")
 
 class Glibc_dev235 < Package
   description 'glibc: everything except what is in glibc_lib'

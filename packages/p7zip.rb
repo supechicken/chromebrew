@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/pkg_7_zip.rb")
+PackageUtils.load_package("#{__dir__}/pkg_7_zip.rb")
 
 class P7zip < Package
   description Pkg_7_zip.description

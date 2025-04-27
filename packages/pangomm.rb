@@ -1,6 +1,6 @@
 require 'package'
-Package.load_package("#{__dir__}/pangomm_1_4.rb")
-Package.load_package("#{__dir__}/pangomm_2_48.rb")
+PackageUtils.load_package("#{__dir__}/pangomm_1_4.rb")
+PackageUtils.load_package("#{__dir__}/pangomm_2_48.rb")
 
 class Pangomm < Package
   description Pangomm_1_4.description

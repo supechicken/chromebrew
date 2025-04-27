@@ -10,16 +10,34 @@ class PackageUtils
     return device_json['installed_packages'].any? { |elem| elem['name'] == pkg_name }
   end
 
-  def self.compatible?(pkg)
-    return (pkg.compatibility.casecmp?('all') || pkg.compatibility.include?(ARCH)) && (pkg.min_glibc.nil? || (pkg.min_glibc <= LIBC_VERSION)) && (pkg.max_glibc.nil? || (pkg.max_glibc >= LIBC_VERSION))
-  end
-
   def self.incompatible_reason(pkg)
     reason = []
     reason.push "#{pkg.name.capitalize} is not compatible with #{ARCH}." if !pkg.compatibility.casecmp?('all') && !pkg.compatibility.include?(ARCH)
     reason.push "ChromeOS is currently running glibc #{LIBC_VERSION}, but the minimum version for #{pkg.name} is #{pkg.min_glibc}." if !pkg.min_glibc.nil? && (pkg.min_glibc >= LIBC_VERSION)
     reason.push "ChromeOS is currently running glibc #{LIBC_VERSION}, but the maximum version for #{pkg.name} is #{pkg.min_glibc}." if !pkg.max_glibc.nil? && (pkg.max_glibc.to_s <= LIBC_VERSION)
     return reason
+  end
+
+  def self.load_package(pkg_file)
+    # self.load_package: load a package under 'Package' class scope
+    #
+    pkg_name = File.basename(pkg_file, '.rb')
+    class_name = "Package::#{pkg_name.capitalize}"
+
+    # Read and eval package script under 'Package' class, using the newest file available.
+    pkg_file = Dir["{#{CREW_LOCAL_REPO_ROOT}/packages,#{CREW_PACKAGES_PATH}}/#{pkg_name}.rb"].max { |a, b| File.mtime(a) <=> File.mtime(b) }
+
+    # If this package has been removed, it won't be found in either directory, so set it back to what it was before to get a nicer error.
+    pkg_file = "#{CREW_PACKAGES_PATH}/#{pkg_name}.rb" if pkg_file.nil?
+
+    Package.class_eval(File.read(pkg_file, encoding: Encoding::UTF_8), pkg_file) unless const_defined?(class_name)
+
+    pkg_obj      = const_get(class_name)
+    pkg_obj.name = pkg_name
+
+    $crew_current_package = $crew_current_package.nil? ? pkg_obj.name : $crew_current_package
+
+    return pkg_obj
   end
 
   def self.get_url(pkg, build_from_source: false)

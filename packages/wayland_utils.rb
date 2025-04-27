@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/wayland_info.rb")
+PackageUtils.load_package("#{__dir__}/wayland_info.rb")
 
 class Wayland_utils < Package
   description Wayland_info.description

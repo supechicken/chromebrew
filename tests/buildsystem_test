@@ -12,7 +12,7 @@ def check_buildsystem(pkg_path, verbose: false)
   puts "Checking #{name} package ...".yellow if verbose
   # If the buildsystem is invalid, it will almost certainly raise a NameError when we attempt to load it.
   begin
-    buildsystem = Package.load_package(pkg_path).superclass.to_s
+    buildsystem = PackageUtils.load_package(pkg_path).superclass.to_s
   rescue NameError => e
     buildsystem = e.name.to_s
   end

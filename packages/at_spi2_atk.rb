@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/at_spi2_core.rb")
+PackageUtils.load_package("#{__dir__}/at_spi2_core.rb")
 
 class At_spi2_atk < Package
   description At_spi2_core.description

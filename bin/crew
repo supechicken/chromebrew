@@ -143,7 +143,7 @@ end
 def print_current_package(extra: false)
   status = if PackageUtils.installed?(@pkg.name)
              :installed
-           elsif !PackageUtils.compatible?(@pkg)
+           elsif !@pkg.compatible?
              :incompatible
            else
              :available
@@ -170,7 +170,7 @@ end
 
 def check_load_package(pkg_path)
   begin
-    @pkg = Package.load_package(pkg_path)
+    @pkg = PackageUtils.load_package(pkg_path)
   rescue SyntaxError => e
     warn "#{e.class}: #{e.message}".red
   end
@@ -339,12 +339,12 @@ def upgrade(*pkgs, build_from_source: false)
       end
     end
 
-    pkg_ver_latest     = Package.load_package(pkg_file).version
+    pkg_ver_latest     = PackageUtils.load_package(pkg_file).version
     pkg_ver_installed  = @device[:installed_packages].select { |pkg| pkg[:name] == pkg_name } [0][:version]
-    pkg_hash_latest    = PackageUtils.get_sha256(Package.load_package(pkg_file))
+    pkg_hash_latest    = PackageUtils.get_sha256(PackageUtils.load_package(pkg_file))
     pkg_hash_installed = @device[:installed_packages].select { |pkg| pkg[:name] == pkg_name } [0][:sha256]
 
-    return pkg_hash_latest != pkg_hash_installed unless !pkg_hash_installed || pkg_hash_latest.to_s.empty? || Package.load_package(pkg_file).is_fake?
+    return pkg_hash_latest != pkg_hash_installed unless !pkg_hash_installed || pkg_hash_latest.to_s.empty? || PackageUtils.load_package(pkg_file).is_fake?
     return pkg_ver_latest != pkg_ver_installed
   end
 
@@ -733,7 +733,7 @@ end
 
 def pre_flight
   puts "Performing pre-flight checks for #{@pkg.name}...".lightblue
-  abort PackageUtils.incompatible_reason(@pkg).join("\n").to_s.lightred unless PackageUtils.compatible?(@pkg)
+  abort PackageUtils.incompatible_reason(@pkg).join("\n").to_s.lightred unless @pkg.compatible?
   if @pkg.superclass.to_s == 'RUBY'
     puts 'Populating gem information using compact index client...'.lightgreen
     $gems ||= BasicCompactIndexClient.new.gems
@@ -1205,22 +1205,30 @@ def resolve_dependencies
 
   # abort & identify incompatible dependencies.
   @dependencies.each do |dep|
-    abort "Some dependencies e.g., #{dep}, are not compatible with your device architecture (#{ARCH}). Unable to continue.".lightred unless PackageUtils.compatible?(Package.load_package("#{CREW_PACKAGES_PATH}/#{dep}.rb"))
+    abort "Some dependencies e.g., #{dep}, are not compatible with your device architecture (#{ARCH}). Unable to continue.".lightred unless PackageUtils.load_package("#{CREW_PACKAGES_PATH}/#{dep}.rb").compatible?
   end
   # leave only not installed packages in dependencies
   @dependencies.reject! { |dep_name| @device[:installed_packages].any? { |pkg| pkg[:name] == dep_name } }
 
   # run preflight check for dependencies
   @dependencies.each do |dep_name|
-    Package.load_package(File.join(CREW_PACKAGES_PATH, "#{dep_name}.rb")).preflight
+    PackageUtils.load_package(File.join(CREW_PACKAGES_PATH, "#{dep_name}.rb")).preflight
   end
 
   return if @dependencies.empty?
 
   puts 'The following packages also need to be installed: '
 
+  copy_prompt = "The package file for #{dep}, which is a required dependency to build #{@pkg.name} only exists in #{CREW_LOCAL_REPO_ROOT}/packages/ . Is it ok to copy it to #{CREW_PACKAGES_PATH} so that the build can continue?"
+
   @dependencies.each do |dep|
-    FileUtils.cp "#{CREW_LOCAL_REPO_ROOT}/packages/#{dep}.rb", CREW_PACKAGES_PATH if !File.file?(File.join(CREW_PACKAGES_PATH, "#{dep}.rb")) && File.file?(File.join(CREW_LOCAL_REPO_ROOT, "packages/#{dep}.rb")) && (@opt_force || Package.agree_default_yes("The package file for #{dep}, which is a required dependency to build #{@pkg.name} only exists in #{CREW_LOCAL_REPO_ROOT}/packages/ . Is it ok to copy it to #{CREW_PACKAGES_PATH} so that the build can continue?"))
+    if File.file?(File.join(CREW_LOCAL_REPO_ROOT, "packages/#{dep}.rb")) &&
+        !File.file?(File.join(CREW_PACKAGES_PATH, "#{dep}.rb")) &&
+        (@opt_force || MiscFunctions.show_prompt(copy_prompt))
+
+      FileUtils.cp "#{CREW_LOCAL_REPO_ROOT}/packages/#{dep}.rb", CREW_PACKAGES_PATH
+    end
+
     abort "Dependency #{dep} for #{@pkg.name} was not found.".lightred unless File.file?(File.join(CREW_PACKAGES_PATH, "#{dep}.rb"))
   end
 
@@ -1228,7 +1236,7 @@ def resolve_dependencies
 
   if @opt_force
     puts 'Proceeding with dependency package installation...'.orange
-  elsif !Package.agree_default_yes('Proceed')
+  elsif !MiscFunctions.show_prompt('Proceed?')
     abort 'No changes made.'
   end
 
@@ -1612,7 +1620,7 @@ def upload(pkg_name = nil, pkg_version = nil, gitlab_token = nil, gitlab_token_u
             puts "\e[1A\e[KThis build of #{File.basename(local_tarfile)} has already been uploaded.\n".lightred
             crewlog "#{arch} = #{local_sha256}"
             binary_sha256_hash[arch.to_sym] = local_sha256
-          elsif @opt_force || Package.agree_default_no('Do you want to overwrite the existing upload')
+          elsif @opt_force || MiscFunctions.show_prompt('Do you want to overwrite the existing upload?')
             # 3j. If the hashes are different, then ask if the new binary
             #     should be uploaded. (Default to no.)
             puts "\e[1A\e[KOverwriting existing upload...\r".orange
@@ -1753,14 +1761,14 @@ def build_command(args)
     # Process preflight block to see if package should be built
     pre_flight
 
-    crewlog "!@pkg.is_fake? #{!@pkg.is_fake?} && PackageUtils.compatible?(@pkg) #{PackageUtils.compatible?(@pkg)} && @pkg.source?(ARCH): #{@pkg.source?(ARCH)}"
+    crewlog "!@pkg.is_fake? #{!@pkg.is_fake?} && @pkg.compatible? #{@pkg.compatible?} && @pkg.source?(ARCH): #{@pkg.source?(ARCH)}"
     crewlog "(@pkg.no_source_build? #{@pkg.no_source_build?} || @pkg.source_url.to_s.upcase != 'SKIP' #{@pkg.source_url.to_s.upcase != 'SKIP'} || @pkg.gem_compile_needed? #{@pkg.gem_compile_needed?})"
     crewlog "!@pkg.no_compile_needed? #{!@pkg.no_compile_needed?} && @pkg.gem_compile_needed? #{@pkg.gem_compile_needed?}"
-    if !@pkg.is_fake? && PackageUtils.compatible?(@pkg) && @pkg.source?(ARCH) && (@pkg.no_source_build? || @pkg.source_url.to_s.upcase != 'SKIP' || @pkg.gem_compile_needed?) && !@pkg.no_compile_needed?
+    if !@pkg.is_fake? && @pkg.compatible? && @pkg.source?(ARCH) && (@pkg.no_source_build? || @pkg.source_url.to_s.upcase != 'SKIP' || @pkg.gem_compile_needed?) && !@pkg.no_compile_needed?
       resolve_dependencies_and_build
     else
       puts 'Unable to build a fake package. Skipping build.'.lightred if @pkg.is_fake?
-      puts "Package #{@pkg.name} is not compatible with your device. Skipping build.".lightred unless PackageUtils.compatible?(@pkg)
+      puts "Package #{@pkg.name} is not compatible with your device. Skipping build.".lightred unless @pkg.compatible?
       puts 'Unable to build without source. Skipping build.'.lightred unless @pkg.source?(ARCH) && @pkg.source_url.to_s.upcase != 'SKIP'
       puts 'Compile not needed. Skipping build.'.lightred if @pkg.no_compile_needed?
     end
@@ -1857,7 +1865,7 @@ def install_command(args)
     @pkg.build_from_source = true if @opt_source || @opt_recursive || CREW_BUILD_FROM_SOURCE
     next unless @pkg_name
 
-    if PackageUtils.compatible?(@pkg)
+    if @pkg.compatible?
       resolve_dependencies_and_install
     else
       puts PackageUtils.incompatible_reason(@pkg).join("\n").to_s.lightred
@@ -1895,7 +1903,7 @@ def reinstall_command(args)
     @pkg.build_from_source = true if @opt_source || @opt_recursive || CREW_BUILD_FROM_SOURCE
     next unless @pkg_name
 
-    if PackageUtils.compatible?(@pkg)
+    if @pkg.compatible?
       @pkg.in_upgrade = true
       resolve_dependencies_and_install
       @pkg.in_upgrade = false

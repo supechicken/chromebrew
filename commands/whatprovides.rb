@@ -9,7 +9,7 @@ class Command
       pkg_name = File.basename(filelist, '.filelist')
       pkg_name_status = File.file?(File.join(CREW_PACKAGES_PATH, "#{pkg_name}.rb")) ? pkg_name : nil
       if pkg_name_status
-        if PackageUtils.compatible?(Package.load_package(File.join(CREW_PACKAGES_PATH, "#{pkg_name}.rb")))
+        if PackageUtils.load_package(File.join(CREW_PACKAGES_PATH, "#{pkg_name}.rb")).compatible?
           pkg_name_status = pkg_name.lightgreen if PackageUtils.installed?(pkg_name)
         else
           pkg_name_status = pkg_name.lightred

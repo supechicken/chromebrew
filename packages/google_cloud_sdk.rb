@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/gcloud.rb")
+PackageUtils.load_package("#{__dir__}/gcloud.rb")
 
 class Google_cloud_sdk < Package
   description Gcloud.description

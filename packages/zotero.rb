@@ -29,7 +29,7 @@ class Zotero < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/Zotero")
-    Package.agree_to_remove("#{HOME}/.zotero")
+    agree_to_remove("#{HOME}/Zotero")
+    agree_to_remove("#{HOME}/.zotero")
   end
 end

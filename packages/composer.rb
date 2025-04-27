@@ -43,6 +43,6 @@ class Composer < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/composer")
+    agree_to_remove("#{CREW_PREFIX}/.config/composer")
   end
 end

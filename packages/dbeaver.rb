@@ -37,6 +37,6 @@ class Dbeaver < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.local/share/DBeaverData")
+    agree_to_remove("#{HOME}/.local/share/DBeaverData")
   end
 end

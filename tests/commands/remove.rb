@@ -15,7 +15,7 @@ class RemoveCommandTest < Minitest::Test
 
     assert_raises(SystemExit) do
       # We don't want the output of this command, so we just capture it here and ignore it.
-      capture_io { Command.remove(Package.load_package("#{random_essential_package}.rb")) }
+      capture_io { Command.remove(PackageUtils.load_package("#{random_essential_package}.rb")) }
     end
   end
 
@@ -26,7 +26,7 @@ class RemoveCommandTest < Minitest::Test
 
     expected_output = "zstd removed!\n"
     assert_output expected_output, nil do
-      Command.remove(Package.load_package('zstd.rb'), force: true)
+      Command.remove(PackageUtils.load_package('zstd.rb'), force: true)
     end
     # We did just remove an essential package, so let's reinstall that now before it causes any issues.
     system 'crew install zstd', %i[out err] => File::NULL
@@ -37,7 +37,7 @@ class RemoveCommandTest < Minitest::Test
     puts "Testing the removal of package gcc_build. This should succeed, but essential file #{essential_file} should not be removed."
 
     system 'crew install gcc_build', %i[out err] => File::NULL
-    capture_io { Command.remove(Package.load_package('gcc_build.rb')) }
+    capture_io { Command.remove(PackageUtils.load_package('gcc_build.rb')) }
     assert File.file?(essential_file), nil
   end
 
@@ -47,7 +47,7 @@ class RemoveCommandTest < Minitest::Test
     expected_output = "xxd_standalone removed!\n"
     assert_output expected_output, nil do
       system 'crew install xxd_standalone', %i[out err] => File::NULL
-      Command.remove(Package.load_package('xxd_standalone.rb'))
+      Command.remove(PackageUtils.load_package('xxd_standalone.rb'))
     end
   end
 
@@ -63,7 +63,7 @@ class RemoveCommandTest < Minitest::Test
     EOT
     assert_output expected_output, nil do
       system 'crew install xxd_standalone', %i[out err] => File::NULL
-      Command.remove(Package.load_package('xxd_standalone.rb'), verbose: true)
+      Command.remove(PackageUtils.load_package('xxd_standalone.rb'), verbose: true)
     end
   end
 end

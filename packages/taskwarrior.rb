@@ -27,8 +27,8 @@ class Taskwarrior < CMake
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.task")
-    Package.agree_to_remove("#{HOME}/.config/task")
-    Package.agree_to_remove("#{HOME}/.taskrc")
+    agree_to_remove("#{HOME}/.task")
+    agree_to_remove("#{HOME}/.config/task")
+    agree_to_remove("#{HOME}/.taskrc")
   end
 end

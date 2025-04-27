@@ -32,6 +32,6 @@ class Termius < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/Termius")
+    agree_to_remove("#{CREW_PREFIX}/.config/Termius")
   end
 end

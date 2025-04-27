@@ -29,7 +29,7 @@ class Flutter < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.flutter")
-    Package.agree_to_remove("#{CREW_PREFIX}/share/flutter")
+    agree_to_remove("#{HOME}/.flutter")
+    agree_to_remove("#{CREW_PREFIX}/share/flutter")
   end
 end

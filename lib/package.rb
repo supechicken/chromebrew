@@ -2,27 +2,11 @@ require 'English'
 require 'json'
 require_relative 'const'
 require_relative 'color'
+require_relative 'misc_functions'
 require_relative 'package_helpers'
 require_relative 'require_gem'
 require_relative 'selector'
 
-require_gem 'highline'
-require_gem 'timeout'
-
-def agree_with_default(yes_or_no_question_msg, character = nil, default:)
-  yes_or_no_question = yes_or_no_question_msg.lightpurple
-  answer_type = ->(yn) { yn.downcase[0] == 'y' || (yn.empty? && default.downcase[0] == 'y') }
-
-  HighLine.ask(yes_or_no_question, answer_type) do |q|
-    q.validate                 = /\A(?:y(?:es)?|no?|)\Z/i
-    q.responses[:not_valid]    = 'Please enter "yes" or "no".'
-    q.responses[:ask_on_error] = :question
-    q.character                = character
-    q.completion               = %w[yes no]
-
-    yield q if block_given?
-  end
-end
 
 class Package
   boolean_property :arch_flags_override, :conflicts_ok, :git_clone_deep, :git_fetchtags, :gem_compile_needed, :gnome, :is_fake, :is_musl, :is_static,
@@ -50,60 +34,25 @@ class Package
     attr_accessor :build_from_source, :cached_build, :in_build, :in_install, :in_upgrade, :missing_binaries, :name
   end
 
-  def self.agree_default_no(message = nil)
-    # This defaults to false.
-    Timeout.timeout(CREW_AGREE_TIMEOUT_SECONDS) do
-      return agree_with_default("#{message} (yes/NO)? ", true, default: 'n')
-    end
-  rescue Timeout::Error
-    return false
+  def compatible?
+    return (
+      (@compatibility.casecmp?('all') || @compatibility.include?(ARCH)) &&
+      ((@min_glibc.nil? || (@min_glibc <= LIBC_VERSION)) && (@max_glibc.nil? || (@max_glibc >= LIBC_VERSION)))
+    )
   end
 
-  def self.agree_default_yes(message = nil)
-    # This defaults to true.
-    Timeout.timeout(CREW_AGREE_TIMEOUT_SECONDS) do
-      return agree_with_default("#{message} (YES/no)? ", true, default: 'y')
-    end
-  rescue Timeout::Error
-    return true
-  end
 
-  def self.agree_to_remove(config_object = nil)
-    if File.file? config_object
-      identifier = 'file'
-    elsif File.directory? config_object
-      identifier = 'directory'
+  def agree_to_remove(path)
+    return unless File.exist?(path)
+
+    identifier = File.ftype(path)
+
+    if MiscFunctions.show_prompt("Would you like to remove the config #{identifier} at #{path}?", false)
+      FileUtils.rm_rf(path)
+      puts "#{path} removed.".lightgreen
     else
-      puts "Cannot identify #{config_object}.".lightred
-      return
+      puts "#{path} remain unchanged.".lightgreen
     end
-    if agree_default_no("Would you like to remove the config #{identifier}: #{config_object} ")
-      FileUtils.rm_rf config_object
-      puts "#{config_object} removed.".lightgreen
-    else
-      puts "#{config_object} saved.".lightgreen
-    end
-  end
-
-  def self.load_package(pkg_file)
-    # self.load_package: load a package under 'Package' class scope
-    #
-    pkg_name = File.basename(pkg_file, '.rb')
-    class_name = pkg_name.capitalize
-
-    # Read and eval package script under 'Package' class, using the newest file available.
-    pkg_file = Dir["{#{CREW_LOCAL_REPO_ROOT}/packages,#{CREW_PACKAGES_PATH}}/#{pkg_name}.rb"].max { |a, b| File.mtime(a) <=> File.mtime(b) }
-
-    # If this package has been removed, it won't be found in either directory, so set it back to what it was before to get a nicer error.
-    pkg_file = "#{CREW_PACKAGES_PATH}/#{pkg_name}.rb" if pkg_file.nil?
-
-    class_eval(File.read(pkg_file, encoding: Encoding::UTF_8), pkg_file) unless const_defined?("Package::#{class_name}")
-    pkg_obj = const_get(class_name)
-    pkg_obj.name = pkg_name
-
-    @crew_current_package = @crew_current_package.nil? ? pkg_obj.name : @crew_current_package
-
-    return pkg_obj
   end
 
   def self.dependencies
@@ -155,8 +104,8 @@ class Package
     expanded_deps = deps.uniq.map do |dep, (dep_tags, ver_check)|
       # Check build dependencies only if building from source is needed/specified.
       # Do not recursively find :build based build dependencies.
-      next unless (include_build_deps == true && @crew_current_package == pkg_obj.name) ||
-                  ((include_build_deps == 'auto') && is_source && @crew_current_package == pkg_obj.name) ||
+      next unless (include_build_deps == true && $crew_current_package == pkg_obj.name) ||
+                  ((include_build_deps == 'auto') && is_source && $crew_current_package == pkg_obj.name) ||
                   !dep_tags.include?(:build)
 
       # Overwrite tags if parent dependency is a build dependency.

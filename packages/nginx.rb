@@ -84,6 +84,6 @@ class Nginx < Package
 
   def self.postremove
     puts "\nWARNING: This will remove all hosting files and configuration.".orange
-    Package.agree_to_remove("#{CREW_PREFIX}/share/nginx")
+    agree_to_remove("#{CREW_PREFIX}/share/nginx")
   end
 end

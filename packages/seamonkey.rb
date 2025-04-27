@@ -46,9 +46,9 @@ class Seamonkey < Package
       end
     end
     if Dir.exist?("#{HOME}/.mozilla/firefox")
-      Package.agree_to_remove("#{HOME}/.mozilla/seamonkey")
+      agree_to_remove("#{HOME}/.mozilla/seamonkey")
     else
-      Package.agree_to_remove("#{HOME}/.mozilla")
+      agree_to_remove("#{HOME}/.mozilla")
     end
   end
 end

@@ -20,7 +20,7 @@ class PackageUtilsTest < Minitest::Test
     pkg.instance_eval do
       compatibility 'all'
     end
-    assert(PackageUtils.compatible?(pkg))
+    assert(pkg.compatible?)
   end
 
   def test_compatible_multiple_values
@@ -29,7 +29,7 @@ class PackageUtilsTest < Minitest::Test
     pkg.instance_eval do
       compatibility "ia64 #{ARCH}"
     end
-    assert(PackageUtils.compatible?(pkg))
+    assert(pkg.compatible?)
   end
 
   def test_compatible_single_value
@@ -38,7 +38,7 @@ class PackageUtilsTest < Minitest::Test
     pkg.instance_eval do
       compatibility ARCH
     end
-    assert(PackageUtils.compatible?(pkg))
+    assert(pkg.compatible?)
   end
 
   def test_not_compatible_arch
@@ -47,7 +47,7 @@ class PackageUtilsTest < Minitest::Test
     pkg.instance_eval do
       compatibility 'ais'
     end
-    refute(PackageUtils.compatible?(pkg))
+    refute(pkg.compatible?)
   end
 
   def test_get_binary_url_old_hash

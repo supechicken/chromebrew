@@ -232,7 +232,7 @@ installed_pkgs_to_deprecate.each do |fixup_pkg|
   pkg_name = working_pkg[:pkg_name]
 
   puts "#{pkg_name.capitalize} is deprecated and should be removed. #{working_pkg[:comments]}".lightpurple
-  if Package.agree_default_yes("\nWould you like to remove deprecated package #{pkg_name.capitalize}")
+  if MiscFunctions.show_prompt("\nWould you like to remove deprecated package #{pkg_name.capitalize}?")
     # Create a minimal Package object and pass it to Command.remove
     pkg_object = Package
     pkg_object.instance_eval do

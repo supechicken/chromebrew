@@ -42,6 +42,6 @@ class Mullvad < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/share/mullvad")
+    agree_to_remove("#{CREW_PREFIX}/share/mullvad")
   end
 end

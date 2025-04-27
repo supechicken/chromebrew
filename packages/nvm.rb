@@ -25,7 +25,7 @@ class Nvm < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/share/nvm")
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/nvm")
+    agree_to_remove("#{CREW_PREFIX}/share/nvm")
+    agree_to_remove("#{CREW_PREFIX}/.config/nvm")
   end
 end

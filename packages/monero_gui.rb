@@ -49,6 +49,6 @@ class Monero_gui < Package
   end
 
   def self.postremove
-    Package.agree_to_remove("#{HOME}/.bitmonero")
+    agree_to_remove("#{HOME}/.bitmonero")
   end
 end

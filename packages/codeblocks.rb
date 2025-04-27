@@ -43,6 +43,6 @@ class Codeblocks < Autotools
   end
 
   def self.postremove
-    Package.agree_to_remove("#{CREW_PREFIX}/.config/codeblocks")
+    agree_to_remove("#{CREW_PREFIX}/.config/codeblocks")
   end
 end

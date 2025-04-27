@@ -85,6 +85,6 @@ class Postgresql < Meson
 
   def self.postremove
     puts 'WARNING: This will delete all databases!'.orange
-    Package.agree_to_remove(PGDATA)
+    agree_to_remove(PGDATA)
   end
 end

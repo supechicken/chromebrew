@@ -99,7 +99,7 @@ class Gvim < Autotools
     @create_vi_symlink = true if !@system_vi && !@crew_vi
     @create_vi_symlink_ask = true if @crew_vi || @system_vi
     if @create_vi_symlink_ask
-      if Package.agree_default_yes('Would you like to set vim to be the default vi')
+      if MiscFunctions.show_prompt('Would you like to set vim to be the default vi?')
         @create_vi_symlink = true
       else
         @create_vi_symlink = false

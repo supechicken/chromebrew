@@ -112,9 +112,9 @@ class Firefox < Package
 
   def self.postremove
     if Dir.exist?("#{HOME}/.mozilla/seamonkey")
-      Package.agree_to_remove("#{HOME}/.mozilla/firefox")
+      agree_to_remove("#{HOME}/.mozilla/firefox")
     else
-      Package.agree_to_remove("#{HOME}/.mozilla")
+      agree_to_remove("#{HOME}/.mozilla")
     end
   end
 end

@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/tepl_6.rb")
+PackageUtils.load_package("#{__dir__}/tepl_6.rb")
 
 class Tepl < Package
   description Tepl_6.description
