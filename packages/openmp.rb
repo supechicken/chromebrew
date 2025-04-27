@@ -4,7 +4,7 @@
 require 'package'
 
 class Openmp < Package
-  llvm_build_obj = Package.load_package("#{__dir__}/#{CREW_LLVM_VER}_build.rb")
+  llvm_build_obj = PackageUtils.load_package("#{__dir__}/#{CREW_LLVM_VER}_build.rb")
   description 'LLVM OpenMP Runtime Library'
   homepage 'https://openmp.llvm.org/'
   version '20.1.3'

@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/perl_unicode_linebreak.rb")
+PackageUtils.load_package("#{__dir__}/perl_unicode_linebreak.rb")
 
 class Perl_gcstring_linebreak < Package
   description 'UAX 14 Unicode Line Breaking Algorithm - Perl binding Unicode::LineBreak Unicode::GCString'

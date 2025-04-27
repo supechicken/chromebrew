@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/perl_stow.rb")
+PackageUtils.load_package("#{__dir__}/perl_stow.rb")
 
 class Stow < Package
   description Perl_stow.description

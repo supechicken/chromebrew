@@ -5,13 +5,38 @@ require 'net/http'
 require_relative 'const'
 
 class PackageUtils
-  def self.installed?(pkg_name)
-    device_json = JSON.load_file(File.join(CREW_CONFIG_PATH, 'device.json'))
-    return device_json['installed_packages'].any? { |elem| elem['name'] == pkg_name }
-  end
+  class InvalidPackageError < StandardError; end
+  class InvalidPackageComponentError < StandardError; end
 
-  def self.compatible?(pkg)
-    return (pkg.compatibility.casecmp?('all') || pkg.compatibility.include?(ARCH)) && (pkg.min_glibc.nil? || (pkg.min_glibc <= LIBC_VERSION)) && (pkg.max_glibc.nil? || (pkg.max_glibc >= LIBC_VERSION))
+  PACKAGE_SEARCH_PATH = ["#{CREW_LOCAL_REPO_ROOT}/packages", CREW_PACKAGES_PATH]
+
+  def self.load_package(full_name, pkg_file = nil, fatal: true)
+    # self.load_package: Load a package under 'Package' class scope
+
+    # Extract component name and its parent package from the full name
+    pkg_name, component_name = pkg_name.split('@', 2)
+
+    component_name = component_name ? component_name.to_sym : :all
+    class_name     = pkg_name.capitalize
+
+    # Search from SEARCH_PATH if no package file is not provided
+    pkg_file ||= Dir["{#{PACKAGE_SEARCH_PATH.join(',')}}/#{pkg_name}.rb"].max { |a, b| File.mtime(a) <=> File.mtime(b) }
+
+    # Raise error if package not found
+    fatal ? raise InvalidPackageError, "Package #{pkg_name} not found." : return false
+
+    # Load package if not loaded already
+    class_eval(File.read(pkg_file, encoding: Encoding::UTF_8), pkg_file) unless const_defined?("Package::#{class_name}")
+
+    pkg                  = const_get(class_name)
+    pkg.name             = pkg_name
+    pkg.target_component = component_name
+
+    unless pkg.components.include?(component_name)
+      fatal ? raise InvalidPackageComponentError, "Component #{component_name} not found under package #{pkg_name}." : return false
+    end
+
+    return pkg
   end
 
   def self.incompatible_reason(pkg)

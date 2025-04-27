@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/py3_mercurial.rb")
+PackageUtils.load_package("#{__dir__}/py3_mercurial.rb")
 
 class Hg < Package
   description Py3_mercurial.description

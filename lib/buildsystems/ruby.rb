@@ -142,7 +142,7 @@ class RUBY < Package
     crewlog "no_compile_needed?: #{no_compile_needed?} @gem_binary_build_needed.blank?: #{@gem_binary_build_needed.blank?}, gem_compile_needed?: #{gem_compile_needed?}"
     puts "#{@gem_name.capitalize} needs a binary gem built!".orange unless @gem_binary_build_needed.blank?
     if !no_compile_needed? || !@gem_binary_build_needed.blank? || gem_compile_needed?
-      @gem_pkg = Package.load_package(File.join(CREW_PACKAGES_PATH, "#{name}.rb"))
+      @gem_pkg = PackageUtils.load_package(File.join(CREW_PACKAGES_PATH, "#{name}.rb"))
       gem_pkg_sha256sum = PackageUtils.get_sha256(@gem_pkg)
       gem_sha256 = `sha256sum #{CREW_DEST_DIR}/#{@gem_name}-#{@gem_version}-#{GEM_ARCH}.gem`.chomp.split.first
       if File.file?("#{CREW_DEST_DIR}/#{@gem_name}-#{@gem_version}-#{GEM_ARCH}.gem") && (gem_sha256 == gem_pkg_sha256sum || @just_built_gem)

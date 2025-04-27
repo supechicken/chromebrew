@@ -2,7 +2,7 @@
 # https://github.com/archlinux/svntogit-community/raw/packages/intel-opencl-clang/trunk/PKGBUILD
 
 require 'buildsystems/cmake'
-Package.load_package("#{__dir__}/llvm19_build.rb")
+PackageUtils.load_package("#{__dir__}/llvm19_build.rb")
 
 class Intel_opencl_clang < CMake
   description 'Wrapper library around clang that can compile OpenCL C kernels to SPIR-V modules'

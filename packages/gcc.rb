@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/gcc_build.rb")
+PackageUtils.load_package("#{__dir__}/gcc_build.rb")
 
 class Gcc < Package
   description 'The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Ada, and Go.'

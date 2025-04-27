@@ -1,6 +1,6 @@
 require 'package'
-Package.load_package("#{__dir__}/glibmm_2_4.rb")
-Package.load_package("#{__dir__}/glibmm_2_68.rb")
+PackageUtils.load_package("#{__dir__}/glibmm_2_4.rb")
+PackageUtils.load_package("#{__dir__}/glibmm_2_68.rb")
 
 class Glibmm < Package
   description Glibmm_2_4.description

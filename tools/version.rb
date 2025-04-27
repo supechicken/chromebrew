@@ -107,7 +107,7 @@ if filelist.length.positive?
   puts "#{'Package'.ljust(35)}#{'Status'.ljust(20)}#{'Current'.ljust(20)}Upstream"
   puts "#{'-------'.ljust(35)}#{'------'.ljust(20)}#{'-------'.ljust(20)}--------"
   filelist.each do |filename|
-    pkg = Package.load_package(filename)
+    pkg = PackageUtils.load_package(filename)
     # Instead of typing out the name of every python package, we just use a regex here.
     # Also, we annotate some packages to let us know that they won't work here.
     if pkg.name.match?(/py3\S+/) || pkg.no_upstream_update?

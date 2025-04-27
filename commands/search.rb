@@ -5,7 +5,7 @@ require_relative '../lib/package_utils'
 class Command
   def self.search(regex_string, verbose)
     Dir["#{CREW_PACKAGES_PATH}/*.rb"].each do |package_path|
-      pkg = Package.load_package(package_path)
+      pkg = PackageUtils.load_package(package_path)
       # Create a case-insensitive regex from the passed string.
       regex = Regexp.new(regex_string, true)
       next unless regex.match?(File.basename(package_path, '.rb')) || regex.match?(pkg.description)

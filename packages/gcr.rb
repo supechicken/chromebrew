@@ -1,6 +1,6 @@
 require 'package'
-Package.load_package("#{__dir__}/gcr_3.rb")
-Package.load_package("#{__dir__}/gcr_4.rb")
+PackageUtils.load_package("#{__dir__}/gcr_3.rb")
+PackageUtils.load_package("#{__dir__}/gcr_4.rb")
 
 class Gcr < Package
   description Gcr_3.description

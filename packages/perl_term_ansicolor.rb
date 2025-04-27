@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/perl.rb")
+PackageUtils.load_package("#{__dir__}/perl.rb")
 
 class Perl_term_ansicolor < Package
   description 'Character mode terminal access for Perl Term::ANSIColor'

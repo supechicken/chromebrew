@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/py3_azure_cli.rb")
+PackageUtils.load_package("#{__dir__}/py3_azure_cli.rb")
 
 class Az < Package
   description Py3_azure_cli.description

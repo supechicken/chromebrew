@@ -1,10 +1,10 @@
 require 'package'
-Package.load_package("#{__dir__}/glibc_build223.rb")
-Package.load_package("#{__dir__}/glibc_build227.rb")
-Package.load_package("#{__dir__}/glibc_build232.rb")
-Package.load_package("#{__dir__}/glibc_build233.rb")
-Package.load_package("#{__dir__}/glibc_build235.rb")
-Package.load_package("#{__dir__}/glibc_build237.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build223.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build227.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build232.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build233.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build235.rb")
+PackageUtils.load_package("#{__dir__}/glibc_build237.rb")
 
 class Glibc < Package
   description 'The GNU C Library project provides the core libraries for GNU/Linux systems.'

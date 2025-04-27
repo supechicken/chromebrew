@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/webkit2gtk_4.rb")
+PackageUtils.load_package("#{__dir__}/webkit2gtk_4.rb")
 
 class Webkit2gtk < Package
   description Webkit2gtk_4.description

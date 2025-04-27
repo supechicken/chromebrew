@@ -36,7 +36,7 @@ abort 'No packages need to be updated.'.orange if updated_packages.empty?
 
 puts 'Changed packages will be checked to see if they need updated.'.orange
 updated_packages.each do |pkg|
-  @pkg_obj = Package.load_package(pkg)
+  @pkg_obj = PackageUtils.load_package(pkg)
   updated_packages.delete(pkg) unless @pkg_obj.no_compile_needed?
 end
 
@@ -49,7 +49,7 @@ updated_packages.each do |pkg|
   puts name.to_s.lightblue
 
   puts "Evaluating #{name} package...".orange
-  @pkg_obj = Package.load_package(pkg)
+  @pkg_obj = PackageUtils.load_package(pkg)
 
   system("crew install -f #{name}")
   abort "#{name} install failed!".lightred unless $CHILD_STATUS.success?

@@ -1,4 +1,4 @@
-Package.load_package("#{__dir__}/libxml2.rb")
+PackageUtils.load_package("#{__dir__}/libxml2.rb")
 # cmake builds are dependent upon libxml2, so we need a libxml2 build
 # done without using cmake.
 require 'buildsystems/autotools'

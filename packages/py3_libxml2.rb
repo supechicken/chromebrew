@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/libxml2.rb")
+PackageUtils.load_package("#{__dir__}/libxml2.rb")
 
 class Py3_libxml2 < Package
   description 'Libxml2-python provides access to libxml2 and libxslt in Python.'

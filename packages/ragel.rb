@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/harfbuzz.rb")
+PackageUtils.load_package("#{__dir__}/harfbuzz.rb")
 
 class Ragel < Package
   description 'Ragel compiles executable finite state machines from regular languages. Now bundled with harfbuzz.'

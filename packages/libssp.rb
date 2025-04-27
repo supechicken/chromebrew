@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/gcc_build.rb")
+PackageUtils.load_package("#{__dir__}/gcc_build.rb")
 
 class Libssp < Package
   description 'Libssp is a part of the GCC toolkit.'

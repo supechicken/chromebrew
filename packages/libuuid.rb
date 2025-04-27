@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/util_linux.rb")
+PackageUtils.load_package("#{__dir__}/util_linux.rb")
 
 class Libuuid < Package
   description 'Portable UUID C library. Bundled with util_linux.'

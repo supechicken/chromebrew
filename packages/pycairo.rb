@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/py3_pycairo.rb")
+PackageUtils.load_package("#{__dir__}/py3_pycairo.rb")
 
 class Pycairo < Package
   description Py3_pycairo.description

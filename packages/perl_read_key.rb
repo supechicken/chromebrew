@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/perl_term_readkey.rb")
+PackageUtils.load_package("#{__dir__}/perl_term_readkey.rb")
 
 class Perl_read_key < Package
   description 'Term::ReadKey - A perl module for simple terminal control'

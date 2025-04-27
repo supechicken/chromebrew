@@ -47,7 +47,7 @@ class Package
                      :postremove   # Function to perform after package removal.
 
   class << self
-    attr_accessor :build_from_source, :cached_build, :in_build, :in_install, :in_upgrade, :missing_binaries, :name
+    attr_accessor :build_from_source, :cached_build, :in_build, :in_install, :in_upgrade, :missing_binaries, :target_component, :name
   end
 
   def self.agree_default_no(message = nil)
@@ -85,25 +85,13 @@ class Package
     end
   end
 
-  def self.load_package(pkg_file)
-    # self.load_package: load a package under 'Package' class scope
-    #
-    pkg_name = File.basename(pkg_file, '.rb')
-    class_name = pkg_name.capitalize
+  def installed?
+    device_json = JSON.load_file(File.join(CREW_CONFIG_PATH, 'device.json'))
+    return device_json['installed_packages'].any? { |elem| elem['name'] == @name }
+  end
 
-    # Read and eval package script under 'Package' class, using the newest file available.
-    pkg_file = Dir["{#{CREW_LOCAL_REPO_ROOT}/packages,#{CREW_PACKAGES_PATH}}/#{pkg_name}.rb"].max { |a, b| File.mtime(a) <=> File.mtime(b) }
-
-    # If this package has been removed, it won't be found in either directory, so set it back to what it was before to get a nicer error.
-    pkg_file = "#{CREW_PACKAGES_PATH}/#{pkg_name}.rb" if pkg_file.nil?
-
-    class_eval(File.read(pkg_file, encoding: Encoding::UTF_8), pkg_file) unless const_defined?("Package::#{class_name}")
-    pkg_obj = const_get(class_name)
-    pkg_obj.name = pkg_name
-
-    @crew_current_package = @crew_current_package.nil? ? pkg_obj.name : @crew_current_package
-
-    return pkg_obj
+  def compatible?
+    return (@compatibility.casecmp?('all') || @compatibility.include?(ARCH)) && (@min_glibc.nil? || (@min_glibc <= LIBC_VERSION)) && (@max_glibc.nil? || (@max_glibc >= LIBC_VERSION))
   end
 
   def self.dependencies

@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/acquia_cli.rb")
+PackageUtils.load_package("#{__dir__}/acquia_cli.rb")
 
 class Acli < Package
   description Acquia_cli.description

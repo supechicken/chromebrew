@@ -1,5 +1,5 @@
 require 'package'
-Package.load_package("#{__dir__}/llvm16_build.rb")
+PackageUtils.load_package("#{__dir__}/llvm16_build.rb")
 
 class Llvm16_lib < Package
   description 'LibLLVM and llvm-strip'

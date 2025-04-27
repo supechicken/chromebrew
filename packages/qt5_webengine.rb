@@ -3,7 +3,7 @@
 # & LFS build documentation at https://www.linuxfromscratch.org/blfs/view/svn/x/qtwebengine.html
 
 require 'package'
-Package.load_package("#{__dir__}/qt5_base.rb")
+PackageUtils.load_package("#{__dir__}/qt5_base.rb")
 
 class Qt5_webengine < Package
   description 'Provides support for web applications using the Chromium browser project'
