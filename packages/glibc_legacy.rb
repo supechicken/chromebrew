@@ -66,7 +66,7 @@ class Glibc_legacy < Package
       EOF
 
       system build_env.transform_keys(&:to_s), '../configure', *config_opts
-      system "make PARALLELMFLAGS='-j #{CREW_NPROC}'"
+      system "mold -run make PARALLELMFLAGS='-j #{CREW_NPROC}'"
     end
   end
 
