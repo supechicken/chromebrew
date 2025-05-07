@@ -3,7 +3,7 @@ require 'package'
 class Glibc_standalone < Package
   description 'The GNU C Library project provides the core libraries for GNU/Linux systems.'
   homepage 'https://www.gnu.org/software/libc/'
-  version '2.41-2'
+  version '2.41-3'
   license 'LGPL-2.1+, BSD, HPND, ISC, inner-net, rc, and PCRE'
   compatibility 'all'
   source_url "https://ftpmirror.gnu.org/glibc/glibc-#{version.partition('-')[0]}.tar.xz"
@@ -32,7 +32,7 @@ class Glibc_standalone < Package
   print_source_bashrc
 
   def self.patch
-    system "git clone --depth=1 https://github.com/chromebrew/crew-package-glibc -b #{version}"
+    system "git clone --depth=1 https://github.com/chromebrew/crew-package-glibc"
     system 'filefix'
 
     Dir.glob('crew-package-glibc/patches/*.patch') do |patch|
@@ -46,15 +46,15 @@ class Glibc_standalone < Package
       -DCREW_AUDIT=\\"#{CREW_GLIBC_PREFIX}/crew-audit.so\\"
       -DCREW_PREFIX=\\"#{CREW_PREFIX}\\"
       -DCREW_GLIBC_PREFIX=\\"#{CREW_GLIBC_PREFIX}\\"
-      -DCREW_GLIBC_VERSION=\\"#{version.partition('-')[0]}\\"
+      -DCREW_GLIBC_INTERPRETER=\\"#{CREW_GLIBC_INTERPRETER}\\"
       -DCREW_LD_LIBRARY_PATH=\\"#{CREW_GLIBC_PREFIX}:#{ENV.fetch('LD_LIBRARY_PATH', nil)}\\"
     ]
 
     build_env = {
-      CFLAGS:   "-O3 -pipe -fPIC -fno-lto -fuse-ld=lld #{cc_macro_list.join(' ')}",
-      CXXFLAGS: "-O3 -pipe -fPIC -fno-lto -fuse-ld=lld #{cc_macro_list.join(' ')}",
-      LDFLAGS:  '-fno-lto -fuse-ld=lld',
-      LD:       'ld.lld' # use lld here as mold will segfault
+      CFLAGS:   "-O3 -pipe -fPIC -fno-lto #{cc_macro_list.join(' ')}",
+      CXXFLAGS: "-O3 -pipe -fPIC -fno-lto #{cc_macro_list.join(' ')}",
+      LDFLAGS:  '-fno-lto',
+
     }
 
     config_opts = %W[
@@ -77,6 +77,8 @@ class Glibc_standalone < Package
 
     config_opts << '--enable-cet' unless ARCH == 'i686'
 
+    library_flags = "-shared -O3 -pipe -ffat-lto-objects -fPIC #{CREW_ARCH_FLAGS} -fuse-ld=#{CREW_LINKER} #{cc_macro_list.join(' ')}"
+
     FileUtils.mkdir_p 'builddir'
     Dir.chdir('builddir') do
       File.write 'configparms', <<~EOF
@@ -87,11 +89,12 @@ class Glibc_standalone < Package
       EOF
 
       system build_env.transform_keys(&:to_s), '../configure', *config_opts
-      system "make PARALLELMFLAGS='-j #{CREW_NPROC}'"
+      system "mold -run make PARALLELMFLAGS='-j #{CREW_NPROC}'"
     end
 
-    # compile crew-audit with system's glibc version, as we want it to work on system's glibc also
-    system "cc #{CREW_COMMON_FLAGS.sub(/-L[^\s]+/, '')} #{cc_macro_list.join(' ')} -shared crew-audit.c -o crew-audit.so", chdir: 'crew-package-glibc'
+    # compile crew-{audit,preload}.so with system's glibc version, as we want it to work on system's glibc also
+    system "cc #{library_flags} crew-audit.c -o crew-audit.so", chdir: 'crew-package-glibc'
+    system "cc #{library_flags} crew-preload.c -o crew-preload.so", chdir: 'crew-package-glibc'
   end
 
   def self.install
@@ -113,6 +116,7 @@ class Glibc_standalone < Package
 
     # install crew-audit
     FileUtils.install 'crew-package-glibc/crew-audit.so', File.join(CREW_DEST_DIR, CREW_GLIBC_PREFIX, 'crew-audit.so'), mode: 0o755
+    FileUtils.install 'crew-package-glibc/crew-preload.so', File.join(CREW_DEST_DIR, CREW_GLIBC_PREFIX, 'crew-preload.so'), mode: 0o755
     File.write "#{CREW_DEST_PREFIX}/etc/env.d/10-glibc", "LD_AUDIT=#{File.join(CREW_GLIBC_PREFIX, 'crew-audit.so')}\n"
   end
 
