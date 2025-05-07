@@ -1,6 +1,6 @@
 require 'package'
 
-class Glibc_standalone < Package
+class Glibc < Package
   description 'The GNU C Library project provides the core libraries for GNU/Linux systems.'
   homepage 'https://www.gnu.org/software/libc/'
   version '2.41-2'
