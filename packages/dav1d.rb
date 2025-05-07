@@ -17,8 +17,7 @@ class Dav1d < Meson
   })
 
   depends_on 'gcc_lib' # R
-  depends_on 'glibc_lib' # R
-  depends_on 'glibc' # R
+    depends_on 'glibc' # R
   depends_on 'nasm' => :build
 
   meson_options CREW_MESON_OPTIONS.gsub('-mfpu=vfpv3-d16', '-mfpu=neon-fp16').to_s

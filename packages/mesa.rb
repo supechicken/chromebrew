@@ -21,8 +21,7 @@ class Mesa < Meson
   depends_on 'expat' # R
   depends_on 'gcc_dev' => :build
   depends_on 'gcc_lib' # R
-  depends_on 'glibc_lib' # R
-  depends_on 'glibc' # R
+    depends_on 'glibc' # R
   depends_on 'glslang' => :build
   depends_on 'libclc' => :build
   depends_on 'libdrm' # R
