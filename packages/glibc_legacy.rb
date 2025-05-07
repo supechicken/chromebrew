@@ -28,6 +28,11 @@ class Glibc_legacy < Package
   no_env_options
   no_shrink
 
+  def self.patch
+    # temporary hack
+    system 'sed -i "s/GNU ld/mold/g" configure'
+  end
+
   def self.build
     build_env = {
       CFLAGS:   "-O3 -pipe -fPIC -fno-lto",
@@ -65,7 +70,7 @@ class Glibc_legacy < Package
         rootsbindir=#{CREW_LEGACY_GLIBC_PREFIX}
       EOF
 
-      system build_env.transform_keys(&:to_s), '../configure', *config_opts
+      system build_env.transform_keys(&:to_s), 'mold', '-run', '../configure', *config_opts
       system "mold -run make PARALLELMFLAGS='-j #{CREW_NPROC}'"
     end
   end
