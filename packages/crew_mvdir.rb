@@ -6,8 +6,8 @@ class Crew_mvdir < Package
   version '0.2-2' # Do not use @_ver here, it will break the installer.
   license 'GPL-3'
   compatibility 'all'
-  source_url 'https://github.com/chromebrew/crew-mvdir.git'
-  git_hashtag '0.2'
+  source_url 'https://github.com/supechicken/crew-mvdir.git'
+  git_hashtag 'fix-rust'
   binary_compression 'tar.zst'
 
   binary_sha256({
@@ -20,11 +20,15 @@ class Crew_mvdir < Package
   depends_on 'glibc' # R
 
   def self.build
-    system "cc #{CREW_COMMON_FLAGS} crew-mvdir.c -o crew-mvdir"
+    extra_flags = %w[aarch64 armv7l i686].include?(ARCH) ? '-m32' : ''
+
+    system "cc #{CREW_COMMON_FLAGS} #{CREW_LINKER_FLAGS} #{extra_flags} -shared src/mvdir.c -o crew-mvdir.so"
+    system "cc #{CREW_COMMON_FLAGS} #{CREW_LINKER_FLAGS} #{extra_flags} -L . -l:crew-mvdir.so src/main.c -o crew-mvdir"
   end
 
   def self.install
-    FileUtils.mkdir_p "#{CREW_DEST_PREFIX}/bin"
+    FileUtils.mkdir_p ["#{CREW_DEST_PREFIX}/bin", CREW_DEST_LIB_PREFIX]
+    FileUtils.install 'crew-mvdir.so', "#{CREW_DEST_LIB_PREFIX}/crew-mvdir.so", mode: 0o755
     FileUtils.install 'crew-mvdir', "#{CREW_DEST_PREFIX}/bin/crew-mvdir", mode: 0o755
   end
 end
