@@ -35,8 +35,8 @@ class Glibc_legacy < Package
 
   def self.build
     build_env = {
-      CFLAGS:   "-O3 -pipe -fPIC -fno-lto",
-      CXXFLAGS: "-O3 -pipe -fPIC -fno-lto",
+      CFLAGS:   "-O3 -pipe -fPIC -fno-lto -Wno-array-parameter",
+      CXXFLAGS: "-O3 -pipe -fPIC -fno-lto -Wno-array-parameter",
       LDFLAGS:  '-fno-lto'
     }
 
