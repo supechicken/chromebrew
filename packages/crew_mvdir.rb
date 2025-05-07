@@ -22,8 +22,8 @@ class Crew_mvdir < Package
   def self.build
     extra_flags = %w[aarch64 armv7l i686].include?(ARCH) ? '-m32' : ''
 
-    system "cc #{CREW_COMMON_FLAGS} #{extra_flags} -shared src/mvdir.c -o crew-mvdir.so"
-    system "cc #{CREW_COMMON_FLAGS} #{extra_flags} -L . -l:crew-mvdir.so src/main.c -o crew-mvdir"
+    system "cc #{CREW_COMMON_FLAGS} #{CREW_LINKER_FLAGS} #{extra_flags} -shared src/mvdir.c -o crew-mvdir.so"
+    system "cc #{CREW_COMMON_FLAGS} #{CREW_LINKER_FLAGS} #{extra_flags} -L . -l:crew-mvdir.so src/main.c -o crew-mvdir"
   end
 
   def self.install
