@@ -7,7 +7,7 @@ class Crew_mvdir < Package
   license 'GPL-3'
   compatibility 'all'
   source_url 'https://github.com/supechicken/crew-mvdir.git'
-  git_branch 'main'
+  git_hashtag 'main'
   binary_compression 'tar.zst'
 
   binary_sha256({
