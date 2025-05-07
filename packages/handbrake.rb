@@ -25,7 +25,7 @@ class Handbrake < Package
   depends_on 'fribidi' # R
   depends_on 'gcc_lib' # R
   depends_on 'gdk_pixbuf' # R
-    depends_on 'glibc' # R
+  depends_on 'glibc' # R
   depends_on 'glib' # R
   depends_on 'graphene' # R
   depends_on 'gstreamer' # R

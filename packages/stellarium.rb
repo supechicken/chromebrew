@@ -18,7 +18,7 @@ class Stellarium < CMake
   })
 
   depends_on 'gcc_lib' # R
-    depends_on 'nlopt' # R
+  depends_on 'nlopt' # R
   depends_on 'qt5_base' # R
   depends_on 'qt5_charts' # R
   depends_on 'qt5_location' => :build

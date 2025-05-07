@@ -21,7 +21,7 @@ class Rhythmbox < Meson
   depends_on 'desktop_file_utils' => :build
   depends_on 'gcc_lib' # R
   depends_on 'gdk_pixbuf' # R
-    depends_on 'glib' # R
+  depends_on 'glib' # R
   depends_on 'gobject_introspection' # R
   depends_on 'gstreamer' # R
   depends_on 'gtk3' # R

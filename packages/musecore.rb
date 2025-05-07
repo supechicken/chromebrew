@@ -21,7 +21,7 @@ class Musecore < CMake
   depends_on 'freetype'
   depends_on 'gcc_lib' # R
   depends_on 'glibc' # R
-    depends_on 'libopusenc'
+  depends_on 'libopusenc'
   depends_on 'libsndfile'
   depends_on 'openssl' # R
   depends_on 'opus' # R

@@ -20,7 +20,7 @@ class Nlopt < CMake
   })
 
   depends_on 'gcc_lib' # R
-    depends_on 'guile' => :build
+  depends_on 'guile' => :build
   depends_on 'octave' # R
   depends_on 'py3_numpy' => :build
   depends_on 'swig' => :build

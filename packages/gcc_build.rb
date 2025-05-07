@@ -39,7 +39,7 @@ class Gcc_build < Package
   depends_on 'binutils' => :build
   depends_on 'ccache' => :build
   depends_on 'dejagnu' => :build # for test
-    depends_on 'glibc' # R
+  depends_on 'glibc' # R
   depends_on 'gmp' # R
   depends_on 'isl' # R
   depends_on 'libssp' # L

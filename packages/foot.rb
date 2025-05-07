@@ -28,7 +28,7 @@ class Foot < Meson
   depends_on 'freetype' # R
   depends_on 'gcc_lib' # R
   depends_on 'glibc' # R
-    depends_on 'harfbuzz' # R
+  depends_on 'harfbuzz' # R
   depends_on 'libxkbcommon'
   depends_on 'ncurses'
   depends_on 'pixman'
