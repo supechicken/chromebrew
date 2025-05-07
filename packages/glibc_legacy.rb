@@ -6,8 +6,8 @@ class Glibc_legacy < Package
   version '2.23'
   license 'LGPL-2.1+, BSD, HPND, ISC, inner-net, rc, and PCRE'
   compatibility 'all'
-  source_url "https://ftpmirror.gnu.org/glibc/glibc-#{version.partition('-')[0]}.tar.xz"
-  source_sha256 'SKIP'
+  source_url "file:///home/chronos/user/MyFiles/Downloads/glibc-2.23.tar.xz"
+  source_sha256 '94efeb00e4603c8546209cefb3e1a50a5315c86fa9b078b6fad758e187ce13e9'
   binary_compression 'tar.zst'
 
   binary_sha256({
