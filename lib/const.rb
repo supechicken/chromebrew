@@ -31,9 +31,9 @@ ARCH_LIB        ||= "lib#{CREW_LIB_SUFFIX}"
 CREW_PREFIX ||= ENV.fetch('CREW_PREFIX', '/usr/local') unless defined?(CREW_PREFIX)
 
 # Glibc related constants
-CREW_GLIBC_PREFIX      ||= File.join(CREW_PREFIX, 'opt/glibc-libs')
-CREW_GLIBC_INTERPRETER ||= File.symlink?("#{CREW_PREFIX}/bin/ld.so") ? File.realpath("#{CREW_PREFIX}/bin/ld.so") : nil unless defined?(CREW_GLIBC_INTERPRETER)
-
+CREW_GLIBC_PREFIX        ||= File.join(CREW_PREFIX, 'opt/glibc-libs')
+CREW_LEGACY_GLIBC_PREFIX ||= File.join(CREW_PREFIX, 'opt/glibc-legacy')
+CREW_GLIBC_INTERPRETER   ||= File.symlink?("#{CREW_PREFIX}/bin/ld.so") ? File.realpath("#{CREW_PREFIX}/bin/ld.so") : nil unless defined?(CREW_GLIBC_INTERPRETER)
 # Glibc version can be found from the output of libc.so.6
 # LIBC_VERSION ||= ENV.fetch('LIBC_VERSION', Etc.confstr(Etc::CS_GNU_LIBC_VERSION).split.last) unless defined?(LIBC_VERSION)
 @libcvertokens = if File.file?("#{CREW_GLIBC_PREFIX}/libc.so.6")
