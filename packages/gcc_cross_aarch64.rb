@@ -75,7 +75,8 @@ class Gcc_cross_aarch64 < Package
       configure_env =
         {
           LIBRARY_PATH: CREW_LIB_PREFIX,
-                  PATH: "#{sysroot}/#{target}:#{ENV.fetch('PATH', nil)}",
+                    NM: 'gcc-nm',
+                    AR: 'gcc-ar',
                 CFLAGS: '-fPIC -pipe',
               CXXFLAGS: '-fPIC -pipe'
         }.transform_keys(&:to_s)
@@ -93,7 +94,6 @@ class Gcc_cross_aarch64 < Package
     make_env =
       {
         LIBRARY_PATH: CREW_LIB_PREFIX,
-                sPATH: "#{sysroot}/#{target}:#{ENV.fetch('PATH', nil)}",
              DESTDIR: CREW_DEST_DIR
       }.transform_keys(&:to_s)
 
