@@ -24,6 +24,8 @@ class Binutils_cross < Package
   depends_on 'zlib' # R
   depends_on 'zstd' # R
 
+  no_mold
+
   def self.prebuilt
     system 'aclocal && automake', chdir: 'ld'
   end
@@ -34,28 +36,30 @@ class Binutils_cross < Package
 
     Dir.mkdir 'build'
     Dir.chdir 'build' do
-      system "../configure \
-        --target=#{target} \
-        --prefix=#{CREW_PREFIX} \
-        --libdir=#{CREW_LIB_PREFIX} \
-        --with-sysroot=#{sysroot} \
-        --disable-gdb \
-        --disable-gdbserver \
-        --disable-maintainer-mode \
-        --enable-64-bit-bfd \
-        --enable-colored-disassembly \
-        --enable-install-libiberty \
-        --enable-ld=default \
-        --enable-lto \
-        --enable-plugins \
-        --enable-relro \
-        --enable-shared \
-        --enable-threads \
-        --enable-vtable-verify \
-        --with-bugurl=https://github.com/chromebrew/chromebrew/issues/new \
-        --with-pic \
-        --with-pkgversion=Chromebrew \
-        --with-system-zlib"
+      system <<~CMD
+        ../configure \
+          --target=#{target} \
+          --prefix=#{sysroot} \
+          --with-sysroot=#{sysroot} \
+          --disable-gdb \
+          --disable-gdbserver \
+          --disable-maintainer-mode \
+          --disable-nls \
+          --enable-64-bit-bfd \
+          --enable-colored-disassembly \
+          --enable-install-libiberty \
+          --enable-ld=default \
+          --enable-lto \
+          --enable-plugins \
+          --enable-relro \
+          --enable-shared \
+          --enable-threads \
+          --enable-vtable-verify \
+          --with-bugurl=https://github.com/chromebrew/chromebrew/issues/new \
+          --with-pic \
+          --with-pkgversion=Chromebrew \
+          --with-system-zlib
+      CMD
       system 'make'
     end
   end
