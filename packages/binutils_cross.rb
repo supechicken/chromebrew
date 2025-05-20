@@ -7,7 +7,7 @@ class Binutils_cross < Package
   license 'GPL-3+'
   compatibility 'all'
   source_url "https://sourceware.org/pub/binutils/releases/binutils-#{version.split('-').first}.tar.zst"
-  source_sha256 'becaac5d295e037587b63a42fad57fe3d9d7b83f478eb24b67f9eec5d0f1872f'
+  source_sha256 '79cb120b39a195ad588cd354aed886249bfab36c808e746b30208d15271cc95c'
   binary_compression 'tar.zst'
 
   binary_sha256({
