@@ -40,6 +40,7 @@ class Binutils_cross < Package
         ../configure \
           --target=#{target} \
           --prefix=#{sysroot} \
+          --bindir=#{CREW_PREFIX}/bin \
           --with-sysroot=#{sysroot} \
           --disable-gdb \
           --disable-gdbserver \
