@@ -11,7 +11,6 @@ class Gcc_cross_aarch64 < Package
   binary_compression 'tar.zst'
 
   depends_on 'binutils_cross' => :build
-  depends_on 'ccache' => :build
   depends_on 'dejagnu' => :build # for test
   depends_on 'glibc' # R
   depends_on 'gmp' # R
@@ -75,7 +74,8 @@ class Gcc_cross_aarch64 < Package
     Dir.chdir('builddir') do
       configure_env =
         {
-          LIBRARY_PATH: CREW_LIB_PREFIX,
+          LIBRARY_PATH: CREW_LIB_REFIX,
+                  PATH: "#{sysroot}/#{target}:#{ENV.fetch('PATH', nil)}"
                 CFLAGS: '-fPIC -pipe',
               CXXFLAGS: '-fPIC -pipe'
         }.transform_keys(&:to_s)
@@ -85,7 +85,7 @@ class Gcc_cross_aarch64 < Package
       # LIBRARY_PATH=#{CREW_LIB_PREFIX} needed for x86_64 to avoid:
       # /usr/local/bin/ld: cannot find crti.o: No such file or directory
       # /usr/local/bin/ld: cannot find /usr/lib64/libc_nonshared.a
-      system({ LIBRARY_PATH: CREW_LIB_PREFIX }.transform_keys(&:to_s), "make -j #{CREW_NPROC} || make -j1")
+      system configure_env, "make -j #{CREW_NPROC} || make -j1"
     end
   end
 
