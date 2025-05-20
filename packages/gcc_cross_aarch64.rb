@@ -74,7 +74,7 @@ class Gcc_cross_aarch64 < Package
     Dir.chdir('builddir') do
       configure_env =
         {
-          LIBRARY_PATH: CREW_LIB_REFIX,
+          LIBRARY_PATH: CREW_LIB_PREFIX,
                   PATH: "#{sysroot}/#{target}:#{ENV.fetch('PATH', nil)}",
                 CFLAGS: '-fPIC -pipe',
               CXXFLAGS: '-fPIC -pipe'
