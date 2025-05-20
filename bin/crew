@@ -718,6 +718,7 @@ def build_and_preconfigure(target_dir)
         abort 'There was a build error, caching build directory.'.lightred
       end
       abort 'There was a build error.'.lightred
+      raise
     end
     @pkg.in_build = false
     # wipe crew destdir
