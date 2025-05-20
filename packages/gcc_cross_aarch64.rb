@@ -41,7 +41,6 @@ class Gcc_cross_aarch64 < Package
       --host=#{CREW_TARGET}
       --target=#{target}
       --program-prefix=#{target}-
-      --disable-bootstrap
       --disable-install-libiberty
       --disable-libmpx
       --disable-libssp
