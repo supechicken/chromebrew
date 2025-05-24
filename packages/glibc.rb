@@ -28,8 +28,7 @@ class Glibc < Package
   print_source_bashrc
 
   def self.patch
-    system "git clone --depth=1 https://github.com/chromebrew/crew-package-glibc -b #{version}"
-    system 'filefix'
+    system "git clone --depth=1 https://github.com/chromebrew/crew-package-glibc"
 
     Dir.glob('crew-package-glibc/patches/*.patch') do |patch|
       puts "Applying #{patch}...".yellow
@@ -42,7 +41,6 @@ class Glibc < Package
       -DCREW_PREFIX=\\"#{CREW_PREFIX}\\"
       -DCREW_GLIBC_PREFIX=\\"#{CREW_GLIBC_PREFIX}\\"
       -DCREW_GLIBC_INTERPRETER=\\"#{CREW_GLIBC_INTERPRETER}\\"
-      -DSYSTEM_GLIBC_INTERPRETER=\\"/#{ARCH_LIB}/#{File.basename(CREW_GLIBC_INTERPRETER)}\\"
     ]
 
     build_env = {
