@@ -167,11 +167,6 @@ crew_folders=(bin cache doc docbook include lib/crew/packages lib$LIB_SUFFIX lib
 # Remove old git config directories if they exist.
 find "${CREW_LIB_PATH}" -mindepth 1 -delete
 
-echo_out 'Set up the local package repo...'
-
-# Download the chromebrew repository.
-curl_wrapper -L --progress-bar "https://github.com/${OWNER}/${REPO}/tarball/${BRANCH}" | tar -xz --strip-components=1 -C "${CREW_LIB_PATH}"
-
 # ncurses, readline, and bash are needed before ruby because our ruby
 # invokes the architecture specific bash instead of using /bin/sh, which
 # may be aarch64 when we are using an armv7l userspace. That wreaks
@@ -311,7 +306,7 @@ function extract_install () {
 
   if [[ "${1}" == 'glibc' ]]; then
     # update ld.so cache
-    ldconfig
+    ${CREW_PREFIX}/bin/ldconfig &> /tmp/crew_ldconfig || true
   else
     # decompress and switch to our glibc for existing binaries
     if command -v upx &> /dev/null; then
@@ -363,8 +358,6 @@ export LD_LIBRARY_PATH="${CREW_PREFIX}/lib${LIB_SUFFIX}:/lib${LIB_SUFFIX}"
 
 # Extract, install and register packages.
 for package in $BOOTSTRAP_PACKAGES; do
-  cd "${CREW_LIB_PATH}/packages"
-  pkg_info=($(get_package_info "${package}"))
   version="${pkg_info[0]}"
   binary_id="${pkg_info[1]}"
   binary_filename="${pkg_info[2]}"
@@ -378,7 +371,36 @@ done
 
 # Work around https://github.com/chromebrew/chromebrew/issues/3305.
 # shellcheck disable=SC2024
-sudo ldconfig &> /tmp/crew_ldconfig || true
+${CREW_PREFIX}/bin/ldconfig &> /tmp/crew_ldconfig || true
+
+echo_out 'Set up the local package repo...'
+
+(
+  mkdir -p "${CREW_LIB_PATH}"
+  cd "${CREW_LIB_PATH}"
+
+  # Make the git default branch error messages go away.
+  git config --global init.defaultBranch main
+
+  # Setup the folder with git information.
+  git init --ref-format=reftable
+  git remote add origin "https://github.com/${OWNER}/${REPO}"
+
+  # Help handle situations where GitHub is down.
+  git config --local http.lowSpeedLimit 1000
+  git config --local http.lowSpeedTime 5
+
+  # Checkout, overwriting local files.
+  git fetch --all
+  git checkout -f "${BRANCH}"
+
+  # Set sparse-checkout folders.
+  git sparse-checkout set packages "manifest/${ARCH}" lib commands bin crew tests tools
+  git reset --hard origin/"${BRANCH}"
+
+  # Set mtimes of files to when the file was committed.
+  git-restore-mtime -sq 2>/dev/null
+)
 
 echo_out "\nCreating symlink to 'crew' in ${CREW_PREFIX}/bin/"
 ln -sfv "../lib/crew/bin/crew" "${CREW_PREFIX}/bin/"
@@ -392,14 +414,13 @@ gem update --no-update-sources -N --system
 # Mark packages as installed for pre-installed gems.
 mapfile -t installed_gems < <(gem list | awk -F ' \(' '{print $1, $2}' | sed -e 's/default://' -e 's/)//' -e 's/,//' | awk '{print $1, $2}')
 CREW_RUBY_VER="ruby$(ruby -e 'puts RUBY_VERSION.slice(/(?:.*(?=\.))/)')"
-for i in "${!installed_gems[@]}"
-  do
-   j="${installed_gems[$i]}"
-   gem_package="${j% *}"
-   crew_gem_package="ruby_${gem_package//-/_}"
-   gem_version="${j#* }"
-   gem contents "${gem_package}" > "${CREW_META_PATH}/${crew_gem_package}.filelist"
-   update_device_json "ruby_${gem_package//-/_}" "${gem_version}-${CREW_RUBY_VER}" ""
+for i in "${!installed_gems[@]}"; do
+  j="${installed_gems[$i]}"
+  gem_package="${j% *}"
+  crew_gem_package="ruby_${gem_package//-/_}"
+  gem_version="${j#* }"
+  gem contents "${gem_package}" > "${CREW_META_PATH}/${crew_gem_package}.filelist"
+  update_device_json "ruby_${gem_package//-/_}" "${gem_version}-${CREW_RUBY_VER}" ""
 done
 
 echo_info "Installing essential ruby gems...\n"
@@ -432,32 +453,6 @@ if ! "${CREW_PREFIX}"/bin/git version &> /dev/null; then
   echo_error "Please report this here:"
   echo_error "https://github.com/chromebrew/chromebrew/issues\n\n"
 else
-  echo_info "Synchronizing local package repo..."
-
-  cd "${CREW_LIB_PATH}"
-
-  # Make the git default branch error messages go away.
-  git config --global init.defaultBranch main
-
-  # Setup the folder with git information.
-  git init --ref-format=reftable
-  git remote add origin "https://github.com/${OWNER}/${REPO}"
-
-  # Help handle situations where GitHub is down.
-  git config --local http.lowSpeedLimit 1000
-  git config --local http.lowSpeedTime 5
-
-  # Checkout, overwriting local files.
-  git fetch --all
-  git checkout -f "${BRANCH}"
-
-  # Set sparse-checkout folders.
-  git sparse-checkout set packages "manifest/${ARCH}" lib commands bin crew tests tools
-  git reset --hard origin/"${BRANCH}"
-
-  # Set mtimes of files to when the file was committed.
-  git-restore-mtime -sq 2>/dev/null
-
   OWNER=${OWNER} REPO=${REPO} crew update && yes | crew upgrade
   echo_info "Cleaning up older ruby gem versions...\n"
   gem cleanup
