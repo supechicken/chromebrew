@@ -132,12 +132,11 @@ fi
 echo_success "Welcome to Chromebrew!"
 
 # Prompt user to enter the sudo password if it is set.
-# If the PASSWD_FILE specified by chromeos-setdevpasswd exist, that means a sudo password is set.
-if [[ "$(< /usr/sbin/chromeos-setdevpasswd)" =~ PASSWD_FILE=\'([^\']+) ]] && [ -f "${BASH_REMATCH[1]}" ]; then
+# If /mnt/stateful_partition/etc/devmode.passwd exists, that means a sudo password is set.
+if [ -f /mnt/stateful_partition/etc/devmode.passwd ]; then
   echo_intra "Please enter the developer mode password."
   # Reset sudo timeout.
-  sudo -k
-  sudo /bin/true
+  sudo -k && sudo /bin/true
 fi
 
 # Force curl to use system libraries.
