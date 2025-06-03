@@ -208,11 +208,12 @@ function get_package_info() {
   local pkg_id="${pkg_info[0]}"
   local pkg_version="${pkg_info[1]}"
   local binary_info_query_url="https://gitlab.com/api/v4/projects/26210301/packages/${pkg_id}/package_files?per_page=1&order_by=created_at&sort=desc"
-  local binary_info=($(curl -LSs "${binary_info_query_url}" | jq -cr ".[0] | \"\(.file_name)\n\(.file_sha256)\""))
-  local binary_url="${binary_info[0]}"
-  local binary_sha256="${binary_info[1]}"
+  local binary_info=($(curl -LSs "${binary_info_query_url}" | jq -cr ".[0] | \"\(.file_id)\n\(.file_name)\n\(.file_sha256)\""))
+  local binary_id="${binary_info[0]}"
+  local binary_name="${binary_info[1]}"
+  local binary_sha256="${binary_info[2]}"
 
-  echo -e "${pkg_version}\n${binary_url}\n${binary_sha256}"
+  echo -e "${pkg_version}\n${binary_id}\n${binary_name}\n${binary_sha256}"
 }
 
 # These functions are for handling packages.
@@ -361,9 +362,10 @@ for package in $BOOTSTRAP_PACKAGES; do
   cd "${CREW_LIB_PATH}/packages"
   pkg_info=($(get_package_info "${package}"))
   version="${pkg_info[0]}"
-  binary_url="${pkg_info[1]}"
-  binary_sha256="${pkg_info[2]}"
-  binary_filename="$(basename "${url}")"
+  binary_id="${pkg_info[1]}"
+  binary_name="${pkg_info[2]}"
+  binary_sha256="${pkg_info[3]}"
+  binary_url="https://gitlab.com/chromebrew/binaries/-/package_files/${binary_id}/download"
 
   download_check "${package}" "${binary_url}" "${binary_filename}" "${binary_sha256}"
   extract_install "${package}" "${binary_filename}"
