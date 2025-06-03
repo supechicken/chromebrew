@@ -358,6 +358,7 @@ export LD_LIBRARY_PATH="${CREW_PREFIX}/lib${LIB_SUFFIX}:/lib${LIB_SUFFIX}"
 
 # Extract, install and register packages.
 for package in $BOOTSTRAP_PACKAGES; do
+  pkg_info=($(get_package_info "${package}"))
   version="${pkg_info[0]}"
   binary_id="${pkg_info[1]}"
   binary_filename="${pkg_info[2]}"
