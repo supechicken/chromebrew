@@ -217,39 +217,44 @@ function get_package_info() {
 
 # These functions are for handling packages.
 function download_check() {
+  local pkg_name="${1}"
+  local binary_url="${2}"
+  local binary_filename="${3}"
+  local binary_sha256="${4}"
+
   cd "$CREW_BREW_DIR"
   # Use cached file if available and caching is enabled.
   if [ -n "$CREW_CACHE_ENABLED" ]; then
-    echo_intra "Looking for ${3} in ${CREW_CACHE_DIR}"
-    if [[ -f "$CREW_CACHE_DIR/${3}" ]] ; then
-      echo_info "$CREW_CACHE_DIR/${3} found."
-      echo_intra "Verifying cached ${1}..."
-      echo_success "$(echo "${4}" "$CREW_CACHE_DIR/${3}" | sha256sum -c -)"
+    echo_intra "Looking for ${binary_filename} in ${CREW_CACHE_DIR}"
+    if [[ -f "$CREW_CACHE_DIR/${binary_filename}" ]] ; then
+      echo_info "$CREW_CACHE_DIR/${binary_filename} found."
+      echo_intra "Verifying cached ${pkg_name}..."
+      echo_success "$(sha256sum -c - <<< "${binary_sha256} $CREW_CACHE_DIR/${binary_filename}")"
       case "${?}" in
       0)
-        ln -sf "$CREW_CACHE_DIR/${3}" "$CREW_BREW_DIR/${3}" || true
+        ln -sf "$CREW_CACHE_DIR/${binary_filename}" "$CREW_BREW_DIR/${binary_filename}" || true
         return
         ;;
       *)
-        echo_error "Verification of cached ${1} failed, downloading."
+        echo_error "Verification of cached ${pkg_name} failed, downloading."
       esac
     else
-      echo_intra "$CREW_CACHE_DIR/${3} not found"
+      echo_intra "$CREW_CACHE_DIR/${binary_filename} not found"
     fi
   fi
 
   # Download
-  echo_intra "Downloading ${1}..."
-  curl_wrapper '-#' -L "${2}" -o "${3}"
+  echo_intra "Downloading ${pkg_name}..."
+  curl_wrapper '-#' -L "${binary_url}" -o "${binary_filename}"
 
   # Verify
-  echo_intra "Verifying ${1}..."
-  if sha256sum -c - <<< "${4} ${3}"; then
-    [ -n "$CREW_CACHE_ENABLED" ] && (cp -f "${3}" "$CREW_CACHE_DIR/${3}" || true)
-    echo_success "Verification of ${1} succeeded."
+  echo_intra "Verifying ${pkg_name}..."
+  if sha256sum -c - <<< "${binary_sha256} ${binary_filename}"; then
+    [ -n "$CREW_CACHE_ENABLED" ] && (cp -f "${binary_filename}" "$CREW_CACHE_DIR/${binary_filename}" || true)
+    echo_success "Verification of ${pkg_name} succeeded."
     return 0
   else
-    echo_error "Verification of ${1} failed, something may be wrong with the download."
+    echo_error "Verification of ${pkg_name} failed, something may be wrong with the download."
     exit 1
   fi
 }
@@ -362,7 +367,7 @@ for package in $BOOTSTRAP_PACKAGES; do
   pkg_info=($(get_package_info "${package}"))
   version="${pkg_info[0]}"
   binary_id="${pkg_info[1]}"
-  binary_name="${pkg_info[2]}"
+  binary_filename="${pkg_info[2]}"
   binary_sha256="${pkg_info[3]}"
   binary_url="https://gitlab.com/chromebrew/binaries/-/package_files/${binary_id}/download"
 
