@@ -386,12 +386,12 @@ echo_out 'Set up the local package repo...'
   mkdir -p "${CREW_LIB_PATH}"
   cd "${CREW_LIB_PATH}"
 
-  # Make the git default branch error messages go away.
-  git config --local init.defaultBranch main
-
   # Setup the folder with git information.
   git init --ref-format=reftable
   git remote add origin "https://github.com/${OWNER}/${REPO}"
+
+  # Make the git default branch error messages go away.
+  git config --local init.defaultBranch main
 
   # Help handle situations where GitHub is down.
   git config --local http.lowSpeedLimit 1000
