@@ -302,7 +302,13 @@ function extract_install () {
   fi
 
   echo_intra "Installing ${1}..."
-  tar cpf - ./*/* | (cd /; tar xp --keep-directory-symlink -m -f -)
+
+  if command -v crew-mvdir &> /dev/null; then
+    [ -d ./usr ] && crew-mvdir ./usr/local ${CREW_PREFIX}
+    [ -d ./home ] && crew-mvdir ./home /home
+  else
+    tar cpf - ./*/* | (cd /; tar xp --keep-directory-symlink -m -f -)
+  fi
 
   if [[ "${1}" == 'glibc' ]]; then
     # update ld.so cache
