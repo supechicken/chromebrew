@@ -381,7 +381,7 @@ echo_out 'Set up the local package repo...'
   cd "${CREW_LIB_PATH}"
 
   # Make the git default branch error messages go away.
-  git config init.defaultBranch main
+  git config --local init.defaultBranch main
 
   # Setup the folder with git information.
   git init --ref-format=reftable
