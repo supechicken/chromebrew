@@ -208,7 +208,7 @@ function get_package_info() {
   local pkg_id="${pkg_info[0]}"
   local pkg_version="${pkg_info[1]}"
   local binary_info_query_url="https://gitlab.com/api/v4/projects/26210301/packages/${pkg_id}/package_files?per_page=1&order_by=created_at&sort=desc"
-  local binary_info=($(curl -LSs "${binary_info_query_url}" | jq -cr ".[0] | \"\(.file_id)\n\(.file_name)\n\(.file_sha256)\""))
+  local binary_info=($(curl -LSs "${binary_info_query_url}" | jq -cr ".[0] | \"\(.id)\n\(.file_name)\n\(.file_sha256)\""))
   local binary_id="${binary_info[0]}"
   local binary_name="${binary_info[1]}"
   local binary_sha256="${binary_info[2]}"
