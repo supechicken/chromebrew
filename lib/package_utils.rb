@@ -21,7 +21,7 @@ class PackageUtils
       Dir.glob("#{CREW_PACKAGES_PATH}/*.rb") do |pkg_file|
         pkg = Package.load_package(pkg_file)
 
-        pkgs_that_need_it << pkg.name if pkg.dependencies.key?(dep_name)
+        pkgs_that_need_it << pkg.name if pkg.dependencies.key?(dep_name) && !pkg.dependencies[dep_name].include?(:build)
       end
     end
 
