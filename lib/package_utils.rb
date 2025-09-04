@@ -15,13 +15,13 @@ class PackageUtils
         pkg_file      = File.join(CREW_PACKAGES_PATH, "#{installed_pkg_info[:name]}.rb")
         installed_pkg = Package.load_package(pkg_file)
 
-        pkgs_that_need_it << installed_pkg.name if installed_pkg.dependencies.key?(dep_name)
+        pkgs_that_need_it << installed_pkg.name if installed_pkg.dependencies.key?(dep_name) && !pkg.dependencies[dep_name][0].include?(:build)
       end
     else
       Dir.glob("#{CREW_PACKAGES_PATH}/*.rb") do |pkg_file|
         pkg = Package.load_package(pkg_file)
 
-        pkgs_that_need_it << pkg.name if pkg.dependencies.key?(dep_name) && !pkg.dependencies[dep_name].include?(:build)
+        pkgs_that_need_it << pkg.name if pkg.dependencies.key?(dep_name) && !pkg.dependencies[dep_name][0].include?(:build)
       end
     end
 
