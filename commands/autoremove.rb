@@ -11,7 +11,7 @@ class Command
       next if pkg[:is_manual_install]
 
       # Add package to redundant list if no other installed package depends on it
-      redundant_deps << pkg[:name] if PackageUtils.reverse_dependency_lookup(pkg[:name], installed: true).any?
+      redundant_deps << pkg[:name] if PackageUtils.reverse_dependency_lookup(pkg[:name], installed: true).none?
     end
 
     p redundant_deps
