@@ -1829,6 +1829,8 @@ def build_command(args)
   puts "Builds are located in #{CREW_LOCAL_BUILD_DIR}.".yellow
 end
 
+def autoremove_command(_args) = Command.autoremove
+
 def check_command(args)
   args = { '<name>' => args.split } if args.is_a? String
   args['<name>'].each do |name|
